@@ -1,14 +1,14 @@
+import type { InventoryItem } from "./player";
+
 export type MapLocation = {
   id: string;
   name: string;
-
   x: number;
   y: number;
-
   icon: string;
-
   unlocked: boolean;
   adventureId: string;
+  loot?: InventoryItem[];
 };
 
 export const locations: MapLocation[] = [
@@ -40,6 +40,14 @@ export const locations: MapLocation[] = [
     icon: "🏚️",
     unlocked: true,
     adventureId: "gamlahem",
+    loot: [
+      {
+        itemId: "old_axe",
+        quantity: 1,
+        x: 0,
+        y: 0,
+      },
+    ],
   },
 
   {

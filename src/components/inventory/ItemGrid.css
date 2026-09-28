@@ -1,0 +1,50 @@
+.inventory-grid {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  height: max-content;
+  padding: 4px;
+  background: #111;
+}
+
+.inventory-cell {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  background: #444;
+  border: 1px solid #666;
+
+  transition:
+    background-color 0.08s ease,
+    border-color 0.08s ease;
+}
+
+.inventory-cell-preview-valid {
+  background: rgba(60, 180, 80, 0.45);
+  border-color: #5fd66b;
+}
+
+.inventory-cell-preview-invalid {
+  background: rgba(200, 50, 50, 0.55);
+  border-color: #ff6666;
+}
+
+.inventory-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.inventory-item {
+  position: absolute;
+  z-index: 10;
+}
+.inventory-drag-preview {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.9;
+  user-select: none;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
+}

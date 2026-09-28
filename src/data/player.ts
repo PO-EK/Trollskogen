@@ -72,22 +72,10 @@ export const createNewPlayer = (): Player => ({
 
   Inventory: [
     {
-      itemId: "old_axe",
+      itemId: "health_potion",
       quantity: 1,
       x: 0,
       y: 0,
-    },
-    {
-      itemId: "health_potion",
-      quantity: 1,
-      x: 3,
-      y: 0,
-    },
-    {
-      itemId: "firewood",
-      quantity: 1,
-      x: 3,
-      y: 3,
     },
   ],
 

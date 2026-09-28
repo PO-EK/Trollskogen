@@ -1,7 +1,9 @@
+import type { InventoryItem } from "./player";
+
 export type AdventureChoice = {
   text: string;
   nextNodeId?: string;
-
+  loot?: InventoryItem[];
   condition?: AdventureCondition;
   effects?: AdventureEffect[];
 };

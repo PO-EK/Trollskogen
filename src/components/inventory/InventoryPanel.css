@@ -1,0 +1,28 @@
+.inventory-panel {
+  width: max-content;
+  height: max-content;
+  padding: 10px;
+  box-sizing: border-box;
+  background: #222;
+  border: 2px solid #5c4a32;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-family: Georgia, serif;
+  margin: 5px;
+}
+
+.gold {
+  padding: 4px 0;
+  color: #d8b46a;
+  font-weight: bold;
+  border-bottom: 1px solid #3d352a;
+}
+
+.inventory-item-name {
+  height: 24px;
+  margin-bottom: 6px;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  font-weight: bold;
+  text-align: center;
+}

@@ -3,6 +3,7 @@ import { usePlayer } from "../context/usePlayer";
 import { locations } from "../data/locations";
 import { adventures } from "../data/places";
 import type { AdventureChoice } from "../data/adventureTypes";
+import ItemGrid from "../components/inventory/ItemGrid";
 
 type LocationProps = {
   locationId: string | null;
@@ -10,25 +11,28 @@ type LocationProps = {
 };
 
 function Location({ locationId, onReturn }: LocationProps) {
-  // Find the location the player clicked on the world map
   const [currentNodeId, setCurrentNodeId] = useState("start");
+
   const location = locations.find((location) => location.id === locationId);
+
   const { setPlayer } = usePlayer();
+
+  const [loot, setLoot] = useState(location?.loot ?? []);
 
   if (!location) {
     return <p>Location not found.</p>;
   }
 
-  // Find the adventure belonging to this location
+  if (!location) {
+    return <p>Location not found.</p>;
+  }
+
   const adventure = adventures[location.adventureId];
 
   if (!adventure) {
     return <p>Adventure not found.</p>;
   }
 
-  // The first node of the adventure
-
-  // Find the current dialogue node
   const currentNode = adventure[currentNodeId];
 
   if (!currentNode) {
@@ -69,6 +73,15 @@ function Location({ locationId, onReturn }: LocationProps) {
       <h1 className="location-header">{location.name}</h1>
 
       <p className="location-text">{currentNode.text}</p>
+
+      {loot.length > 0 && (
+        <ItemGrid
+          width={5}
+          height={3}
+          inventory={loot}
+          onInventoryChange={setLoot}
+        />
+      )}
 
       <div className="location-choices">
         {currentNode.choices.map((choice) => (

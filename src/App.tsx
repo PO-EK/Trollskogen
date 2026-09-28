@@ -3,7 +3,7 @@ import "./App.css";
 
 import TopBar from "./components/TopBar";
 import CharacterPanel from "./components/CharacterPanel";
-import InventoryPanel from "./components/InventoryPanel";
+import InventoryPanel from "./components/inventory/InventoryPanel";
 
 import WorldMap from "./pages/WorldMap";
 import Location from "./pages/Location";
