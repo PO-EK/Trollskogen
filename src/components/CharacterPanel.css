@@ -1,0 +1,103 @@
+.character-panel {
+  padding: 10px;
+  box-sizing: border-box;
+
+  background: #1b1b1b;
+  color: #e8e0d0;
+
+  border: 2px solid #5c4a32;
+  border-radius: 10px;
+  margin: 5px;
+  font-family: Georgia, serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.character-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid #5c4a32;
+}
+
+.character-header h2 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.4rem;
+}
+
+.character-header span {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.resource-section {
+  margin-bottom: 16px;
+}
+
+.resource-label {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.resource-bar {
+  height: 14px;
+  background: #333;
+  border-radius: 7px;
+  overflow: hidden;
+
+  border: 1px solid #111;
+}
+
+.health-bar {
+  height: 100%;
+  background: #a83232;
+  transition: width 0.3s ease;
+}
+
+.mana-bar {
+  height: 100%;
+  background: #315fa8;
+  transition: width 0.3s ease;
+}
+
+.stats {
+  margin-top: 18px;
+}
+
+.stats h3 {
+  margin: 0 0 10px;
+
+  color: #d8b46a;
+  font-size: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 6px 0;
+
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.stat-row span:last-child {
+  font-weight: bold;
+  color: #d8b46a;
+}
+
+.inventory-info {
+  margin-top: 18px;
+  padding-top: 12px;
+
+  border-top: 1px solid #5c4a32;
+
+  color: #aaa;
+  font-size: 0.9rem;
+}

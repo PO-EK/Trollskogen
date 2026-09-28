@@ -1,0 +1,8 @@
+Todo:
+
+Navigation engine <- funktionell
+Character <-- påbörjad
+
+Inventory
+Skills
+Combat Sim
