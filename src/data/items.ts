@@ -1,6 +1,7 @@
 import oldAxeImage from "../assets/items/axe.png";
 import healthPotionImage from "../assets/items/potion.png";
 import firewoodImage from "../assets/items/firewood.png";
+import woodtorchImage from "../assets/items/woodtorch.png";
 
 export type ItemShape = {
   x: number;
@@ -26,9 +27,19 @@ export const items: Item[] = [
     description: "Magisk vätska som snabbt läker sår, smakar som jordgubbar.",
     image: healthPotionImage,
     shape: [{ x: 0, y: 0 }],
-    maxStack: 10,
+    maxStack: 5,
   },
-
+  {
+    id: "wood_torch",
+    name: "Fakla",
+    description: "Lyser upp världen och gör monster rädda.",
+    image: woodtorchImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    maxStack: 1,
+  },
   {
     id: "firewood",
     name: "Vedträd",
@@ -41,7 +52,7 @@ export const items: Item[] = [
       { x: 1, y: 1 },
     ],
     imageScale: 1.4,
-    maxStack: 10,
+    maxStack: 3,
   },
 
   {

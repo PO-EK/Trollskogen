@@ -1,37 +1,40 @@
 import { useState } from "react";
 import { items } from "../../data/items";
 import type { InventoryItem } from "../../data/player";
+import { useItemDrag } from "../../context/useItemDrag";
 import "./ItemGrid.css";
 
 type ItemGridProps = {
+  containerId: string;
   width: number;
   height: number;
   inventory: InventoryItem[];
   onInventoryChange: (inventory: InventoryItem[]) => void;
+  onItemRemoved?: (inventoryId: string) => void;
   onHoveredItemChange?: (itemId: string | null) => void;
 };
 
 function ItemGrid({
+  containerId,
   width,
   height,
   inventory,
   onInventoryChange,
+  onItemRemoved,
   onHoveredItemChange,
 }: ItemGridProps) {
-  // Drag states
-  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const {
+    draggedItem,
+    dragSourceId,
+    removeFromSource,
+    dragOffset,
+    startDrag,
+    updatePointerPosition,
+    endDrag,
+  } = useItemDrag();
 
+  // Position of the dragged item relative to THIS grid.
   const [dragPosition, setDragPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-
-  const [dragOffset, setDragOffset] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-
-  const [pointerPosition, setPointerPosition] = useState<{
     x: number;
     y: number;
   } | null>(null);
@@ -40,8 +43,12 @@ function ItemGrid({
   // Check if an item can be placed
   // --------------------------------------------------
 
-  const canPlaceItem = (itemId: string, x: number, y: number): boolean => {
-    const item = items.find((item) => item.id === itemId);
+  const canPlaceItem = (
+    itemToPlace: InventoryItem,
+    x: number,
+    y: number,
+  ): boolean => {
+    const item = items.find((item) => item.id === itemToPlace.itemId);
 
     if (!item) {
       return false;
@@ -51,15 +58,12 @@ function ItemGrid({
       const targetX = x + shapeCell.x;
       const targetY = y + shapeCell.y;
 
-      // Outside the container
       if (targetX < 0 || targetX >= width || targetY < 0 || targetY >= height) {
         return false;
       }
 
-      // Check against other items
       for (const otherInventoryItem of inventory) {
-        // Don't collide with ourselves
-        if (otherInventoryItem.itemId === itemId) {
+        if (otherInventoryItem.inventoryId === itemToPlace.inventoryId) {
           continue;
         }
 
@@ -94,11 +98,11 @@ function ItemGrid({
     x: number,
     y: number,
   ): "valid" | "invalid" | null => {
-    if (!draggedItemId || !dragPosition) {
+    if (!draggedItem || !dragPosition) {
       return null;
     }
 
-    const item = items.find((item) => item.id === draggedItemId);
+    const item = items.find((item) => item.id === draggedItem.itemId);
 
     if (!item) {
       return null;
@@ -115,10 +119,27 @@ function ItemGrid({
       return null;
     }
 
-    const isValid = canPlaceItem(draggedItemId, dragPosition.x, dragPosition.y);
+    const isValid = canPlaceItem(draggedItem, dragPosition.x, dragPosition.y);
 
     return isValid ? "valid" : "invalid";
   };
+
+  function getDragPosition(event: React.PointerEvent<HTMLDivElement>) {
+    if (!dragOffset) {
+      return null;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    const mouseX = Math.floor((event.clientX - rect.left - 4) / 34);
+
+    const mouseY = Math.floor((event.clientY - rect.top - 4) / 34);
+
+    return {
+      x: mouseX - dragOffset.x,
+      y: mouseY - dragOffset.y,
+    };
+  }
 
   // --------------------------------------------------
   // Create grid cells
@@ -157,112 +178,93 @@ function ItemGrid({
         gridTemplateRows: `repeat(${height}, 32px)`,
       }}
       onPointerMove={(event) => {
-        if (!draggedItemId || !dragOffset) {
+        if (!draggedItem || !dragOffset) {
           return;
         }
 
-        setPointerPosition({
+        updatePointerPosition({
           x: event.clientX,
           y: event.clientY,
         });
 
-        const rect = event.currentTarget.getBoundingClientRect();
+        const newDragPosition = getDragPosition(event);
 
-        const mouseX = Math.floor((event.clientX - rect.left - 4) / 34);
-
-        const mouseY = Math.floor((event.clientY - rect.top - 4) / 34);
-
-        setDragPosition({
-          x: mouseX - dragOffset.x,
-          y: mouseY - dragOffset.y,
-        });
+        if (newDragPosition) {
+          setDragPosition(newDragPosition);
+        }
       }}
-      onPointerUp={() => {
-        if (!draggedItemId || !dragPosition) {
+      onPointerEnter={(event) => {
+        if (!draggedItem || !dragOffset) {
+          return;
+        }
+        updatePointerPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
+
+        const newDragPosition = getDragPosition(event);
+
+        if (newDragPosition) {
+          setDragPosition(newDragPosition);
+        }
+      }}
+      onPointerUp={(event) => {
+        if (!draggedItem || !dragOffset) {
           return;
         }
 
-        if (!canPlaceItem(draggedItemId, dragPosition.x, dragPosition.y)) {
-          setDraggedItemId(null);
+        const newDragPosition = getDragPosition(event);
+
+        if (!newDragPosition) {
+          endDrag();
           setDragPosition(null);
-          setDragOffset(null);
-          setPointerPosition(null);
-
           return;
         }
 
-        onInventoryChange(
-          inventory.map((inventoryItem) =>
-            inventoryItem.itemId === draggedItemId
-              ? {
-                  ...inventoryItem,
-                  x: dragPosition.x,
-                  y: dragPosition.y,
-                }
-              : inventoryItem,
-          ),
+        const isValid = canPlaceItem(
+          draggedItem,
+          newDragPosition.x,
+          newDragPosition.y,
         );
 
-        setDraggedItemId(null);
+        if (!isValid) {
+          endDrag();
+          setDragPosition(null);
+          return;
+        }
+
+        const isSameGrid = dragSourceId === containerId;
+
+        if (isSameGrid) {
+          onInventoryChange(
+            inventory.map((inventoryItem) =>
+              inventoryItem.inventoryId === draggedItem.inventoryId
+                ? {
+                    ...inventoryItem,
+                    x: newDragPosition.x,
+                    y: newDragPosition.y,
+                  }
+                : inventoryItem,
+            ),
+          );
+        } else {
+          onInventoryChange([
+            ...inventory,
+            {
+              ...draggedItem,
+              x: newDragPosition.x,
+              y: newDragPosition.y,
+            },
+          ]);
+
+          removeFromSource?.();
+        }
+
+        endDrag();
         setDragPosition(null);
-        setDragOffset(null);
-        setPointerPosition(null);
       }}
     >
       {cells}
-
-      {/* DOM drag preview */}
-      {draggedItemId &&
-        pointerPosition &&
-        (() => {
-          const draggedItem = items.find((item) => item.id === draggedItemId);
-
-          if (!draggedItem) {
-            return null;
-          }
-
-          const itemWidth =
-            Math.max(...draggedItem.shape.map((cell) => cell.x)) + 1;
-
-          const itemHeight =
-            Math.max(...draggedItem.shape.map((cell) => cell.y)) + 1;
-
-          return (
-            <div
-              className="inventory-drag-preview"
-              style={{
-                left: pointerPosition.x,
-                top: pointerPosition.y,
-
-                width: `${itemWidth * 32 + (itemWidth - 1) * 2}px`,
-                height: `${itemHeight * 32 + (itemHeight - 1) * 2}px`,
-
-                transform: `translate(
-                  ${-(dragOffset?.x ?? 0) * 34}px,
-                  ${-(dragOffset?.y ?? 0) * 34}px
-                )`,
-              }}
-            >
-              <img
-                src={draggedItem.image}
-                alt={draggedItem.name}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-
-                  transform: `
-                    translate(
-                      ${draggedItem.imageOffsetX ?? 0}px,
-                      ${draggedItem.imageOffsetY ?? 0}px
-                    )
-                    scale(${draggedItem.imageScale ?? 1})
-                  `,
-                }}
-              />
-            </div>
-          );
-        })()}
 
       {/* Items */}
       {inventory.map((inventoryItem) => {
@@ -278,7 +280,7 @@ function ItemGrid({
 
         return (
           <div
-            key={inventoryItem.itemId}
+            key={inventoryItem.inventoryId}
             className="inventory-item"
             onPointerDown={(event) => {
               event.preventDefault();
@@ -286,6 +288,7 @@ function ItemGrid({
               const rect = event.currentTarget.getBoundingClientRect();
 
               const localX = Math.floor((event.clientX - rect.left) / 34);
+
               const localY = Math.floor((event.clientY - rect.top) / 34);
 
               const grabbedShapeCell = item.shape.find(
@@ -296,21 +299,25 @@ function ItemGrid({
                 return;
               }
 
-              setDraggedItemId(inventoryItem.itemId);
-
-              setDragOffset({
-                x: grabbedShapeCell.x,
-                y: grabbedShapeCell.y,
-              });
+              startDrag(
+                inventoryItem,
+                containerId,
+                () => {
+                  onItemRemoved?.(inventoryItem.inventoryId);
+                },
+                {
+                  x: grabbedShapeCell.x,
+                  y: grabbedShapeCell.y,
+                },
+                {
+                  x: event.clientX,
+                  y: event.clientY,
+                },
+              );
 
               setDragPosition({
                 x: inventoryItem.x,
                 y: inventoryItem.y,
-              });
-
-              setPointerPosition({
-                x: event.clientX,
-                y: event.clientY,
               });
             }}
             onMouseEnter={() => onHoveredItemChange?.(inventoryItem.itemId)}
@@ -318,14 +325,12 @@ function ItemGrid({
             style={{
               left: `${inventoryItem.x * 34 + 4}px`,
               top: `${inventoryItem.y * 34 + 4}px`,
-
               width: `${itemWidth * 32 + (itemWidth - 1) * 2}px`,
               height: `${itemHeight * 32 + (itemHeight - 1) * 2}px`,
-
-              opacity: draggedItemId === inventoryItem.itemId ? 0 : 1,
+              opacity:
+                draggedItem?.inventoryId === inventoryItem.inventoryId ? 0 : 1,
             }}
           >
-            {" "}
             <img
               src={item.image}
               alt={item.name}
@@ -333,14 +338,13 @@ function ItemGrid({
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-
                 transform: `
-        translate(
-          ${item.imageOffsetX ?? 0}px,
-          ${item.imageOffsetY ?? 0}px
-        )
-        scale(${item.imageScale ?? 1})
-      `,
+                  translate(
+                    ${item.imageOffsetX ?? 0}px,
+                    ${item.imageOffsetY ?? 0}px
+                  )
+                  scale(${item.imageScale ?? 1})
+                `,
               }}
             />
           </div>

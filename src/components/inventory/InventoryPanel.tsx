@@ -20,6 +20,7 @@ function InventoryPanel() {
       </div>
 
       <ItemGrid
+        containerId="player"
         width={player.BackpackWidth}
         height={player.BackpackHeight}
         inventory={player.Inventory}
@@ -27,6 +28,14 @@ function InventoryPanel() {
           setPlayer((currentPlayer) => ({
             ...currentPlayer,
             Inventory: newInventory,
+          }));
+        }}
+        onItemRemoved={(inventoryId) => {
+          setPlayer((currentPlayer) => ({
+            ...currentPlayer,
+            Inventory: currentPlayer.Inventory.filter(
+              (item) => item.inventoryId !== inventoryId,
+            ),
           }));
         }}
         onHoveredItemChange={setHoveredItemId}

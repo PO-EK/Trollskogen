@@ -35,6 +35,7 @@ export type Player = {
 };
 
 export type InventoryItem = {
+  inventoryId: string;
   itemId: string;
   quantity: number;
 
@@ -72,10 +73,18 @@ export const createNewPlayer = (): Player => ({
 
   Inventory: [
     {
+      inventoryId: "p0001",
       itemId: "health_potion",
       quantity: 1,
       x: 0,
       y: 0,
+    },
+    {
+      inventoryId: "t0001",
+      itemId: "wood_torch",
+      quantity: 1,
+      x: 0,
+      y: 2,
     },
   ],
 

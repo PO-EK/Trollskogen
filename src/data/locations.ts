@@ -15,8 +15,8 @@ export const locations: MapLocation[] = [
   {
     id: "intro",
     name: "Spela intro igen",
-    x: 50,
-    y: 5,
+    x: 5,
+    y: 90,
     icon: "📜",
     unlocked: true,
     adventureId: "intro",
@@ -26,7 +26,7 @@ export const locations: MapLocation[] = [
     id: "village",
     name: "Utforska byn",
     x: 50,
-    y: 60,
+    y: 25,
     icon: "🏘️",
     unlocked: true,
     adventureId: "village",
@@ -35,13 +35,14 @@ export const locations: MapLocation[] = [
   {
     id: "gamlahem",
     name: "Nedbränd gård",
-    x: 23,
-    y: 45,
+    x: 85,
+    y: 85,
     icon: "🏚️",
     unlocked: true,
     adventureId: "gamlahem",
     loot: [
       {
+        inventoryId: "oldaxe0001",
         itemId: "old_axe",
         quantity: 1,
         x: 0,
@@ -53,8 +54,8 @@ export const locations: MapLocation[] = [
   {
     id: "forest",
     name: "Utforska Trollskogen",
-    x: 90,
-    y: 55,
+    x: 50,
+    y: 95,
     icon: "🌲",
     unlocked: false,
     adventureId: "trollskogen",

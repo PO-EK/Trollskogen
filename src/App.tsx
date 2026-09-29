@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-
+import DragPreview from "./components/inventory/DragPreview";
 import TopBar from "./components/TopBar";
 import CharacterPanel from "./components/CharacterPanel";
 import InventoryPanel from "./components/inventory/InventoryPanel";
@@ -17,33 +17,36 @@ function App() {
     null,
   );
   return (
-    <div className="game">
-      <TopBar />
+    <>
+      <DragPreview />
+      <div className="game">
+        <TopBar />
 
-      <main className="game-layout">
-        <CharacterPanel />
+        <main className="game-layout">
+          <CharacterPanel />
 
-        <section className="main-panel">
-          {screen === "worldMap" && (
-            <WorldMap
-              onLocationSelect={(locationId) => {
-                setSelectedLocationId(locationId);
-                setScreen("location");
-              }}
-            />
-          )}
+          <section className="main-panel">
+            {screen === "worldMap" && (
+              <WorldMap
+                onLocationSelect={(locationId) => {
+                  setSelectedLocationId(locationId);
+                  setScreen("location");
+                }}
+              />
+            )}
 
-          {screen === "location" && (
-            <Location
-              locationId={selectedLocationId}
-              onReturn={() => setScreen("worldMap")}
-            />
-          )}
-        </section>
+            {screen === "location" && (
+              <Location
+                locationId={selectedLocationId}
+                onReturn={() => setScreen("worldMap")}
+              />
+            )}
+          </section>
 
-        <InventoryPanel />
-      </main>
-    </div>
+          <InventoryPanel />
+        </main>
+      </div>
+    </>
   );
 }
 

@@ -23,10 +23,6 @@ function Location({ locationId, onReturn }: LocationProps) {
     return <p>Location not found.</p>;
   }
 
-  if (!location) {
-    return <p>Location not found.</p>;
-  }
-
   const adventure = adventures[location.adventureId];
 
   if (!adventure) {
@@ -76,10 +72,16 @@ function Location({ locationId, onReturn }: LocationProps) {
 
       {loot.length > 0 && (
         <ItemGrid
+          containerId={location.id}
           width={5}
           height={3}
           inventory={loot}
           onInventoryChange={setLoot}
+          onItemRemoved={(inventoryId) => {
+            setLoot((currentLoot) =>
+              currentLoot.filter((item) => item.inventoryId !== inventoryId),
+            );
+          }}
         />
       )}
 
