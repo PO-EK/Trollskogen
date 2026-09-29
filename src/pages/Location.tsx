@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
+
 import { locations } from "../data/locations";
 import { adventures } from "../data/places";
-import type { AdventureChoice } from "../data/adventureTypes";
+import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
+import type { InventoryItem } from "../data/player";
 import ItemGrid from "../components/inventory/ItemGrid";
 
 type LocationProps = {
@@ -12,12 +14,11 @@ type LocationProps = {
 
 function Location({ locationId, onReturn }: LocationProps) {
   const [currentNodeId, setCurrentNodeId] = useState("start");
+  const [loot, setLoot] = useState<InventoryItem[]>([]);
 
   const location = locations.find((location) => location.id === locationId);
 
-  const { setPlayer } = usePlayer();
-
-  const [loot, setLoot] = useState(location?.loot ?? []);
+  const { player, setPlayer } = usePlayer();
 
   if (!location) {
     return <p>Location not found.</p>;
@@ -35,33 +36,121 @@ function Location({ locationId, onReturn }: LocationProps) {
     return <p>Adventure node not found.</p>;
   }
 
+  function meetsCondition(choice: AdventureChoice): boolean {
+    if (!choice.condition) {
+      return true;
+    }
+
+    const condition = choice.condition;
+
+    if (condition.type === "storyFlag") {
+      const flagValue = player.StoryFlags[condition.flag] ?? false;
+
+      return flagValue === condition.value;
+    }
+
+    if (condition.type === "hasItem") {
+      return player.Inventory.some((item) => item.itemId === condition.itemId);
+    }
+
+    return false;
+  }
+
+  function handleEffect(effect: AdventureEffect) {
+    if (effect.type === "addGold") {
+      setPlayer((player) => ({
+        ...player,
+        Gold: player.Gold + effect.amount,
+      }));
+    }
+
+    if (effect.type === "removeGold") {
+      setPlayer((player) => ({
+        ...player,
+        Gold: player.Gold - effect.amount,
+      }));
+    }
+
+    if (effect.type === "addItem") {
+      const newItem: InventoryItem = {
+        inventoryId: crypto.randomUUID(),
+        itemId: effect.itemId,
+        quantity: 1,
+        x: 0,
+        y: 0,
+      };
+
+      setLoot([newItem]);
+    }
+
+    if (effect.type === "removeItem") {
+      setPlayer((player) => ({
+        ...player,
+        Inventory: player.Inventory.filter(
+          (item) => item.itemId !== effect.itemId,
+        ),
+      }));
+    }
+
+    if (effect.type === "addExperience") {
+      setPlayer((player) => ({
+        ...player,
+        Exp: player.Exp + effect.amount,
+      }));
+    }
+
+    if (effect.type === "heal") {
+      setPlayer((player) => ({
+        ...player,
+        HP: Math.min(player.HP + effect.amount, player.HPMax),
+      }));
+    }
+
+    if (effect.type === "damage") {
+      setPlayer((player) => ({
+        ...player,
+        HP: Math.max(player.HP - effect.amount, 0),
+      }));
+    }
+
+    if (effect.type === "setStoryFlag") {
+      setPlayer((player) => ({
+        ...player,
+        StoryFlags: {
+          ...player.StoryFlags,
+          [effect.flag]: effect.value,
+        },
+      }));
+    }
+
+    if (effect.type === "endAdventure") {
+      onReturn();
+    }
+  }
+
   function handleChoice(choice: AdventureChoice) {
+    // Every choice wipes the temporary location loot.
+    setLoot([]);
+
     if (choice.effects) {
       for (const effect of choice.effects) {
-        if (effect.type === "addGold") {
-          setPlayer((player) => ({
-            ...player,
-            Gold: player.Gold + effect.amount,
-          }));
-        }
-
-        if (effect.type === "removeGold") {
-          setPlayer((player) => ({
-            ...player,
-            Gold: player.Gold - effect.amount,
-          }));
-        }
-
-        if (effect.type === "endAdventure") {
-          onReturn();
-          return;
-        }
+        handleEffect(effect);
       }
     }
 
     if (choice.nextNodeId) {
       setCurrentNodeId(choice.nextNodeId);
     }
+  }
+
+  function handleLootChanged(updatedLoot: InventoryItem[]) {
+    setLoot(updatedLoot);
+  }
+
+  function handleItemRemoved(inventoryId: string) {
+    setLoot((currentLoot) =>
+      currentLoot.filter((item) => item.inventoryId !== inventoryId),
+    );
   }
 
   return (
@@ -76,17 +165,13 @@ function Location({ locationId, onReturn }: LocationProps) {
           width={5}
           height={3}
           inventory={loot}
-          onInventoryChange={setLoot}
-          onItemRemoved={(inventoryId) => {
-            setLoot((currentLoot) =>
-              currentLoot.filter((item) => item.inventoryId !== inventoryId),
-            );
-          }}
+          onInventoryChange={handleLootChanged}
+          onItemRemoved={handleItemRemoved}
         />
       )}
 
       <div className="location-choices">
-        {currentNode.choices.map((choice) => (
+        {currentNode.choices.filter(meetsCondition).map((choice) => (
           <button
             className="location-choice"
             key={choice.text}

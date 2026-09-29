@@ -1,3 +1,5 @@
+export type StoryFlags = Record<string, boolean>;
+
 export type Player = {
   Id?: string;
 
@@ -32,6 +34,7 @@ export type Player = {
 
   // Quest progression
   Quests: QuestState[];
+  StoryFlags: Record<string, boolean>;
 };
 
 export type InventoryItem = {
@@ -72,6 +75,7 @@ export const createNewPlayer = (): Player => ({
   BackpackHeight: 5,
 
   Inventory: [
+    //start with these items
     {
       inventoryId: "p0001",
       itemId: "health_potion",
@@ -87,6 +91,6 @@ export const createNewPlayer = (): Player => ({
       y: 2,
     },
   ],
-
   Quests: [],
+  StoryFlags: {},
 });

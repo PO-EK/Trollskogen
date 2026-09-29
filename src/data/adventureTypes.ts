@@ -25,7 +25,7 @@ export type AdventureCondition =
       value: boolean;
     };
 
-type AdventureEffect =
+export type AdventureEffect =
   | { type: "addItem"; itemId: string }
   | { type: "removeItem"; itemId: string }
   | { type: "addGold"; amount: number }
@@ -33,4 +33,5 @@ type AdventureEffect =
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
   | { type: "damage"; amount: number }
+  | { type: "setStoryFlag"; flag: string; value: boolean }
   | { type: "endAdventure" };
