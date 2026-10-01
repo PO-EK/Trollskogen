@@ -96,14 +96,14 @@ function Trading({ traderId, onReturn }: TradingProps) {
         />
       </div>
 
-      <div className="inventory-item-name">
+      <div>
         {hoveredItemId
           ? items.find((item) => item.id === hoveredItemId)?.name
           : ""}
       </div>
-      <div className="inventory-item-name">
+      <div>
         {hoveredItemId
-          ? `${trader.inventory.find((item) => item.itemId === hoveredItemId)?.buyPrice ?? 0} Kronor`
+          ? `Kostnad: ${trader.inventory.find((item) => item.itemId === hoveredItemId)?.buyPrice ?? 0} Kronor`
           : "Peka på ett föremål"}
       </div>
 

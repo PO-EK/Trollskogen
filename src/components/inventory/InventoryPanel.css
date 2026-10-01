@@ -20,17 +20,22 @@
 
 .inventory-item-name {
   height: 24px;
-  margin-bottom: 6px;
   color: #e8d7b0;
   font-family: Georgia, serif;
   font-weight: bold;
   text-align: center;
+  font-size: larger;
 }
 .inventory-item-descript {
   height: 14px;
-  margin-bottom: 4px;
   color: #e8d7b0;
   font-family: Georgia, serif;
   text-align: center;
+  font-size: medium;
+}
+
+.inventory-item-value {
+  padding: 4px 0;
   font-size: small;
+  color: #d8b46a;
 }

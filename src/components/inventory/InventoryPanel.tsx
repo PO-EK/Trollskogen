@@ -102,6 +102,11 @@ function InventoryPanel() {
           ? items.find((item) => item.id === hoveredItemId)?.name
           : ""}
       </div>
+      <div className="inventory-item-value">
+        {hoveredItemId
+          ? `Värt ${items.find((item) => item.id === hoveredItemId)?.baseValue} Kronor`
+          : ""}
+      </div>
       <div className="inventory-item-descript">
         {hoveredItemId
           ? items.find((item) => item.id === hoveredItemId)?.description

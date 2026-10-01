@@ -6,12 +6,5 @@ export const witch: Trader = {
   description: "En mystisk kvinna som säljer märkliga drycker och föremål.",
   inventoryWidth: 5,
   inventoryHeight: 3,
-  inventory: [
-    {
-      containerItemId: "witch_potion_1",
-      itemId: "health_potion",
-      x: 0,
-      y: 0,
-    },
-  ],
+  inventory: [],
 };

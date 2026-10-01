@@ -27,7 +27,7 @@ export const village: Record<string, AdventureNode> = {
     text: "Du vandrar omkring och ser att någon har tappat en påse på vägen. Du plockar upp den och märker att den är fylld med pengar. Du funderar om du ska behålla den eller donerar du pengarna till byborna.",
     choices: [
       {
-        text: "+ 63 Öre",
+        text: "+ 63 Kroner",
         nextNodeId: "start",
         effects: [
           {
