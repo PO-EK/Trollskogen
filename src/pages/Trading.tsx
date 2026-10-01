@@ -29,6 +29,18 @@ function Trading({ traderId, onReturn }: TradingProps) {
   }
 
   const currentTrader = trader;
+  const backButtonStyle = {
+    padding: "0.5rem",
+    fontSize: "1rem",
+    fontWeight: 400,
+    border: "none",
+    borderRadius: "12px",
+    background: "linear-gradient(silver, darkgray)",
+    color: "black",
+    cursor: "pointer",
+    boxShadow: "0 8px 20px rgba(99, 102, 241, 0.28)",
+    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+  } as const;
 
   function handleInventoryChange(updatedInventory: TraderInventoryItem[]) {
     setTraders((currentTraders) =>
@@ -83,7 +95,7 @@ function Trading({ traderId, onReturn }: TradingProps) {
         Dra ett föremål till ditt inventory för att köpa det.
       </div>
 
-      <div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <ItemGrid<TraderInventoryItem>
           containerId={`trader-${trader.id}`}
           containerType="trader"
@@ -101,13 +113,15 @@ function Trading({ traderId, onReturn }: TradingProps) {
           ? items.find((item) => item.id === hoveredItemId)?.name
           : ""}
       </div>
-      <div>
+      <div style={{ marginBottom: "20px" }}>
         {hoveredItemId
           ? `Kostnad: ${trader.inventory.find((item) => item.itemId === hoveredItemId)?.buyPrice ?? 0} Kronor`
           : "Peka på ett föremål"}
       </div>
 
-      <button onClick={onReturn}>Tillbaka</button>
+      <button onClick={onReturn} style={backButtonStyle}>
+        Tillbaka
+      </button>
     </div>
   );
 }

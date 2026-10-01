@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
-
+import "./Location.css";
 import { locations } from "../data/locations";
 import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
@@ -174,27 +174,31 @@ function Location({
       <p className="location-text">{currentNode.text}</p>
 
       {loot.length > 0 && (
-        <ItemGrid
-          containerId={location.id}
-          containerType="loot"
-          width={5}
-          height={3}
-          inventory={loot}
-          onInventoryChange={handleLootChanged}
-          onItemRemoved={handleItemRemoved}
-        />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <ItemGrid
+            containerId={location.id}
+            containerType="loot"
+            width={3}
+            height={3}
+            inventory={loot}
+            onInventoryChange={handleLootChanged}
+            onItemRemoved={handleItemRemoved}
+          />
+        </div>
       )}
 
-      <div className="location-choices">
-        {currentNode.choices.filter(meetsCondition).map((choice) => (
-          <button
-            className="location-choice"
-            key={choice.text}
-            onClick={() => handleChoice(choice)}
-          >
-            {choice.text}
-          </button>
-        ))}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div className="location-choices">
+          {currentNode.choices.filter(meetsCondition).map((choice) => (
+            <button
+              className="location-choice"
+              key={choice.text}
+              onClick={() => handleChoice(choice)}
+            >
+              {choice.text}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

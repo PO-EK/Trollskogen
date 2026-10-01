@@ -1,10 +1,8 @@
 function TopBar() {
   return (
     <header className="top-bar">
-      <div>Trollskogen</div>
-      <div>Day 1</div>
-
-      <button>Options</button>
+      <h2>Trollskogen</h2>
+      <p>Version 0.0.5 - 2026-10-1</p>
     </header>
   );
 }

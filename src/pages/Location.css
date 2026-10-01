@@ -1,0 +1,70 @@
+.location-tooltip {
+  position: absolute;
+
+  transform: translate(-50%, -100%);
+  margin-top: -15px;
+
+  padding: 8px 14px;
+
+  background: #1b1712;
+  color: #e8d7b0;
+
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: bold;
+
+  white-space: nowrap;
+
+  pointer-events: none;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+
+  z-index: 10;
+}
+
+.location-choices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.location-choice {
+  width: 300px;
+  padding: 12px 16px;
+
+  background: transparent;
+  color: white;
+
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+
+  font-family: Georgia, serif;
+  font-size: 16px;
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.location-choice:hover {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.location-text {
+  border: 2px solid #c09a5b;
+  padding: 10px;
+  font-size: 20px;
+  padding-top: 20px;
+  padding-bottom: 30px;
+  text-wrap-mode: wrap;
+}
+
+.location-header {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
