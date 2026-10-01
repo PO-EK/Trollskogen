@@ -1,6 +1,6 @@
 .inventory-panel {
-  width: max-content;
-  height: max-content;
+  width: auto;
+  height: auto;
   padding: 10px;
   box-sizing: border-box;
   background: #222;
@@ -25,4 +25,12 @@
   font-family: Georgia, serif;
   font-weight: bold;
   text-align: center;
+}
+.inventory-item-descript {
+  height: 14px;
+  margin-bottom: 4px;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  text-align: center;
+  font-size: small;
 }

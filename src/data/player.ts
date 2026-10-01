@@ -1,4 +1,11 @@
 export type StoryFlags = Record<string, boolean>;
+import type { ContainerItem } from "./containerItems";
+
+/* type Storage = {
+  width: number;
+  height: number;
+  inventory: ContainerItem[];
+}; */
 
 export type Player = {
   Id?: string;
@@ -30,20 +37,15 @@ export type Player = {
   // Inventory
   BackpackWidth: 5;
   BackpackHeight: 5;
-  Inventory: InventoryItem[];
+  Inventory: ContainerItem[];
+
+  StorageWidth: number;
+  StorageHeight: number;
+  Storage: ContainerItem[];
 
   // Quest progression
   Quests: QuestState[];
   StoryFlags: Record<string, boolean>;
-};
-
-export type InventoryItem = {
-  inventoryId: string;
-  itemId: string;
-  quantity: number;
-
-  x: number;
-  y: number;
 };
 
 export type QuestState = {
@@ -54,7 +56,7 @@ export type QuestState = {
 export const createNewPlayer = (): Player => ({
   Name: "Admin",
 
-  Gold: 100,
+  Gold: 128,
 
   Level: 1,
   Exp: 0,
@@ -74,21 +76,16 @@ export const createNewPlayer = (): Player => ({
   BackpackWidth: 5,
   BackpackHeight: 5,
 
+  StorageWidth: 10,
+  StorageHeight: 10,
+  Storage: [],
+
   Inventory: [
-    //start with these items
     {
-      inventoryId: "p0001",
-      itemId: "health_potion",
-      quantity: 1,
-      x: 0,
-      y: 0,
-    },
-    {
-      inventoryId: "t0001",
-      itemId: "wood_torch",
-      quantity: 1,
-      x: 0,
-      y: 2,
+      containerItemId: "myStorageKey",
+      itemId: "storageKey",
+      x: 1,
+      y: 1,
     },
   ],
   Quests: [],

@@ -1,9 +1,9 @@
-import type { InventoryItem } from "./player";
+import type { ContainerItem } from "../data/containerItems";
 
 export type AdventureChoice = {
   text: string;
   nextNodeId?: string;
-  loot?: InventoryItem[];
+  loot?: ContainerItem[];
   condition?: AdventureCondition;
   effects?: AdventureEffect[];
 };
@@ -26,7 +26,10 @@ export type AdventureCondition =
     };
 
 export type AdventureEffect =
-  | { type: "addItem"; itemId: string }
+  // Items are never placed directly into the player's inventory.
+  // Items enter the game world through containers such as location loot,
+  // chests, traders, etc., and the player must physically drag them.
+  | { type: "spawnLoot"; itemId: string }
   | { type: "removeItem"; itemId: string }
   | { type: "addGold"; amount: number }
   | { type: "removeGold"; amount: number }
@@ -34,4 +37,6 @@ export type AdventureEffect =
   | { type: "heal"; amount: number }
   | { type: "damage"; amount: number }
   | { type: "setStoryFlag"; flag: string; value: boolean }
+  | { type: "openTrader"; traderId: string }
+  | { type: "travelTo"; locationId: string }
   | { type: "endAdventure" };

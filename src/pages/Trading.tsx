@@ -1,0 +1,115 @@
+import { usePlayer } from "../context/usePlayer";
+import { useTrader } from "../context/useTrader";
+import ItemGrid from "../components/inventory/ItemGrid";
+import { useState } from "react";
+import type { ContainerItem } from "../data/containerItems";
+import type { TraderInventoryItem } from "../data/traders/tradersTypes";
+import { items } from "../data/items";
+import { performTransaction } from "../game/performTransaction";
+
+type TradingProps = {
+  traderId: string | null;
+  onReturn: () => void;
+};
+
+function Trading({ traderId, onReturn }: TradingProps) {
+  const { player, setPlayer } = usePlayer();
+  const { traders, setTraders } = useTrader();
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const trader = traders.find((trader) => trader.id === traderId);
+
+  if (!trader) {
+    return (
+      <div>
+        <p>Handlaren kunde inte hittas.</p>
+
+        <button onClick={onReturn}>Tillbaka</button>
+      </div>
+    );
+  }
+
+  const currentTrader = trader;
+
+  function handleInventoryChange(updatedInventory: TraderInventoryItem[]) {
+    setTraders((currentTraders) =>
+      currentTraders.map((currentTrader) =>
+        currentTrader.id === traderId
+          ? {
+              ...currentTrader,
+              inventory: updatedInventory,
+            }
+          : currentTrader,
+      ),
+    );
+  }
+
+  function handleCrossContainerDrop(
+    item: ContainerItem,
+    position: { x: number; y: number },
+  ) {
+    const result = performTransaction({
+      item,
+      sourceId: "player",
+      sourceType: "player",
+      destinationId: `trader-${currentTrader.id}`,
+      destinationType: "trader",
+      position,
+      player,
+      trader,
+    });
+
+    if (!result.success) {
+      return;
+    }
+
+    setPlayer(result.player);
+
+    if (result.trader) {
+      setTraders((currentTraders) =>
+        currentTraders.map((currentTrader) =>
+          currentTrader.id === currentTrader.id
+            ? result.trader!
+            : currentTrader,
+        ),
+      );
+    }
+  }
+
+  return (
+    <div>
+      <div>
+        <h2>{trader.name}</h2>
+        <p>{trader.description}</p>
+        Dra ett föremål till ditt inventory för att köpa det.
+      </div>
+
+      <div>
+        <ItemGrid<TraderInventoryItem>
+          containerId={`trader-${trader.id}`}
+          containerType="trader"
+          width={trader.inventoryWidth}
+          height={trader.inventoryHeight}
+          inventory={trader.inventory}
+          onInventoryChange={handleInventoryChange}
+          onCrossContainerDrop={handleCrossContainerDrop}
+          onHoveredItemChange={setHoveredItemId}
+        />
+      </div>
+
+      <div className="inventory-item-name">
+        {hoveredItemId
+          ? items.find((item) => item.id === hoveredItemId)?.name
+          : ""}
+      </div>
+      <div className="inventory-item-name">
+        {hoveredItemId
+          ? `${trader.inventory.find((item) => item.itemId === hoveredItemId)?.buyPrice ?? 0} Kronor`
+          : "Peka på ett föremål"}
+      </div>
+
+      <button onClick={onReturn}>Tillbaka</button>
+    </div>
+  );
+}
+
+export default Trading;

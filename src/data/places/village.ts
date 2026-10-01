@@ -12,10 +12,6 @@ export const village: Record<string, AdventureNode> = {
         nextNodeId: "utforska",
       },
       {
-        text: "Besök smeden",
-        nextNodeId: "smeden",
-      },
-      {
         text: "Lämna torget",
         effects: [
           {
@@ -66,7 +62,7 @@ export const village: Record<string, AdventureNode> = {
 
   smeden: {
     id: "smeden",
-    text: "Smedjan beksrivning och välkommen",
+    text: "Smedjan presenterar sig!",
     choices: [
       {
         text: "Köp och sälj",
@@ -75,25 +71,6 @@ export const village: Record<string, AdventureNode> = {
       {
         text: "Sök arbete",
         nextNodeId: "smedenwork",
-      },
-    ],
-  },
-
-  smedenwork: {
-    id: "smedenwork",
-    text: "Du spenderar några timmar med att hjälpa smeden med olika sysslor. Din närvaro drar till sig nyfikna bybor och smeden lyckas boka nya jobb.",
-    choices: [
-      {
-        text: "Du tjänar: 15 öre",
-        effects: [
-          {
-            type: "addGold",
-            amount: 15,
-          },
-          {
-            type: "endAdventure",
-          },
-        ],
       },
     ],
   },

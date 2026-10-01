@@ -1,10 +1,11 @@
 import { createContext } from "react";
-import type { InventoryItem } from "../data/player";
+import type { ContainerItem } from "../data/containerItems";
+import type { ContainerType } from "../data/containerTypes";
 
 export type ItemDragContextType = {
-  draggedItem: InventoryItem | null;
-
+  draggedItem: ContainerItem | null;
   dragSourceId: string | null;
+  dragSourceType: ContainerType | null;
 
   removeFromSource: (() => void) | null;
 
@@ -19,8 +20,9 @@ export type ItemDragContextType = {
   } | null;
 
   startDrag: (
-    item: InventoryItem,
+    item: ContainerItem,
     sourceId: string,
+    sourceType: ContainerType,
     removeFromSource: () => void,
     dragOffset: {
       x: number;

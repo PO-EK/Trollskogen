@@ -1,10 +1,13 @@
 import { useState } from "react";
-import type { InventoryItem } from "../data/player";
+import type { ContainerItem } from "../data/containerItems";
 import { ItemDragContext } from "./ItemDragContext";
+import type { ContainerType } from "../data/containerTypes";
 
 export function ItemDragProvider({ children }: { children: React.ReactNode }) {
-  const [draggedItem, setDraggedItem] = useState<InventoryItem | null>(null);
-
+  const [draggedItem, setDraggedItem] = useState<ContainerItem | null>(null);
+  const [dragSourceType, setDragSourceType] = useState<ContainerType | null>(
+    null,
+  );
   const [dragSourceId, setDragSourceId] = useState<string | null>(null);
   const [removeFromSource, setRemoveFromSource] = useState<(() => void) | null>(
     null,
@@ -21,8 +24,9 @@ export function ItemDragProvider({ children }: { children: React.ReactNode }) {
   } | null>(null);
 
   function startDrag(
-    item: InventoryItem,
+    item: ContainerItem,
     sourceId: string,
+    sourceType: ContainerType,
     removeItemFromSource: () => void,
     offset: {
       x: number;
@@ -35,6 +39,7 @@ export function ItemDragProvider({ children }: { children: React.ReactNode }) {
   ) {
     setDraggedItem(item);
     setDragSourceId(sourceId);
+    setDragSourceType(sourceType);
     setRemoveFromSource(() => removeItemFromSource);
     setDragOffset(offset);
     setPointerPosition(pointer);
@@ -47,6 +52,7 @@ export function ItemDragProvider({ children }: { children: React.ReactNode }) {
   function endDrag() {
     setDraggedItem(null);
     setDragSourceId(null);
+    setDragSourceType(null);
     setRemoveFromSource(null);
     setDragOffset(null);
     setPointerPosition(null);
@@ -57,6 +63,7 @@ export function ItemDragProvider({ children }: { children: React.ReactNode }) {
       value={{
         draggedItem,
         dragSourceId,
+        dragSourceType,
         removeFromSource,
         dragOffset,
         pointerPosition,

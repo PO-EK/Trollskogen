@@ -1,32 +1,42 @@
 import { useState } from "react";
 import { items } from "../../data/items";
-import type { InventoryItem } from "../../data/player";
 import { useItemDrag } from "../../context/useItemDrag";
+import type { ContainerItem } from "../../data/containerItems";
+import type { ContainerType } from "../../data/containerTypes";
 import "./ItemGrid.css";
 
-type ItemGridProps = {
+type ItemGridProps<T extends ContainerItem = ContainerItem> = {
   containerId: string;
+  containerType: ContainerType;
   width: number;
   height: number;
-  inventory: InventoryItem[];
-  onInventoryChange: (inventory: InventoryItem[]) => void;
-  onItemRemoved?: (inventoryId: string) => void;
+  inventory: T[];
+  onInventoryChange: (inventory: T[]) => void;
+  onItemRemoved?: (containerItemId: string) => void;
   onHoveredItemChange?: (itemId: string | null) => void;
+  onCrossContainerDrop?: (
+    item: ContainerItem,
+    position: { x: number; y: number },
+    sourceId: string,
+    sourceType: ContainerType,
+  ) => void;
 };
 
-function ItemGrid({
+function ItemGrid<T extends ContainerItem>({
   containerId,
+  containerType,
   width,
   height,
   inventory,
   onInventoryChange,
   onItemRemoved,
   onHoveredItemChange,
-}: ItemGridProps) {
+  onCrossContainerDrop,
+}: ItemGridProps<T>) {
   const {
     draggedItem,
     dragSourceId,
-    removeFromSource,
+    dragSourceType,
     dragOffset,
     startDrag,
     updatePointerPosition,
@@ -40,15 +50,15 @@ function ItemGrid({
   } | null>(null);
 
   // --------------------------------------------------
-  // Check if an item can be placed
+  // Check if a ContainerItem can be placed
   // --------------------------------------------------
 
   const canPlaceItem = (
-    itemToPlace: InventoryItem,
+    containerItemToPlace: ContainerItem,
     x: number,
     y: number,
   ): boolean => {
-    const item = items.find((item) => item.id === itemToPlace.itemId);
+    const item = items.find((item) => item.id === containerItemToPlace.itemId);
 
     if (!item) {
       return false;
@@ -58,17 +68,23 @@ function ItemGrid({
       const targetX = x + shapeCell.x;
       const targetY = y + shapeCell.y;
 
+      // Check if the item would be outside the container.
       if (targetX < 0 || targetX >= width || targetY < 0 || targetY >= height) {
         return false;
       }
 
-      for (const otherInventoryItem of inventory) {
-        if (otherInventoryItem.inventoryId === itemToPlace.inventoryId) {
+      // Check if the item would overlap another ContainerItem.
+      for (const otherContainerItem of inventory) {
+        // An item does not collide with itself.
+        if (
+          otherContainerItem.containerItemId ===
+          containerItemToPlace.containerItemId
+        ) {
           continue;
         }
 
         const otherItem = items.find(
-          (item) => item.id === otherInventoryItem.itemId,
+          (item) => item.id === otherContainerItem.itemId,
         );
 
         if (!otherItem) {
@@ -76,9 +92,9 @@ function ItemGrid({
         }
 
         for (const otherShapeCell of otherItem.shape) {
-          const otherX = otherInventoryItem.x + otherShapeCell.x;
+          const otherX = otherContainerItem.x + otherShapeCell.x;
 
-          const otherY = otherInventoryItem.y + otherShapeCell.y;
+          const otherY = otherContainerItem.y + otherShapeCell.y;
 
           if (targetX === otherX && targetY === otherY) {
             return false;
@@ -123,6 +139,10 @@ function ItemGrid({
 
     return isValid ? "valid" : "invalid";
   };
+
+  // --------------------------------------------------
+  // Calculate dragged item position inside this grid
+  // --------------------------------------------------
 
   function getDragPosition(event: React.PointerEvent<HTMLDivElement>) {
     if (!dragOffset) {
@@ -197,6 +217,7 @@ function ItemGrid({
         if (!draggedItem || !dragOffset) {
           return;
         }
+
         updatePointerPosition({
           x: event.clientX,
           y: event.clientY,
@@ -228,6 +249,14 @@ function ItemGrid({
         );
 
         if (!isValid) {
+          console.log("Drop rejected:", {
+            draggedItem,
+            newDragPosition,
+            containerId,
+            containerType,
+            inventory,
+          });
+
           endDrag();
           setDragPosition(null);
           return;
@@ -237,27 +266,32 @@ function ItemGrid({
 
         if (isSameGrid) {
           onInventoryChange(
-            inventory.map((inventoryItem) =>
-              inventoryItem.inventoryId === draggedItem.inventoryId
+            inventory.map((containerItem) =>
+              containerItem.containerItemId === draggedItem.containerItemId
                 ? {
-                    ...inventoryItem,
+                    ...containerItem,
                     x: newDragPosition.x,
                     y: newDragPosition.y,
                   }
-                : inventoryItem,
+                : containerItem,
             ),
           );
-        } else {
-          onInventoryChange([
-            ...inventory,
-            {
-              ...draggedItem,
-              x: newDragPosition.x,
-              y: newDragPosition.y,
-            },
-          ]);
+        } else if (dragSourceId && dragSourceType) {
+          console.log("Cross-container drop:", {
+            draggedItem,
+            newDragPosition,
+            dragSourceId,
+            dragSourceType,
+            destinationId: containerId,
+            destinationType: containerType,
+          });
 
-          removeFromSource?.();
+          onCrossContainerDrop?.(
+            draggedItem,
+            newDragPosition,
+            dragSourceId,
+            dragSourceType,
+          );
         }
 
         endDrag();
@@ -267,8 +301,8 @@ function ItemGrid({
       {cells}
 
       {/* Items */}
-      {inventory.map((inventoryItem) => {
-        const item = items.find((item) => item.id === inventoryItem.itemId);
+      {inventory.map((containerItem) => {
+        const item = items.find((item) => item.id === containerItem.itemId);
 
         if (!item) {
           return null;
@@ -280,7 +314,7 @@ function ItemGrid({
 
         return (
           <div
-            key={inventoryItem.inventoryId}
+            key={containerItem.containerItemId}
             className="inventory-item"
             onPointerDown={(event) => {
               event.preventDefault();
@@ -300,10 +334,11 @@ function ItemGrid({
               }
 
               startDrag(
-                inventoryItem,
+                containerItem,
                 containerId,
+                containerType,
                 () => {
-                  onItemRemoved?.(inventoryItem.inventoryId);
+                  onItemRemoved?.(containerItem.containerItemId);
                 },
                 {
                   x: grabbedShapeCell.x,
@@ -316,19 +351,21 @@ function ItemGrid({
               );
 
               setDragPosition({
-                x: inventoryItem.x,
-                y: inventoryItem.y,
+                x: containerItem.x,
+                y: containerItem.y,
               });
             }}
-            onMouseEnter={() => onHoveredItemChange?.(inventoryItem.itemId)}
+            onMouseEnter={() => onHoveredItemChange?.(containerItem.itemId)}
             onMouseLeave={() => onHoveredItemChange?.(null)}
             style={{
-              left: `${inventoryItem.x * 34 + 4}px`,
-              top: `${inventoryItem.y * 34 + 4}px`,
+              left: `${containerItem.x * 34 + 4}px`,
+              top: `${containerItem.y * 34 + 4}px`,
               width: `${itemWidth * 32 + (itemWidth - 1) * 2}px`,
               height: `${itemHeight * 32 + (itemHeight - 1) * 2}px`,
               opacity:
-                draggedItem?.inventoryId === inventoryItem.inventoryId ? 0 : 1,
+                draggedItem?.containerItemId === containerItem.containerItemId
+                  ? 0
+                  : 1,
             }}
           >
             <img

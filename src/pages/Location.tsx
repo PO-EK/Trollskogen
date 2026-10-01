@@ -4,17 +4,24 @@ import { usePlayer } from "../context/usePlayer";
 import { locations } from "../data/locations";
 import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
-import type { InventoryItem } from "../data/player";
+import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
 
 type LocationProps = {
   locationId: string | null;
   onReturn: () => void;
+  onOpenTrader: (traderId: string) => void;
+  onTravelTo: (locationId: string) => void;
 };
 
-function Location({ locationId, onReturn }: LocationProps) {
+function Location({
+  locationId,
+  onReturn,
+  onOpenTrader,
+  onTravelTo,
+}: LocationProps) {
   const [currentNodeId, setCurrentNodeId] = useState("start");
-  const [loot, setLoot] = useState<InventoryItem[]>([]);
+  const [loot, setLoot] = useState<ContainerItem[]>([]);
 
   const location = locations.find((location) => location.id === locationId);
 
@@ -71,11 +78,18 @@ function Location({ locationId, onReturn }: LocationProps) {
       }));
     }
 
-    if (effect.type === "addItem") {
-      const newItem: InventoryItem = {
-        inventoryId: crypto.randomUUID(),
+    if (effect.type === "openTrader") {
+      onOpenTrader(effect.traderId);
+    }
+
+    if (effect.type === "travelTo") {
+      onTravelTo(effect.locationId);
+    }
+
+    if (effect.type === "spawnLoot") {
+      const newItem: ContainerItem = {
+        containerItemId: crypto.randomUUID(),
         itemId: effect.itemId,
-        quantity: 1,
         x: 0,
         y: 0,
       };
@@ -129,7 +143,7 @@ function Location({ locationId, onReturn }: LocationProps) {
   }
 
   function handleChoice(choice: AdventureChoice) {
-    // Every choice wipes the temporary location loot.
+    // Choices clear temporary loot before applying their effects.
     setLoot([]);
 
     if (choice.effects) {
@@ -143,13 +157,13 @@ function Location({ locationId, onReturn }: LocationProps) {
     }
   }
 
-  function handleLootChanged(updatedLoot: InventoryItem[]) {
+  function handleLootChanged(updatedLoot: ContainerItem[]) {
     setLoot(updatedLoot);
   }
 
-  function handleItemRemoved(inventoryId: string) {
+  function handleItemRemoved(containerItemId: string) {
     setLoot((currentLoot) =>
-      currentLoot.filter((item) => item.inventoryId !== inventoryId),
+      currentLoot.filter((item) => item.containerItemId !== containerItemId),
     );
   }
 
@@ -162,6 +176,7 @@ function Location({ locationId, onReturn }: LocationProps) {
       {loot.length > 0 && (
         <ItemGrid
           containerId={location.id}
+          containerType="loot"
           width={5}
           height={3}
           inventory={loot}

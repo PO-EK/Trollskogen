@@ -61,7 +61,7 @@ export const ruins: Record<string, AdventureNode> = {
         nextNodeId: "inside2",
         effects: [
           {
-            type: "addItem",
+            type: "spawnLoot",
             itemId: "health_potion",
           },
           {
@@ -102,7 +102,7 @@ export const ruins: Record<string, AdventureNode> = {
 
         effects: [
           {
-            type: "addItem",
+            type: "spawnLoot",
             itemId: "old_axe",
           },
           {

@@ -18,7 +18,15 @@ export const locations: MapLocation[] = [
     unlocked: true,
     adventureId: "intro",
   },
-
+  {
+    id: "playerHQ",
+    name: "Ditt hus.",
+    x: 85,
+    y: 50,
+    icon: "🏚️",
+    unlocked: true,
+    adventureId: "playerHQ",
+  },
   {
     id: "village",
     name: "Utforska byn",
@@ -27,6 +35,16 @@ export const locations: MapLocation[] = [
     icon: "🏘️",
     unlocked: true,
     adventureId: "village",
+  },
+
+  {
+    id: "blacksmith",
+    name: "Smeden",
+    x: 45,
+    y: 45,
+    icon: "S",
+    unlocked: true,
+    adventureId: "smeden",
   },
 
   {
