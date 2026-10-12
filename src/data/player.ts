@@ -46,6 +46,7 @@ export type Player = {
   // Quest progression
   Quests: QuestState[];
   StoryFlags: Record<string, boolean>;
+  UnlockedLocations: string[];
 };
 
 export type QuestState = {
@@ -90,4 +91,5 @@ export const createNewPlayer = (): Player => ({
   ],
   Quests: [],
   StoryFlags: {},
+  UnlockedLocations: ["intro", "playerHQ", "village", "witchHut", "ruins"],
 });

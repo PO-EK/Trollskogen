@@ -1,1 +1,1 @@
-export type ContainerType = "player" | "trader" | "chest" | "quest" | "loot";
+export type ContainerType = "player" | "trader" | "storage" | "quest" | "loot";

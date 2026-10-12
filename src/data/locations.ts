@@ -4,7 +4,6 @@ export type MapLocation = {
   x: number;
   y: number;
   icon: string;
-  unlocked: boolean;
   adventureId: string;
 };
 
@@ -15,7 +14,6 @@ export const locations: MapLocation[] = [
     x: 15,
     y: 95,
     icon: "📜",
-    unlocked: true,
     adventureId: "intro",
   },
   {
@@ -24,7 +22,6 @@ export const locations: MapLocation[] = [
     x: 85,
     y: 50,
     icon: "🏚️",
-    unlocked: true,
     adventureId: "playerHQ",
   },
   {
@@ -33,7 +30,6 @@ export const locations: MapLocation[] = [
     x: 50,
     y: 25,
     icon: "🏘️",
-    unlocked: true,
     adventureId: "village",
   },
 
@@ -43,7 +39,6 @@ export const locations: MapLocation[] = [
     x: 45,
     y: 45,
     icon: "S",
-    unlocked: true,
     adventureId: "smeden",
   },
 
@@ -53,7 +48,6 @@ export const locations: MapLocation[] = [
     x: 85,
     y: 85,
     icon: "🏚️",
-    unlocked: true,
     adventureId: "ruins",
   },
   {
@@ -62,7 +56,6 @@ export const locations: MapLocation[] = [
     x: 30,
     y: 80,
     icon: "🏚️",
-    unlocked: true,
     adventureId: "witchHut",
   },
 ];

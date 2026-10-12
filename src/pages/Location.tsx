@@ -6,6 +6,20 @@ import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
+import type { ContainerType } from "../data/containerTypes";
+
+type ActiveLocationContainer =
+  | {
+      type: "loot";
+      id: string;
+    }
+  | {
+      type: "quest";
+      id: string;
+      questId: string;
+      acceptedItemId: string;
+    }
+  | { type: "storage"; id: "storage" };
 
 type LocationProps = {
   locationId: string | null;
@@ -21,7 +35,9 @@ function Location({
   onTravelTo,
 }: LocationProps) {
   const [currentNodeId, setCurrentNodeId] = useState("start");
-  const [loot, setLoot] = useState<ContainerItem[]>([]);
+  const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
+  const [activeContainer, setActiveContainer] =
+    useState<ActiveLocationContainer | null>(null);
 
   const location = locations.find((location) => location.id === locationId);
 
@@ -30,6 +46,8 @@ function Location({
   if (!location) {
     return <p>Location not found.</p>;
   }
+
+  const safeLocation = location;
 
   const adventure = adventures[location.adventureId];
 
@@ -41,6 +59,79 @@ function Location({
 
   if (!currentNode) {
     return <p>Adventure node not found.</p>;
+  }
+
+  function handleCrossContainerDrop(
+    item: ContainerItem,
+    position: { x: number; y: number },
+    sourceId: string,
+    sourceType: ContainerType,
+  ) {
+    if (!activeContainer) {
+      return;
+    }
+
+    if (activeContainer.type === "storage") {
+      if (sourceType !== "player") return;
+
+      setPlayer((p) => ({
+        ...p,
+        Inventory: p.Inventory.filter(
+          (i) => i.containerItemId !== item.containerItemId,
+        ),
+        Storage: [...p.Storage, { ...item, x: position.x, y: position.y }],
+      }));
+      return;
+    }
+
+    if (activeContainer.type !== "quest") {
+      return;
+    }
+
+    // Quest containers only accept items dragged from the player's inventory.
+    if (sourceType !== "player" || sourceId !== "player") {
+      return;
+    }
+
+    // Validate the accepted item again when processing the transfer.
+    if (item.itemId !== activeContainer.acceptedItemId) {
+      return;
+    }
+
+    const deliveredFlag = `${activeContainer.questId}.Delivered`;
+
+    // Don't accept an item that is no longer in the player's inventory.
+    const playerHasItem = player.Inventory.some(
+      (inventoryItem) =>
+        inventoryItem.containerItemId === item.containerItemId &&
+        inventoryItem.itemId === activeContainer.acceptedItemId,
+    );
+
+    if (!playerHasItem) {
+      return;
+    }
+
+    // Move the accepted item from the player's inventory into the quest container.
+    setPlayer((currentPlayer) => ({
+      ...currentPlayer,
+      Inventory: currentPlayer.Inventory.filter(
+        (inventoryItem) =>
+          inventoryItem.containerItemId !== item.containerItemId,
+      ),
+      StoryFlags: {
+        ...currentPlayer.StoryFlags,
+        [deliveredFlag]: true,
+      },
+    }));
+
+    setContainerItems((currentItems) => [
+      ...currentItems,
+      {
+        ...item,
+        x: position.x,
+        y: position.y,
+      },
+    ]);
   }
 
   function meetsCondition(choice: AdventureChoice): boolean {
@@ -64,6 +155,14 @@ function Location({
   }
 
   function handleEffect(effect: AdventureEffect) {
+    if (effect.type === "unlockLocation") {
+      setPlayer((player) => ({
+        ...player,
+        UnlockedLocations: player.UnlockedLocations.includes(effect.locationId)
+          ? player.UnlockedLocations
+          : [...player.UnlockedLocations, effect.locationId],
+      }));
+    }
     if (effect.type === "addGold") {
       setPlayer((player) => ({
         ...player,
@@ -94,7 +193,21 @@ function Location({
         y: 0,
       };
 
-      setLoot([newItem]);
+      setContainerItems([newItem]);
+      setActiveContainer({
+        type: "loot",
+        id: safeLocation.id,
+      });
+    }
+
+    if (effect.type === "openQuestContainer") {
+      setContainerItems([]);
+      setActiveContainer({
+        type: "quest",
+        id: `quest-${effect.questId}`,
+        questId: effect.questId,
+        acceptedItemId: effect.acceptedItemId,
+      });
     }
 
     if (effect.type === "removeItem") {
@@ -143,8 +256,9 @@ function Location({
   }
 
   function handleChoice(choice: AdventureChoice) {
-    // Choices clear temporary loot before applying their effects.
-    setLoot([]);
+    // Clear the temporary location container before applying new effects.
+    setContainerItems([]);
+    setActiveContainer(null);
 
     if (choice.effects) {
       for (const effect of choice.effects) {
@@ -157,13 +271,13 @@ function Location({
     }
   }
 
-  function handleLootChanged(updatedLoot: ContainerItem[]) {
-    setLoot(updatedLoot);
+  function handleContainerItemsChanged(updatedItems: ContainerItem[]) {
+    setContainerItems(updatedItems);
   }
 
-  function handleItemRemoved(containerItemId: string) {
-    setLoot((currentLoot) =>
-      currentLoot.filter((item) => item.containerItemId !== containerItemId),
+  function handleContainerItemRemoved(containerItemId: string) {
+    setContainerItems((currentItems) =>
+      currentItems.filter((item) => item.containerItemId !== containerItemId),
     );
   }
 
@@ -173,17 +287,43 @@ function Location({
 
       <p className="location-text">{currentNode.text}</p>
 
-      {loot.length > 0 && (
+      {activeContainer && (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <ItemGrid
-            containerId={location.id}
-            containerType="loot"
-            width={3}
-            height={3}
-            inventory={loot}
-            onInventoryChange={handleLootChanged}
-            onItemRemoved={handleItemRemoved}
-          />
+          {activeContainer.type === "storage" ? (
+            <ItemGrid
+              containerId="storage"
+              containerType="storage"
+              width={player.StorageWidth}
+              height={player.StorageHeight}
+              inventory={player.Storage}
+              onInventoryChange={(updated) =>
+                setPlayer((p) => ({ ...p, Storage: updated }))
+              }
+              onItemRemoved={(id) =>
+                setPlayer((p) => ({
+                  ...p,
+                  Storage: p.Storage.filter((i) => i.containerItemId !== id),
+                }))
+              }
+              onCrossContainerDrop={handleCrossContainerDrop}
+            />
+          ) : (
+            <ItemGrid
+              containerId={activeContainer.id}
+              containerType={activeContainer.type}
+              width={3}
+              height={3}
+              inventory={containerItems}
+              onInventoryChange={handleContainerItemsChanged}
+              onItemRemoved={handleContainerItemRemoved}
+              onCrossContainerDrop={handleCrossContainerDrop}
+              acceptedItemId={
+                activeContainer.type === "quest"
+                  ? activeContainer.acceptedItemId
+                  : undefined
+              }
+            />
+          )}
         </div>
       )}
 

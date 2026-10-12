@@ -10,6 +10,7 @@ export const playerHQ: Record<string, AdventureNode> = {
       {
         text: "Öppna din kista",
         nextNodeId: "storageChest",
+        effects: [{ type: "openStorage" }],
       },
       {
         text: "Använd arbetsbänken.",

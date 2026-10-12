@@ -30,8 +30,14 @@ export type AdventureEffect =
   // Items enter the game world through containers such as location loot,
   // chests, traders, etc., and the player must physically drag them.
   | { type: "spawnLoot"; itemId: string }
+  | {
+      type: "openQuestContainer";
+      questId: string;
+      acceptedItemId: string;
+    }
   | { type: "removeItem"; itemId: string }
   | { type: "addGold"; amount: number }
+  | { type: "openStorage" }
   | { type: "removeGold"; amount: number }
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
@@ -39,4 +45,5 @@ export type AdventureEffect =
   | { type: "setStoryFlag"; flag: string; value: boolean }
   | { type: "openTrader"; traderId: string }
   | { type: "travelTo"; locationId: string }
+  | { type: "unlockLocation"; locationId: string }
   | { type: "endAdventure" };

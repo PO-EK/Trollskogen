@@ -3,7 +3,7 @@ import type { AdventureNode } from "../adventureTypes";
 export const smeden: Record<string, AdventureNode> = {
   start: {
     id: "start",
-    text: "Smedjan beksrivning och välkommen",
+    text: "Smedjan är i full gång, men rök ut skorsten och ljud av hammare mot metal. Du finns smeden framför sitt städ. 'Jag mår mycket bättre nu, lite stel kanske. Vad behöver du idag?'",
     choices: [
       {
         text: "Köp och sälj",
@@ -21,7 +21,7 @@ export const smeden: Record<string, AdventureNode> = {
         condition: {
           type: "storyFlag",
           flag: "smeden.employed",
-          value: false,
+          value: true,
         },
       },
       {
@@ -52,8 +52,8 @@ export const smeden: Record<string, AdventureNode> = {
         nextNodeId: "smedenVillage",
       },
       {
-        text: "Vad hände med mina föräldrar?",
-        nextNodeId: "smedenParents",
+        text: "Kan jag hjälpa dig?",
+        nextNodeId: "smedenaskforwork",
       },
       {
         text: "Ursäkta, men jag måste gå vidare.",
@@ -71,7 +71,7 @@ export const smeden: Record<string, AdventureNode> = {
     text: "Du spenderar några timmar med att hjälpa smeden med olika sysslor. Din närvaro drar till sig nyfikna bybor och smeden lyckas boka nya jobb.",
     choices: [
       {
-        text: "Du tjänar: 15 öre",
+        text: "Du tjänar: 15 Kroner",
         effects: [
           {
             type: "addGold",
@@ -123,37 +123,24 @@ export const smeden: Record<string, AdventureNode> = {
     ],
   },
 
-  smedenParents: {
-    id: "smedenParents",
-    text: "Jag hörde att de blev dödade, haha. Skill Issue. Git Gud noobs.",
+  smedenaskforwork: {
+    id: "smedenaskforwork",
+    text: "Ja, jag kan behöva lite hjälp. Dock kan jag inte betala så mycket.",
     choices: [
       {
-        text: "De hittade aldrig Dodge knappen.",
+        text: "Okej, det låter bra.",
+        nextNodeId: "smedenwork",
         effects: [
           {
-            type: "endAdventure",
+            type: "setStoryFlag",
+            flag: "smeden.employed",
+            value: true,
           },
         ],
       },
       {
-        text: "Dom skulle ha köpt Premium Battle Pass.",
-        effects: [
-          {
-            type: "endAdventure",
-          },
-        ],
-      },
-      {
-        text: "Du är den mänskliga versionen av en huvudvärk.",
-        effects: [
-          {
-            type: "endAdventure",
-          },
-        ],
-      },
-      {
-        text: "Tillbaka.",
-        nextNodeId: "smedenAsk",
+        text: "Jag har viktigare uppgifter just nu.",
+        nextNodeId: "start",
       },
     ],
   },

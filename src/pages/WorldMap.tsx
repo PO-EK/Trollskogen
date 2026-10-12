@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePlayer } from "../context/usePlayer";
 import { locations } from "../data/locations";
 type WorldMapProps = {
   onLocationSelect: (locationId: string) => void;
@@ -8,13 +9,17 @@ function WorldMap({ onLocationSelect }: WorldMapProps) {
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(
     null,
   );
+  const { player } = usePlayer();
   const hoveredLocation = locations.find(
     (location) => location.id === hoveredLocationId,
+  );
+  const visibleLocations = locations.filter((location) =>
+    player.UnlockedLocations.includes(location.id),
   );
 
   return (
     <div className="world-map">
-      {locations.map((location) => (
+      {visibleLocations.map((location) => (
         <button
           key={location.id}
           className="map-location"

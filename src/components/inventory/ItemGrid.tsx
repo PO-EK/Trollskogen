@@ -20,9 +20,10 @@ type ItemGridProps<T extends ContainerItem = ContainerItem> = {
     sourceId: string,
     sourceType: ContainerType,
   ) => void;
+  acceptedItemId?: string;
 };
 
-function ItemGrid<T extends ContainerItem>({
+function ItemGrid<T extends ContainerItem = ContainerItem>({
   containerId,
   containerType,
   width,
@@ -32,6 +33,7 @@ function ItemGrid<T extends ContainerItem>({
   onItemRemoved,
   onHoveredItemChange,
   onCrossContainerDrop,
+  acceptedItemId,
 }: ItemGridProps<T>) {
   const {
     draggedItem,
