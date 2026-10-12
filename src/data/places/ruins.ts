@@ -171,6 +171,10 @@ export const ruins: Record<string, AdventureNode> = {
             value: false,
           },
           {
+            type: "lockLocation",
+            locationId: "ruins",
+          },
+          {
             type: "endAdventure",
           },
         ],

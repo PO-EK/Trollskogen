@@ -163,6 +163,14 @@ function Location({
           : [...player.UnlockedLocations, effect.locationId],
       }));
     }
+    if (effect.type === "lockLocation") {
+      setPlayer((player) => ({
+        ...player,
+        UnlockedLocations: player.UnlockedLocations.filter(
+          (locationId) => locationId !== effect.locationId,
+        ),
+      }));
+    }
     if (effect.type === "addGold") {
       setPlayer((player) => ({
         ...player,

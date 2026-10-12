@@ -12,7 +12,7 @@ export const locations: MapLocation[] = [
     id: "intro",
     name: "Spela intro igen",
     x: 15,
-    y: 95,
+    y: 15,
     icon: "📜",
     adventureId: "intro",
   },

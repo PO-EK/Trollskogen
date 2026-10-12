@@ -33,7 +33,6 @@ function ItemGrid<T extends ContainerItem = ContainerItem>({
   onItemRemoved,
   onHoveredItemChange,
   onCrossContainerDrop,
-  acceptedItemId,
 }: ItemGridProps<T>) {
   const {
     draggedItem,

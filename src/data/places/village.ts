@@ -136,7 +136,7 @@ export const village: Record<string, AdventureNode> = {
     choices: [
       {
         text: "Jag återkommer när jag har något.",
-        nextNodeId: "start",
+        nextNodeId: "smedenStart",
         effects: [
           { type: "setStoryFlag", flag: "healTheSmith.Started", value: true },
         ],
@@ -171,6 +171,11 @@ export const village: Record<string, AdventureNode> = {
       {
         text: "Jag återvänder när jag har en Läkande Dryck.",
         nextNodeId: "start",
+        condition: {
+          type: "storyFlag",
+          flag: "healTheSmith.Delivered",
+          value: false,
+        },
       },
     ],
   },

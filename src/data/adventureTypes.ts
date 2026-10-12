@@ -46,4 +46,5 @@ export type AdventureEffect =
   | { type: "openTrader"; traderId: string }
   | { type: "travelTo"; locationId: string }
   | { type: "unlockLocation"; locationId: string }
+  | { type: "lockLocation"; locationId: string }
   | { type: "endAdventure" };

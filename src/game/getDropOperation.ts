@@ -21,11 +21,11 @@ export function getDropOperation(
     return "pickup";
   }
 
-  if (sourceType === "player" && destinationType === "chest") {
+  if (sourceType === "player" && destinationType === "storage") {
     return "store";
   }
 
-  if (sourceType === "chest" && destinationType === "player") {
+  if (sourceType === "storage" && destinationType === "player") {
     return "retrieve";
   }
 
