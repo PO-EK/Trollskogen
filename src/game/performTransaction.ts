@@ -82,6 +82,28 @@ export function performTransaction({
         trader,
       });
 
+    case "store":
+      return performMoveBetweenPlayerLists({
+        item,
+        sourceId,
+        destinationId,
+        position,
+        player,
+        trader,
+        direction: "store",
+      });
+
+    case "retrieve":
+      return performMoveBetweenPlayerLists({
+        item,
+        sourceId,
+        destinationId,
+        position,
+        player,
+        trader,
+        direction: "retrieve",
+      });
+
     default:
       return {
         success: false,
@@ -362,5 +384,96 @@ function performSell({
     success: true,
     player: updatedPlayer,
     trader: updatedTrader,
+  };
+}
+
+/*
+ * Moves an item between the player's backpack and the player's storage.
+ * Both lists live in the Player object, so the item is removed from one
+ * and added to the other in a single update. It can't be lost or duplicated.
+ */
+function performMoveBetweenPlayerLists({
+  item,
+  sourceId,
+  destinationId,
+  position,
+  player,
+  trader,
+  direction,
+}: TransactionHandlerArgs & {
+  direction: "store" | "retrieve";
+}): PerformTransactionOutput {
+  const expectedSourceId = direction === "store" ? "player" : "storage";
+  const expectedDestinationId = direction === "store" ? "storage" : "player";
+
+  if (
+    sourceId !== expectedSourceId ||
+    destinationId !== expectedDestinationId
+  ) {
+    return {
+      success: false,
+      reason: "invalid_transaction",
+      player,
+      trader,
+    };
+  }
+
+  const sourceList = direction === "store" ? player.Inventory : player.Storage;
+
+  // Trust our own state, not the dragged copy (same approach as performSell).
+  const ownedItem = sourceList.find(
+    (listItem) => listItem.containerItemId === item.containerItemId,
+  );
+
+  if (!ownedItem) {
+    return {
+      success: false,
+      reason: "invalid_transaction",
+      player,
+      trader,
+    };
+  }
+
+  const itemDefinition = items.find(
+    (itemDefinition) => itemDefinition.id === ownedItem.itemId,
+  );
+
+  if (!itemDefinition) {
+    return {
+      success: false,
+      reason: "invalid_transaction",
+      player,
+      trader,
+    };
+  }
+
+  const movedItem: ContainerItem = {
+    containerItemId: ownedItem.containerItemId,
+    itemId: ownedItem.itemId,
+    x: position.x,
+    y: position.y,
+  };
+
+  const remaining = sourceList.filter(
+    (listItem) => listItem.containerItemId !== ownedItem.containerItemId,
+  );
+
+  const updatedPlayer: Player =
+    direction === "store"
+      ? {
+          ...player,
+          Inventory: remaining,
+          Storage: [...player.Storage, movedItem],
+        }
+      : {
+          ...player,
+          Storage: remaining,
+          Inventory: [...player.Inventory, movedItem],
+        };
+
+  return {
+    success: true,
+    player: updatedPlayer,
+    trader,
   };
 }

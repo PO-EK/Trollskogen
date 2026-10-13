@@ -7,6 +7,7 @@ import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
 import type { ContainerType } from "../data/containerTypes";
+import { performTransaction } from "../game/performTransaction";
 
 type ActiveLocationContainer =
   | {
@@ -61,44 +62,55 @@ function Location({
     return <p>Adventure node not found.</p>;
   }
 
+  /*
+   * Returns true if ItemGrid should remove the item from its source container.
+   * Returns false if the handler already updated the source,
+   * or if the drop was rejected.
+   */
   function handleCrossContainerDrop(
     item: ContainerItem,
     position: { x: number; y: number },
     sourceId: string,
     sourceType: ContainerType,
-  ) {
+  ): boolean {
     if (!activeContainer) {
-      return;
+      return false;
     }
 
+    // Storage: the transaction moves the item between the player's lists,
+    // so the source has already been updated.
     if (activeContainer.type === "storage") {
-      if (sourceType !== "player") return;
+      const result = performTransaction({
+        item,
+        sourceId,
+        sourceType,
+        destinationId: "storage",
+        destinationType: "storage",
+        position,
+        player,
+      });
 
-      setPlayer((p) => ({
-        ...p,
-        Inventory: p.Inventory.filter(
-          (i) => i.containerItemId !== item.containerItemId,
-        ),
-        Storage: [...p.Storage, { ...item, x: position.x, y: position.y }],
-      }));
-      return;
+      if (!result.success) {
+        return false;
+      }
+
+      setPlayer(result.player);
+      return false;
     }
 
     if (activeContainer.type !== "quest") {
-      return;
+      return false;
     }
 
     // Quest containers only accept items dragged from the player's inventory.
     if (sourceType !== "player" || sourceId !== "player") {
-      return;
+      return false;
     }
 
     // Validate the accepted item again when processing the transfer.
     if (item.itemId !== activeContainer.acceptedItemId) {
-      return;
+      return false;
     }
-
-    const deliveredFlag = `${activeContainer.questId}.Delivered`;
 
     // Don't accept an item that is no longer in the player's inventory.
     const playerHasItem = player.Inventory.some(
@@ -108,16 +120,15 @@ function Location({
     );
 
     if (!playerHasItem) {
-      return;
+      return false;
     }
 
-    // Move the accepted item from the player's inventory into the quest container.
+    const deliveredFlag = `${activeContainer.questId}.Delivered`;
+
+    // Mark the quest as delivered. The item itself is removed from the
+    // player's inventory by ItemGrid, because we return true below.
     setPlayer((currentPlayer) => ({
       ...currentPlayer,
-      Inventory: currentPlayer.Inventory.filter(
-        (inventoryItem) =>
-          inventoryItem.containerItemId !== item.containerItemId,
-      ),
       StoryFlags: {
         ...currentPlayer.StoryFlags,
         [deliveredFlag]: true,
@@ -132,6 +143,8 @@ function Location({
         y: position.y,
       },
     ]);
+
+    return true;
   }
 
   function meetsCondition(choice: AdventureChoice): boolean {

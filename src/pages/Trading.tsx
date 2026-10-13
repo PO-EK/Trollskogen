@@ -3,6 +3,7 @@ import { useTrader } from "../context/useTrader";
 import ItemGrid from "../components/inventory/ItemGrid";
 import { useState } from "react";
 import type { ContainerItem } from "../data/containerItems";
+import type { ContainerType } from "../data/containerTypes";
 import type { TraderInventoryItem } from "../data/traders/tradersTypes";
 import { items } from "../data/items";
 import { performTransaction } from "../game/performTransaction";
@@ -55,36 +56,47 @@ function Trading({ traderId, onReturn }: TradingProps) {
     );
   }
 
+  /*
+   * Returns true if ItemGrid should remove the item from its source container.
+   *
+   * Selling (backpack -> trader) returns false: performTransaction already
+   * removed the item from the player's inventory, so there is nothing for
+   * ItemGrid to remove. Rejected drops also return false.
+   */
   function handleCrossContainerDrop(
     item: ContainerItem,
     position: { x: number; y: number },
-  ) {
+    sourceId: string,
+    sourceType: ContainerType,
+  ): boolean {
     const result = performTransaction({
       item,
-      sourceId: "player",
-      sourceType: "player",
+      sourceId,
+      sourceType,
       destinationId: `trader-${currentTrader.id}`,
       destinationType: "trader",
       position,
       player,
-      trader,
+      trader: currentTrader,
     });
 
     if (!result.success) {
-      return;
+      return false;
     }
 
     setPlayer(result.player);
 
     if (result.trader) {
       setTraders((currentTraders) =>
-        currentTraders.map((currentTrader) =>
-          currentTrader.id === currentTrader.id
+        currentTraders.map((existingTrader) =>
+          existingTrader.id === currentTrader.id
             ? result.trader!
-            : currentTrader,
+            : existingTrader,
         ),
       );
     }
+
+    return false;
   }
 
   return (

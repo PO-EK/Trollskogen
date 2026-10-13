@@ -14,12 +14,20 @@ type ItemGridProps<T extends ContainerItem = ContainerItem> = {
   onInventoryChange: (inventory: T[]) => void;
   onItemRemoved?: (containerItemId: string) => void;
   onHoveredItemChange?: (itemId: string | null) => void;
+
+  /**
+   * Called when an item from another container is dropped on this grid.
+   *
+   * Return true if ItemGrid should remove the item from its source container.
+   * Return false if the handler already updated the source itself
+   * (e.g. through performTransaction) or rejected the drop.
+   */
   onCrossContainerDrop?: (
     item: ContainerItem,
     position: { x: number; y: number },
     sourceId: string,
     sourceType: ContainerType,
-  ) => void;
+  ) => boolean;
   acceptedItemId?: string;
 };
 
@@ -39,6 +47,7 @@ function ItemGrid<T extends ContainerItem = ContainerItem>({
     dragSourceId,
     dragSourceType,
     dragOffset,
+    removeFromSource,
     startDrag,
     updatePointerPosition,
     endDrag,
@@ -287,12 +296,16 @@ function ItemGrid<T extends ContainerItem = ContainerItem>({
             destinationType: containerType,
           });
 
-          onCrossContainerDrop?.(
+          const shouldRemoveFromSource = onCrossContainerDrop?.(
             draggedItem,
             newDragPosition,
             dragSourceId,
             dragSourceType,
           );
+
+          if (shouldRemoveFromSource) {
+            removeFromSource?.();
+          }
         }
 
         endDrag();

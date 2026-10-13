@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { usePlayer } from "../../context/usePlayer";
 import { useTrader } from "../../context/useTrader";
-import { useItemDrag } from "../../context/useItemDrag";
 import { items } from "../../data/items";
 import type { ContainerItem } from "../../data/containerItems";
 import type { ContainerType } from "../../data/containerTypes";
@@ -12,23 +11,27 @@ import { performTransaction } from "../../game/performTransaction";
 function InventoryPanel() {
   const { player, setPlayer } = usePlayer();
   const { traders, setTraders } = useTrader();
-  const { removeFromSource } = useItemDrag();
 
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
+  /*
+   * Returns true if ItemGrid should remove the item from its source container.
+   * Returns false if the transaction already updated the source,
+   * or if the drop was rejected.
+   */
   function handleCrossContainerDrop(
     item: ContainerItem,
     position: { x: number; y: number },
     sourceId: string,
     sourceType: ContainerType,
-  ) {
+  ): boolean {
     let trader;
 
     if (sourceType === "trader") {
       trader = traders.find((trader) => `trader-${trader.id}` === sourceId);
 
       if (!trader) {
-        return;
+        return false;
       }
     }
 
@@ -44,7 +47,7 @@ function InventoryPanel() {
     });
 
     if (!result.success) {
-      return;
+      return false;
     }
 
     setPlayer(result.player);
@@ -58,16 +61,13 @@ function InventoryPanel() {
     }
 
     /*
-     * The source container owns the item.
+     * Loot lives in temporary local state that performTransaction can't
+     * touch, so ItemGrid has to remove it from the loot container.
      *
-     * For pickup, remove the item from the temporary loot
-     * container only after the transaction succeeded.
-     *
-     * Buy/sell use trader/player state updates above instead.
+     * Buy and retrieve already updated their source (trader / storage)
+     * inside the transaction, so they return false here.
      */
-    if (sourceType === "loot") {
-      removeFromSource?.();
-    }
+    return sourceType === "loot";
   }
 
   return (
