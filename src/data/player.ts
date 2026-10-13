@@ -79,16 +79,28 @@ export const createNewPlayer = (): Player => ({
 
   StorageWidth: 10,
   StorageHeight: 10,
-  Storage: [],
-
-  Inventory: [
+  Storage: [
     {
-      containerItemId: "myStorageKey",
-      itemId: "storageKey",
-      x: 1,
-      y: 1,
+      containerItemId: "startItem1",
+      itemId: "cloth",
+      x: 0,
+      y: 0,
+    },
+    {
+      containerItemId: "startItem2",
+      itemId: "woodlog",
+      x: 3,
+      y: 0,
+    },
+    {
+      containerItemId: "startItem3",
+      itemId: "leather",
+      x: 0,
+      y: 4,
     },
   ],
+
+  Inventory: [],
   Quests: [],
   StoryFlags: {},
   UnlockedLocations: ["intro", "playerHQ", "village", "witchHut", "ruins"],

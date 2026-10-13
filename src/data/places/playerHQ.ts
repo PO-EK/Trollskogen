@@ -33,7 +33,7 @@ export const playerHQ: Record<string, AdventureNode> = {
 
   storageChest: {
     id: "storageChest",
-    text: "Kistan är gjord av trä men bunden med tjock metal, den ser väldigt tung och säker ut. Du låser upp den med den stora svara järn nyckel som följde med huset. Här kan du förvara saker du till spara, utan rädsla att det ska försvinna. (TOMT - KOMMER SNART)",
+    text: "Kistan är gjord av trä men bunden med tjock metal, den ser väldigt tung och säker ut. Här kan du förvara saker du till spara, utan rädsla att det ska försvinna.",
     choices: [
       {
         text: "Tillbaka",

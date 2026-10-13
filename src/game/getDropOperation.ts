@@ -32,6 +32,9 @@ export function getDropOperation(
   if (destinationType === "quest") {
     return "quest";
   }
+  if (sourceType === "storage" && destinationType === "storage") {
+    return "move";
+  }
 
   return null;
 }

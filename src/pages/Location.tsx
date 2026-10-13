@@ -155,111 +155,127 @@ function Location({
   }
 
   function handleEffect(effect: AdventureEffect) {
-    if (effect.type === "unlockLocation") {
-      setPlayer((player) => ({
-        ...player,
-        UnlockedLocations: player.UnlockedLocations.includes(effect.locationId)
-          ? player.UnlockedLocations
-          : [...player.UnlockedLocations, effect.locationId],
-      }));
-    }
-    if (effect.type === "lockLocation") {
-      setPlayer((player) => ({
-        ...player,
-        UnlockedLocations: player.UnlockedLocations.filter(
-          (locationId) => locationId !== effect.locationId,
-        ),
-      }));
-    }
-    if (effect.type === "addGold") {
-      setPlayer((player) => ({
-        ...player,
-        Gold: player.Gold + effect.amount,
-      }));
-    }
+    switch (effect.type) {
+      case "unlockLocation":
+        setPlayer((p) => ({
+          ...p,
+          UnlockedLocations: p.UnlockedLocations.includes(effect.locationId)
+            ? p.UnlockedLocations
+            : [...p.UnlockedLocations, effect.locationId],
+        }));
+        break;
 
-    if (effect.type === "removeGold") {
-      setPlayer((player) => ({
-        ...player,
-        Gold: player.Gold - effect.amount,
-      }));
-    }
+      case "lockLocation":
+        setPlayer((p) => ({
+          ...p,
+          UnlockedLocations: p.UnlockedLocations.filter(
+            (id) => id !== effect.locationId,
+          ),
+        }));
+        break;
 
-    if (effect.type === "openTrader") {
-      onOpenTrader(effect.traderId);
-    }
+      case "addGold":
+        setPlayer((p) => ({
+          ...p,
+          Gold: p.Gold + effect.amount,
+        }));
+        break;
 
-    if (effect.type === "travelTo") {
-      onTravelTo(effect.locationId);
-    }
+      case "removeGold":
+        setPlayer((p) => ({
+          ...p,
+          Gold: p.Gold - effect.amount,
+        }));
+        break;
 
-    if (effect.type === "spawnLoot") {
-      const newItem: ContainerItem = {
-        containerItemId: crypto.randomUUID(),
-        itemId: effect.itemId,
-        x: 0,
-        y: 0,
-      };
+      case "openTrader":
+        onOpenTrader(effect.traderId);
+        break;
 
-      setContainerItems([newItem]);
-      setActiveContainer({
-        type: "loot",
-        id: safeLocation.id,
-      });
-    }
+      case "travelTo":
+        onTravelTo(effect.locationId);
+        break;
 
-    if (effect.type === "openQuestContainer") {
-      setContainerItems([]);
-      setActiveContainer({
-        type: "quest",
-        id: `quest-${effect.questId}`,
-        questId: effect.questId,
-        acceptedItemId: effect.acceptedItemId,
-      });
-    }
+      case "spawnLoot": {
+        const newItem: ContainerItem = {
+          containerItemId: crypto.randomUUID(),
+          itemId: effect.itemId,
+          x: 0,
+          y: 0,
+        };
 
-    if (effect.type === "removeItem") {
-      setPlayer((player) => ({
-        ...player,
-        Inventory: player.Inventory.filter(
-          (item) => item.itemId !== effect.itemId,
-        ),
-      }));
-    }
+        setContainerItems([newItem]);
+        setActiveContainer({
+          type: "loot",
+          id: safeLocation.id,
+        });
+        break;
+      }
 
-    if (effect.type === "addExperience") {
-      setPlayer((player) => ({
-        ...player,
-        Exp: player.Exp + effect.amount,
-      }));
-    }
+      case "openQuestContainer":
+        setContainerItems([]);
+        setActiveContainer({
+          type: "quest",
+          id: `quest-${effect.questId}`,
+          questId: effect.questId,
+          acceptedItemId: effect.acceptedItemId,
+        });
+        break;
 
-    if (effect.type === "heal") {
-      setPlayer((player) => ({
-        ...player,
-        HP: Math.min(player.HP + effect.amount, player.HPMax),
-      }));
-    }
+      case "openStorage":
+        setContainerItems([]);
+        setActiveContainer({ type: "storage", id: "storage" });
+        break;
 
-    if (effect.type === "damage") {
-      setPlayer((player) => ({
-        ...player,
-        HP: Math.max(player.HP - effect.amount, 0),
-      }));
-    }
+      case "removeItem":
+        setPlayer((p) => ({
+          ...p,
+          Inventory: p.Inventory.filter(
+            (item) => item.itemId !== effect.itemId,
+          ),
+        }));
+        break;
 
-    if (effect.type === "setStoryFlag") {
-      setPlayer((player) => ({
-        ...player,
-        StoryFlags: {
-          ...player.StoryFlags,
-          [effect.flag]: effect.value,
-        },
-      }));
-    }
+      case "addExperience":
+        setPlayer((p) => ({
+          ...p,
+          Exp: p.Exp + effect.amount,
+        }));
+        break;
 
-    if (effect.type === "endAdventure") {
-      onReturn();
+      case "heal":
+        setPlayer((p) => ({
+          ...p,
+          HP: Math.min(p.HP + effect.amount, p.HPMax),
+        }));
+        break;
+
+      case "damage":
+        setPlayer((p) => ({
+          ...p,
+          HP: Math.max(p.HP - effect.amount, 0),
+        }));
+        break;
+
+      case "setStoryFlag":
+        setPlayer((p) => ({
+          ...p,
+          StoryFlags: {
+            ...p.StoryFlags,
+            [effect.flag]: effect.value,
+          },
+        }));
+        break;
+
+      case "endAdventure":
+        onReturn();
+        break;
+
+      default: {
+        // Compile-time check: errors if an AdventureEffect type has no case above.
+        const _exhaustive: never = effect;
+        void _exhaustive;
+      }
     }
   }
 

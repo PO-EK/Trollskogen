@@ -4,6 +4,9 @@ import firewoodImage from "../assets/items/firewood.png";
 import woodtorchImage from "../assets/items/fakla.png";
 import storageKeyImage from "../assets/items/storageKey.png";
 import manaPotionImage from "../assets/items/mana_potion.png";
+import clothImage from "../assets/items/cloth.png";
+import leatherImage from "../assets/items/leather.png";
+import woodlogImage from "../assets/items/woodlog.png";
 
 export type ItemShape = {
   x: number;
@@ -23,6 +26,43 @@ export type Item = {
 };
 
 export const items: Item[] = [
+  {
+    id: "cloth",
+    name: "Tygrulle",
+    description: "Råmatrial av bomull.",
+    image: clothImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 18,
+  },
+  {
+    id: "leather",
+    name: "Läder",
+    description: "Råmatrial av djurskin.",
+    image: leatherImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 20,
+  },
+  {
+    id: "woodlog",
+    name: "Stock",
+    description: "Råmatrial av trä.",
+    image: woodlogImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 1 },
+      { x: 1, y: 2 },
+    ],
+    baseValue: 12,
+  },
   {
     id: "health_potion",
     name: "Läkande dryck",
