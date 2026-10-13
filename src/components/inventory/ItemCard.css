@@ -1,0 +1,253 @@
+.item-card {
+  --accent: #c9a24a;
+  --accent-glow: rgba(201, 162, 74, 0.22);
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 300px;
+  min-height: 180px;
+  margin: 12px auto 0;
+  padding: 14px 16px 16px;
+  text-align: left;
+  color: #e8dcc4;
+  font-size: 0.9rem;
+  line-height: 1.4;
+
+  /* Layered backgrounds: glow, dark parchment, then a gradient that
+     shows through the transparent border as a metallic frame. */
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--accent-glow), transparent 55%)
+      padding-box,
+    linear-gradient(165deg, #261e15 0%, #17130e 65%, #1d1810 100%) padding-box,
+    linear-gradient(
+        135deg,
+        var(--accent) 0%,
+        #4a3a20 40%,
+        #2a2216 60%,
+        var(--accent) 100%
+      )
+      border-box;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.55),
+    0 0 16px var(--accent-glow),
+    inset 0 0 24px rgba(0, 0, 0, 0.5);
+
+  animation: item-card-in 140ms ease-out;
+}
+
+/* Accent color per item category */
+.item-card[data-category="weapon"] {
+  --accent: #d2603f;
+  --accent-glow: rgba(210, 96, 63, 0.24);
+}
+
+.item-card[data-category="armour"] {
+  --accent: #6fa3d1;
+  --accent-glow: rgba(111, 163, 209, 0.22);
+}
+
+/* Nothing hovered */
+.item-card[data-empty="true"] {
+  --accent: #6b5d44;
+  --accent-glow: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: none;
+}
+
+.item-card-placeholder {
+  margin: 0;
+  color: #7d7260;
+  font-style: italic;
+}
+
+/* Header */
+.item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.item-card-name {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  text-shadow:
+    0 0 10px var(--accent-glow),
+    0 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.item-card-tag {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  opacity: 0.85;
+}
+
+.item-card-slot {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #9c8f78;
+}
+
+/* Divider with a small diamond in the middle */
+.item-card-divider {
+  position: relative;
+  height: 1px;
+  margin: 10px 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.7;
+}
+
+.item-card-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Stat rows */
+.item-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 2px 0;
+}
+
+.item-card-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9c8f78;
+}
+
+.item-card-value {
+  font-weight: 600;
+  color: #f3e9d2;
+}
+
+.item-card-value--big {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.item-card-subline {
+  margin: 0 0 6px;
+  text-align: right;
+  font-size: 0.72rem;
+  color: #8a7e69;
+}
+
+/* Skills */
+.item-card-section-title {
+  margin: 10px 0 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #8a7e69;
+}
+
+.item-card-skills {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item-card-skill {
+  --skill-color: #888;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 8px 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--skill-color);
+  border-radius: 0 6px 6px 0;
+}
+
+.item-card-skill[data-type="slashing"] {
+  --skill-color: #b8c2cc;
+}
+
+.item-card-skill[data-type="piercing"] {
+  --skill-color: #8fc27a;
+}
+
+.item-card-skill[data-type="crushing"] {
+  --skill-color: #c08a52;
+}
+
+.item-card-skill[data-type="fire"] {
+  --skill-color: #e8663a;
+}
+
+.item-card-skill-name {
+  font-weight: 600;
+}
+
+.item-card-skill-meta {
+  font-size: 0.72rem;
+  text-align: right;
+  color: #a99d86;
+}
+
+/* Footer */
+.item-card-description {
+  margin: 10px 0 0;
+  font-style: italic;
+  color: #b5a88f;
+}
+
+.item-card-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.item-card-price .item-card-value {
+  color: #e3c46f;
+}
+
+@keyframes item-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-card {
+    animation: none;
+  }
+}

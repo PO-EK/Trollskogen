@@ -47,6 +47,9 @@ export type Player = {
   Quests: QuestState[];
   StoryFlags: Record<string, boolean>;
   UnlockedLocations: string[];
+  // In the Player type:
+  KnownSkills: string[]; // spells/skills the player has learned
+  EquippedSkills: string[]; // chosen for the free slots, in order
 };
 
 export type QuestState = {
@@ -104,4 +107,6 @@ export const createNewPlayer = (): Player => ({
   Quests: [],
   StoryFlags: {},
   UnlockedLocations: ["intro", "playerHQ", "village", "witchHut", "ruins"],
+  KnownSkills: [],
+  EquippedSkills: [],
 });

@@ -1,4 +1,7 @@
-import oldAxeImage from "../assets/items/oldaxe.png";
+import type { GameItem, GeneralItem } from "./itemTypes";
+import { weapons } from "./weapons";
+import { armour } from "./armour";
+import { getSkill } from "./skills";
 import healthPotionImage from "../assets/items/health_potion.png";
 import firewoodImage from "../assets/items/firewood.png";
 import woodtorchImage from "../assets/items/fakla.png";
@@ -8,24 +11,11 @@ import clothImage from "../assets/items/cloth.png";
 import leatherImage from "../assets/items/leather.png";
 import woodlogImage from "../assets/items/woodlog.png";
 
-export type ItemShape = {
-  x: number;
-  y: number;
-};
+// Keeps existing imports of these types from "data/items" working.
+export type { ItemShape } from "./itemTypes";
+export type Item = GameItem;
 
-export type Item = {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  shape: ItemShape[];
-  imageOffsetX?: number;
-  imageOffsetY?: number;
-  baseValue: number;
-  imageScale?: number;
-};
-
-export const items: Item[] = [
+const generalItems: GeneralItem[] = [
   {
     id: "cloth",
     name: "Tygrulle",
@@ -118,19 +108,30 @@ export const items: Item[] = [
     ],
     baseValue: 0,
   },
-  {
-    id: "old_axe",
-    name: "Järn Yxa",
-    description: "En gammal yxa gjort av järn och ek.",
-    image: oldAxeImage,
-    shape: [
-      { x: 0, y: 0 },
-      { x: 1, y: 0 },
-      { x: 1, y: 1 },
-      { x: 1, y: 2 },
-    ],
-    baseValue: 25,
-    imageOffsetX: 10,
-    imageOffsetY: -5,
-  },
 ];
+
+export const items: GameItem[] = [...generalItems, ...weapons, ...armour];
+
+// Dev-only: catches duplicate ids now that items live in several files.
+if (import.meta.env.DEV) {
+  for (const weapon of weapons) {
+    if (weapon.skills.length < 1 || weapon.skills.length > 3) {
+      console.error(`${weapon.id} must have 1-3 skills`);
+    }
+
+    for (const skillId of weapon.skills) {
+      if (!getSkill(skillId)) {
+        console.error(`${weapon.id} references unknown skill: ${skillId}`);
+      }
+    }
+  }
+  const seen = new Set<string>();
+
+  for (const item of items) {
+    if (seen.has(item.id)) {
+      console.error(`Duplicate item id: ${item.id}`);
+    }
+
+    seen.add(item.id);
+  }
+}

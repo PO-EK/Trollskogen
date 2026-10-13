@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { usePlayer } from "../../context/usePlayer";
 import { useTrader } from "../../context/useTrader";
-import { items } from "../../data/items";
 import type { ContainerItem } from "../../data/containerItems";
 import type { ContainerType } from "../../data/containerTypes";
 import ItemGrid from "./ItemGrid";
 import "./InventoryPanel.css";
 import { performTransaction } from "../../game/performTransaction";
+import ItemCard from "./ItemCard";
 
 function InventoryPanel() {
   const { player, setPlayer } = usePlayer();
@@ -73,45 +73,35 @@ function InventoryPanel() {
   return (
     <aside className="inventory-panel">
       <h3 className="gold">🪙 {player.Gold} Kroner</h3>
-      Ryggsäcken
-      <ItemGrid
-        containerId="player"
-        containerType="player"
-        width={player.BackpackWidth}
-        height={player.BackpackHeight}
-        inventory={player.Inventory}
-        onInventoryChange={(newInventory) => {
-          setPlayer((currentPlayer) => ({
-            ...currentPlayer,
-            Inventory: newInventory,
-          }));
-        }}
-        onItemRemoved={(containerItemId) => {
-          setPlayer((currentPlayer) => ({
-            ...currentPlayer,
-            Inventory: currentPlayer.Inventory.filter(
-              (item) => item.containerItemId !== containerItemId,
-            ),
-          }));
-        }}
-        onHoveredItemChange={setHoveredItemId}
-        onCrossContainerDrop={handleCrossContainerDrop}
-      />
-      <div className="inventory-item-name">
-        {hoveredItemId
-          ? items.find((item) => item.id === hoveredItemId)?.name
-          : ""}
+      <div className="inventory-panel-title">Ryggsäcken</div>
+
+      <div className="inventory-grid-wrapper">
+        <ItemGrid
+          containerId="player"
+          containerType="player"
+          width={player.BackpackWidth}
+          height={player.BackpackHeight}
+          inventory={player.Inventory}
+          onInventoryChange={(newInventory) => {
+            setPlayer((currentPlayer) => ({
+              ...currentPlayer,
+              Inventory: newInventory,
+            }));
+          }}
+          onItemRemoved={(containerItemId) => {
+            setPlayer((currentPlayer) => ({
+              ...currentPlayer,
+              Inventory: currentPlayer.Inventory.filter(
+                (item) => item.containerItemId !== containerItemId,
+              ),
+            }));
+          }}
+          onHoveredItemChange={setHoveredItemId}
+          onCrossContainerDrop={handleCrossContainerDrop}
+        />
       </div>
-      <div className="inventory-item-value">
-        {hoveredItemId
-          ? `Värt ${items.find((item) => item.id === hoveredItemId)?.baseValue} Kronor`
-          : ""}
-      </div>
-      <div className="inventory-item-descript">
-        {hoveredItemId
-          ? items.find((item) => item.id === hoveredItemId)?.description
-          : ""}
-      </div>
+
+      <ItemCard itemId={hoveredItemId} />
     </aside>
   );
 }

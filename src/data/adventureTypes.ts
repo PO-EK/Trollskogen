@@ -36,6 +36,7 @@ export type AdventureEffect =
       acceptedItemId: string;
     }
   | { type: "removeItem"; itemId: string }
+  | { type: "learnSkill"; skillId: string }
   | { type: "addGold"; amount: number }
   | { type: "openStorage" }
   | { type: "removeGold"; amount: number }

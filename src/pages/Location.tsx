@@ -6,6 +6,7 @@ import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
+import ItemCard from "../components/inventory/ItemCard";
 import type { ContainerType } from "../data/containerTypes";
 import { performTransaction } from "../game/performTransaction";
 
@@ -39,6 +40,7 @@ function Location({
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
   const location = locations.find((location) => location.id === locationId);
 
@@ -284,6 +286,15 @@ function Location({
         onReturn();
         break;
 
+      case "learnSkill":
+        setPlayer((p) => ({
+          ...p,
+          KnownSkills: p.KnownSkills.includes(effect.skillId)
+            ? p.KnownSkills
+            : [...p.KnownSkills, effect.skillId],
+        }));
+        break;
+
       default: {
         // Compile-time check: errors if an AdventureEffect type has no case above.
         const _exhaustive: never = effect;
@@ -296,6 +307,7 @@ function Location({
     // Clear the temporary location container before applying new effects.
     setContainerItems([]);
     setActiveContainer(null);
+    setHoveredItemId(null);
 
     if (choice.effects) {
       for (const effect of choice.effects) {
@@ -325,42 +337,48 @@ function Location({
       <p className="location-text">{currentNode.text}</p>
 
       {activeContainer && (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {activeContainer.type === "storage" ? (
-            <ItemGrid
-              containerId="storage"
-              containerType="storage"
-              width={player.StorageWidth}
-              height={player.StorageHeight}
-              inventory={player.Storage}
-              onInventoryChange={(updated) =>
-                setPlayer((p) => ({ ...p, Storage: updated }))
-              }
-              onItemRemoved={(id) =>
-                setPlayer((p) => ({
-                  ...p,
-                  Storage: p.Storage.filter((i) => i.containerItemId !== id),
-                }))
-              }
-              onCrossContainerDrop={handleCrossContainerDrop}
-            />
-          ) : (
-            <ItemGrid
-              containerId={activeContainer.id}
-              containerType={activeContainer.type}
-              width={3}
-              height={3}
-              inventory={containerItems}
-              onInventoryChange={handleContainerItemsChanged}
-              onItemRemoved={handleContainerItemRemoved}
-              onCrossContainerDrop={handleCrossContainerDrop}
-              acceptedItemId={
-                activeContainer.type === "quest"
-                  ? activeContainer.acceptedItemId
-                  : undefined
-              }
-            />
-          )}
+        <div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            {activeContainer.type === "storage" ? (
+              <ItemGrid
+                containerId="storage"
+                containerType="storage"
+                width={player.StorageWidth}
+                height={player.StorageHeight}
+                inventory={player.Storage}
+                onInventoryChange={(updated) =>
+                  setPlayer((p) => ({ ...p, Storage: updated }))
+                }
+                onItemRemoved={(id) =>
+                  setPlayer((p) => ({
+                    ...p,
+                    Storage: p.Storage.filter((i) => i.containerItemId !== id),
+                  }))
+                }
+                onHoveredItemChange={setHoveredItemId}
+                onCrossContainerDrop={handleCrossContainerDrop}
+              />
+            ) : (
+              <ItemGrid
+                containerId={activeContainer.id}
+                containerType={activeContainer.type}
+                width={3}
+                height={3}
+                inventory={containerItems}
+                onInventoryChange={handleContainerItemsChanged}
+                onItemRemoved={handleContainerItemRemoved}
+                onHoveredItemChange={setHoveredItemId}
+                onCrossContainerDrop={handleCrossContainerDrop}
+                acceptedItemId={
+                  activeContainer.type === "quest"
+                    ? activeContainer.acceptedItemId
+                    : undefined
+                }
+              />
+            )}
+          </div>
+
+          <ItemCard itemId={hoveredItemId} />
         </div>
       )}
 

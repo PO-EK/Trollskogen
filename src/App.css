@@ -24,7 +24,7 @@
 .game-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 210px;
+  grid-template-columns: 300px minmax(0, 1fr) 300px;
   min-height: 0;
 }
 

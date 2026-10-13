@@ -5,8 +5,8 @@ import { useState } from "react";
 import type { ContainerItem } from "../data/containerItems";
 import type { ContainerType } from "../data/containerTypes";
 import type { TraderInventoryItem } from "../data/traders/tradersTypes";
-import { items } from "../data/items";
 import { performTransaction } from "../game/performTransaction";
+import ItemCard from "../components/inventory/ItemCard";
 
 type TradingProps = {
   traderId: string | null;
@@ -42,6 +42,11 @@ function Trading({ traderId, onReturn }: TradingProps) {
     boxShadow: "0 8px 20px rgba(99, 102, 241, 0.28)",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
   } as const;
+
+  // The trader's entry for the hovered item, used for its asking price.
+  const hoveredTraderItem = trader.inventory.find(
+    (item) => item.itemId === hoveredItemId,
+  );
 
   function handleInventoryChange(updatedInventory: TraderInventoryItem[]) {
     setTraders((currentTraders) =>
@@ -120,15 +125,15 @@ function Trading({ traderId, onReturn }: TradingProps) {
         />
       </div>
 
-      <div>
-        {hoveredItemId
-          ? items.find((item) => item.id === hoveredItemId)?.name
-          : ""}
-      </div>
       <div style={{ marginBottom: "20px" }}>
-        {hoveredItemId
-          ? `Kostnad: ${trader.inventory.find((item) => item.itemId === hoveredItemId)?.buyPrice ?? 0} Kronor`
-          : "Peka på ett föremål"}
+        <ItemCard
+          itemId={hoveredItemId}
+          price={
+            hoveredTraderItem
+              ? { label: "Kostnad", amount: hoveredTraderItem.buyPrice }
+              : undefined
+          }
+        />
       </div>
 
       <button onClick={onReturn} style={backButtonStyle}>

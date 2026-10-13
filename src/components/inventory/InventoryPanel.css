@@ -18,24 +18,13 @@
   border-bottom: 1px solid #3d352a;
 }
 
-.inventory-item-name {
-  height: 24px;
-  color: #e8d7b0;
-  font-family: Georgia, serif;
-  font-weight: bold;
-  text-align: center;
-  font-size: larger;
-}
-.inventory-item-descript {
-  height: 14px;
-  color: #e8d7b0;
-  font-family: Georgia, serif;
-  text-align: center;
-  font-size: medium;
+.inventory-grid-wrapper {
+  display: flex;
+  justify-content: center;
 }
 
-.inventory-item-value {
-  padding: 4px 0;
-  font-size: small;
-  color: #d8b46a;
+/* Optional: centers the "Ryggsäcken" label too */
+.inventory-panel-title {
+  margin: 6px 0;
+  text-align: center;
 }
