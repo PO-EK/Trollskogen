@@ -37,7 +37,7 @@ export type Player = {
 
   // HP
   HP: number;
-
+  HPMax: number;
   // Mana
   Mana: number;
   ManaMax: number;
@@ -81,6 +81,7 @@ export const createNewPlayer = (): Player => ({
 
   HP: maxHP,
 
+  HPMax: maxHP,
   Mana: 50,
   ManaMax: 50,
   Equipment: {},
