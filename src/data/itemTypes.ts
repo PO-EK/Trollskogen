@@ -48,6 +48,8 @@ export type ArmourItem = BaseItem & {
   category: "armour";
   slot: ArmourSlot;
   defense: number;
+  skills?: string[];
+  attackBonus?: number;
 };
 
 export type EquipmentSlot = WeaponSlot | ArmourSlot;

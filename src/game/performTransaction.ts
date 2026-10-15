@@ -3,7 +3,7 @@ import type { ContainerItem } from "../data/containerItems";
 import type { ContainerType } from "../data/containerTypes";
 import type { Player } from "../data/player";
 import type { Trader, TraderInventoryItem } from "../data/traders/tradersTypes";
-
+import { canEquipInSlot, parseEquipSlotId } from "./equipment";
 import { getDropOperation } from "./getDropOperation";
 import type { TransactionResult } from "./transactionTypes";
 
@@ -102,6 +102,26 @@ export function performTransaction({
         player,
         trader,
         direction: "retrieve",
+      });
+
+    case "equip":
+      return performEquip({
+        item,
+        sourceId,
+        destinationId,
+        position,
+        player,
+        trader,
+      });
+
+    case "unequip":
+      return performUnequip({
+        item,
+        sourceId,
+        destinationId,
+        position,
+        player,
+        trader,
       });
 
     default:
@@ -474,6 +494,98 @@ function performMoveBetweenPlayerLists({
   return {
     success: true,
     player: updatedPlayer,
+    trader,
+  };
+}
+function invalid(player: Player, trader?: Trader): PerformTransactionOutput {
+  return { success: false, reason: "invalid_transaction", player, trader };
+}
+
+// Backpack -> equipment slot.
+function performEquip({
+  item,
+  sourceId,
+  destinationId,
+  player,
+  trader,
+}: TransactionHandlerArgs): PerformTransactionOutput {
+  const slot = parseEquipSlotId(destinationId);
+
+  if (sourceId !== "player" || !slot) {
+    return invalid(player, trader);
+  }
+
+  // Trust our own state, not the dragged copy.
+  const ownedItem = player.Inventory.find(
+    (inventoryItem) => inventoryItem.containerItemId === item.containerItemId,
+  );
+
+  if (!ownedItem) {
+    return invalid(player, trader);
+  }
+
+  const definition = items.find((def) => def.id === ownedItem.itemId);
+
+  if (!definition || !canEquipInSlot(definition, slot)) {
+    return invalid(player, trader);
+  }
+
+  // Occupied slot: the player has to unequip first.
+  if (player.Equipment[slot]) {
+    return invalid(player, trader);
+  }
+
+  const equipment = { ...player.Equipment };
+  equipment[slot] = { ...ownedItem, x: 0, y: 0 };
+
+  return {
+    success: true,
+    player: {
+      ...player,
+      Inventory: player.Inventory.filter(
+        (inventoryItem) =>
+          inventoryItem.containerItemId !== ownedItem.containerItemId,
+      ),
+      Equipment: equipment,
+    },
+    trader,
+  };
+}
+
+// Equipment slot -> backpack.
+function performUnequip({
+  item,
+  sourceId,
+  destinationId,
+  position,
+  player,
+  trader,
+}: TransactionHandlerArgs): PerformTransactionOutput {
+  const slot = parseEquipSlotId(sourceId);
+
+  if (!slot || destinationId !== "player") {
+    return invalid(player, trader);
+  }
+
+  const equipped = player.Equipment[slot];
+
+  if (!equipped || equipped.containerItemId !== item.containerItemId) {
+    return invalid(player, trader);
+  }
+
+  const equipment = { ...player.Equipment };
+  delete equipment[slot];
+
+  return {
+    success: true,
+    player: {
+      ...player,
+      Inventory: [
+        ...player.Inventory,
+        { ...equipped, x: position.x, y: position.y },
+      ],
+      Equipment: equipment,
+    },
     trader,
   };
 }

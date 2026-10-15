@@ -1,11 +1,20 @@
 export type StoryFlags = Record<string, boolean>;
 import type { ContainerItem } from "./containerItems";
+import type { EquipmentSlot } from "./itemTypes";
+import {
+  BASELINE_STAT,
+  HP_BONUS_PER_CON_POINT,
+  HP_PER_CON_POINT,
+} from "../game/balance";
+export function getMaxHP(player: Player): number {
+  const flat = HP_PER_CON_POINT * player.Con;
+  const multiplier = Math.max(
+    0,
+    1 + HP_BONUS_PER_CON_POINT * (player.Con - BASELINE_STAT),
+  );
 
-/* type Storage = {
-  width: number;
-  height: number;
-  inventory: ContainerItem[];
-}; */
+  return Math.max(1, Math.ceil(flat * multiplier));
+}
 
 export type Player = {
   Id?: string;
@@ -28,15 +37,14 @@ export type Player = {
 
   // HP
   HP: number;
-  HPMax: number;
 
   // Mana
   Mana: number;
   ManaMax: number;
-
+  Equipment: Partial<Record<EquipmentSlot, ContainerItem>>;
   // Inventory
-  BackpackWidth: 5;
-  BackpackHeight: 5;
+  BackpackWidth: number;
+  BackpackHeight: number;
   Inventory: ContainerItem[];
 
   StorageWidth: number;
@@ -56,32 +64,31 @@ export type QuestState = {
   questId: string;
   completed: boolean;
 };
-
+const maxHP = getMaxHP({ Con: 15 } as Player);
 export const createNewPlayer = (): Player => ({
   Name: "Admin",
 
-  Gold: 128,
+  Gold: 1280,
 
   Level: 1,
-  Exp: 0,
+  Exp: 54,
   ExpMax: 100,
 
-  Str: 10,
-  Dex: 10,
-  Con: 10,
+  Str: 22,
+  Dex: 17,
+  Con: 15,
   Int: 10,
 
-  HP: 100,
-  HPMax: 100,
+  HP: maxHP,
 
   Mana: 50,
   ManaMax: 50,
+  Equipment: {},
+  BackpackWidth: 6,
+  BackpackHeight: 6,
 
-  BackpackWidth: 5,
-  BackpackHeight: 5,
-
-  StorageWidth: 10,
-  StorageHeight: 10,
+  StorageWidth: 7,
+  StorageHeight: 7,
   Storage: [
     {
       containerItemId: "startItem1",
@@ -103,10 +110,17 @@ export const createNewPlayer = (): Player => ({
     },
   ],
 
-  Inventory: [],
+  Inventory: [
+    {
+      containerItemId: "yxa1",
+      itemId: "battle_axe",
+      x: 0,
+      y: 0,
+    },
+  ],
   Quests: [],
   StoryFlags: {},
-  UnlockedLocations: ["intro", "playerHQ", "village", "witchHut", "ruins"],
+  UnlockedLocations: ["intro", "playerHQ", "village", "ruins", "blacksmith"],
   KnownSkills: [],
   EquippedSkills: [],
 });

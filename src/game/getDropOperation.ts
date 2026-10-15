@@ -29,6 +29,14 @@ export function getDropOperation(
     return "retrieve";
   }
 
+  if (sourceType === "player" && destinationType === "equipment") {
+    return "equip";
+  }
+
+  if (sourceType === "equipment" && destinationType === "player") {
+    return "unequip";
+  }
+
   if (destinationType === "quest") {
     return "quest";
   }

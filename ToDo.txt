@@ -1,8 +1,25 @@
-Todo:
+Features:
 
-Navigation engine <- funktionell
-Character <-- påbörjad
-
-Inventory
-Skills
+Navigation - Klart
+Dialog - Klart
+Inventory - Klart
+Quest - Klart
+Storage - Klart
+Items - Klart
+Weapons & Armor - Klart
+Equip items
+Equip Skills
+Enemies
 Combat Sim
+
+
+
+Story:
+
+Intro - Klart
+Ruins - Klart
+Smeden - Klart
+Snickare
+Värdhuset
+Jägaren
+Häxan

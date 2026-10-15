@@ -1,11 +1,16 @@
 import { usePlayer } from "../context/usePlayer";
+import type { OverlayId } from "../pages/overlays";
 import "./CharacterPanel.css";
+import { getMaxHP } from "../game/characterStats";
+type CharacterPanelProps = {
+  onOpenOverlay: (overlay: OverlayId) => void;
+};
 
-function CharacterPanel() {
+function CharacterPanel({ onOpenOverlay }: CharacterPanelProps) {
   const { player } = usePlayer();
-  const hpPercent = (player.HP / player.HPMax) * 100;
   const manaPercent = (player.Mana / player.ManaMax) * 100;
-
+  const maxHP = getMaxHP(player);
+  const hpPercent = (player.HP / maxHP) * 100;
   return (
     <aside className="character-panel">
       <div className="character-header">
@@ -15,9 +20,9 @@ function CharacterPanel() {
 
       <div className="resource-section">
         <div className="resource-label">
-          <span>❤️ Hälsa</span>
+          <span>❤️ Hälsa: </span>
           <span>
-            {player.HP} / {player.HPMax}
+            {player.HP} / {maxHP}
           </span>
         </div>
 
@@ -28,7 +33,7 @@ function CharacterPanel() {
 
       <div className="resource-section">
         <div className="resource-label">
-          <span>💧 Magi</span>
+          <span>💧 Magi: </span>
           <span>
             {player.Mana} / {player.ManaMax}
           </span>
@@ -39,29 +44,24 @@ function CharacterPanel() {
         </div>
       </div>
 
-      <div className="stats">
-        <h3>Egenskaper</h3>
-
-        <div className="stat-row">
-          <span>⚔️ Styrka</span>
-          <span>{player.Str}</span>
-        </div>
-
-        <div className="stat-row">
-          <span>🏹 Smidighet </span>
-          <span>{player.Dex}</span>
-        </div>
-
-        <div className="stat-row">
-          <span>🛡️ Fysik </span>
-          <span>{player.Con}</span>
-        </div>
-
-        <div className="stat-row">
-          <span>🔮 Intelligens </span>
-          <span>{player.Int}</span>
-        </div>
-      </div>
+      <button
+        className="character-panel-button"
+        onClick={() => onOpenOverlay("character")}
+      >
+        Karaktär
+      </button>
+      <button
+        className="character-panel-button"
+        onClick={() => onOpenOverlay("character")}
+      >
+        Skills
+      </button>
+      <button
+        className="character-panel-button"
+        onClick={() => onOpenOverlay("character")}
+      >
+        Quests
+      </button>
     </aside>
   );
 }

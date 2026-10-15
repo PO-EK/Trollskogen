@@ -4,7 +4,7 @@ import type { Player } from "../data/player";
 import { getSkill } from "../data/skills";
 import { FISTS } from "../data/weapons";
 import { rollDamage } from "./weaponDamage";
-
+import { getFlatAttackBonus } from "./characterStats";
 export const MAX_SKILL_SLOTS = 6;
 const UNARMED_SKILL_IDS = ["punch"];
 
@@ -44,7 +44,9 @@ export function rollSkillDamage(
   let base: number;
 
   if (damage.kind === "weapon") {
-    base = rollDamage(player, weapon ?? FISTS, random) * damage.multiplier;
+    base =
+      rollDamage(player, weapon ?? FISTS, random, getFlatAttackBonus(player)) *
+      damage.multiplier;
   } else {
     base = rollDamage(
       player,

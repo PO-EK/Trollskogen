@@ -1,0 +1,207 @@
+.character-page {
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 16px;
+  color: #e8e0d0;
+  font-family: Georgia, serif;
+}
+/* The page is now two rows stacked: the top row, then the stats. */
+.character-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Row 1: item card (left) and equipment (right) */
+.character-page-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* Let the card fill its column instead of using its own 300px width. */
+.character-page-card .item-card {
+  max-width: none;
+  margin: 0;
+}
+
+.character-page-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #5c4a32;
+}
+
+.character-page-header h1 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.6rem;
+}
+
+.character-page-header span {
+  color: #aaa;
+}
+
+.character-page-close {
+  margin-left: auto;
+  padding: 8px 16px;
+
+  background: transparent;
+  color: #e8e0d0;
+
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.character-page-close:hover {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.character-page h3 {
+  margin: 0 0 10px;
+  color: #d8b46a;
+  font-size: 1rem;
+}
+
+.character-page-equipment .equip-section {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.equip-section {
+  position: relative; /* slots are positioned inside this box */
+  width: 100%;
+  aspect-ratio: 3 / 4; /* set this to your image's width / height */
+  margin-top: 18px;
+
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.equip-slot {
+  position: absolute;
+  width: 22%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%); /* left/top below = the slot's center */
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(20, 16, 10, 0.45);
+  border: 2px dashed rgba(216, 180, 106, 0.45);
+  border-radius: 8px;
+
+  touch-action: none;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s,
+    background 0.12s;
+}
+
+.equip-slot--filled {
+  border-style: solid;
+  background: rgba(20, 16, 10, 0.75);
+  cursor: grab;
+}
+
+/* While dragging an item from the backpack: slots that accept it glow green. */
+.equip-slot[data-drag-state="valid"] {
+  border-color: #7fc06a;
+  box-shadow: 0 0 10px rgba(127, 192, 106, 0.45);
+}
+
+.equip-slot[data-drag-state="valid"][data-over="true"] {
+  background: rgba(127, 192, 106, 0.25);
+  box-shadow: 0 0 16px rgba(127, 192, 106, 0.8);
+}
+
+.equip-slot[data-drag-state="invalid"][data-over="true"] {
+  border-color: #c0503a;
+  background: rgba(192, 80, 58, 0.2);
+}
+
+.equip-slot-image {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.equip-slot-label {
+  font-size: 0.6rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(216, 180, 106, 0.7);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Positions: percentages of the figure box. These are guesses, so tune
+   them against your image. */
+.equip-slot[data-slot="head"] {
+  left: 50%;
+  top: 11%;
+}
+.equip-slot[data-slot="body"] {
+  left: 50%;
+  top: 38%;
+}
+.equip-slot[data-slot="feet"] {
+  left: 50%;
+  top: 88%;
+}
+.equip-slot[data-slot="mainHand"] {
+  left: 14%;
+  top: 45%;
+}
+.equip-slot[data-slot="offHand"] {
+  left: 86%;
+  top: 45%;
+}
+/* Row 2: two columns, attributes and combat values */
+.character-page-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+
+  padding-top: 14px;
+  border-top: 1px solid #5c4a32;
+}
+
+/* Small line under a stat, e.g. the equipped weapon's name */
+.stat-note {
+  margin: 2px 0 0;
+  text-align: right;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #8a7e69;
+}
+
+/* Higher specificity than the gold color from .stat-row in CharacterPanel.css */
+.character-page .stat-row span.stat-value--boosted {
+  color: #7fc06a;
+}
+
+@media (max-width: 700px) {
+  .character-page-top {
+    grid-template-columns: 1fr;
+  }
+  .character-page-bottom {
+    grid-template-columns: 1fr;
+  }
+}

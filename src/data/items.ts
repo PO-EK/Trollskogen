@@ -4,7 +4,7 @@ import { armour } from "./armour";
 import { getSkill } from "./skills";
 import healthPotionImage from "../assets/items/health_potion.png";
 import firewoodImage from "../assets/items/firewood.png";
-import woodtorchImage from "../assets/items/fakla.png";
+
 import storageKeyImage from "../assets/items/storageKey.png";
 import manaPotionImage from "../assets/items/mana_potion.png";
 import clothImage from "../assets/items/cloth.png";
@@ -63,18 +63,6 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 1 },
     ],
     baseValue: 40,
-  },
-  {
-    id: "wood_torch",
-    name: "Fakla",
-    description: "Lyser upp världen och gör monster rädda.",
-    image: woodtorchImage,
-    shape: [
-      { x: 0, y: 0 },
-      { x: 0, y: 1 },
-      { x: 0, y: 2 },
-    ],
-    baseValue: 6,
   },
   {
     id: "mana_potion",

@@ -5,4 +5,6 @@ export type DragOperation =
   | "pickup"
   | "store"
   | "retrieve"
-  | "quest";
+  | "quest"
+  | "equip"
+  | "unequip";

@@ -29,7 +29,7 @@ const STAT_LABELS: Record<WeaponStat, string> = {
 };
 
 const DAMAGE_TYPE_LABELS: Record<DamageType, string> = {
-  slashing: "Huggande",
+  slashing: "Skärande",
   piercing: "Stickande",
   crushing: "Krossande",
   fire: "Eld",
@@ -53,7 +53,7 @@ function getSkillMeta(skill: Skill): string {
   }
 
   if (skill.cooldown) {
-    parts.push(`Väntetid ${skill.cooldown}`);
+    parts.push(`Cooldown ${skill.cooldown}`);
   }
 
   return parts.join(" · ");
@@ -78,8 +78,7 @@ function WeaponDetails({ weapon }: { weapon: WeaponItem }) {
         </span>
       </div>
       <p className="item-card-subline">
-        Grundskada {weapon.minDamage}–{weapon.maxDamage} · skalar med{" "}
-        {STAT_LABELS[weapon.stat]}
+        Skada ökar med {STAT_LABELS[weapon.stat]}
       </p>
 
       <h4 className="item-card-section-title">Färdigheter</h4>
