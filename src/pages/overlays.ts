@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import Character from "./Character";
+import Skills from "./Skills";
 
 export type OverlayProps = {
   onClose: () => void;
@@ -10,6 +11,7 @@ export type OverlayProps = {
 // below updates by itself.
 export const OVERLAYS = {
   character: Character,
+  skills: Skills,
 } satisfies Record<string, ComponentType<OverlayProps>>;
 
 export type OverlayId = keyof typeof OVERLAYS;

@@ -175,6 +175,7 @@
 }
 /* Row 2: two columns, attributes and combat values */
 .character-page-bottom {
+  order: -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;

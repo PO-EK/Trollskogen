@@ -23,7 +23,7 @@ export type GeneralItem = BaseItem & {
 
 export type WeaponSlot = "mainHand" | "offHand";
 
-export type WeaponStat = "Str" | "Dex" | "Int";
+export type WeaponStat = "Str" | "Dex" | "Con" | "Int";
 
 export type WeaponItem = BaseItem & {
   category: "weapon";
@@ -48,8 +48,8 @@ export type ArmourItem = BaseItem & {
   category: "armour";
   slot: ArmourSlot;
   defense: number;
-  skills?: string[];
   attackBonus?: number;
+  skills?: string[];
 };
 
 export type EquipmentSlot = WeaponSlot | ArmourSlot;

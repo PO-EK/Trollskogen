@@ -5,7 +5,7 @@ export const SLOT_LABELS: Record<EquipmentSlot, string> = {
   mainHand: "Huvudhand",
   offHand: "Andra handen",
   head: "Huvud",
-  body: "Bröst",
+  body: "Kropp",
   feet: "Fötter",
   hands: "Händer",
 };

@@ -52,15 +52,9 @@ function CharacterPanel({ onOpenOverlay }: CharacterPanelProps) {
       </button>
       <button
         className="character-panel-button"
-        onClick={() => onOpenOverlay("character")}
+        onClick={() => onOpenOverlay("skills")}
       >
-        Skills
-      </button>
-      <button
-        className="character-panel-button"
-        onClick={() => onOpenOverlay("character")}
-      >
-        Quests
+        Färdigheter
       </button>
     </aside>
   );

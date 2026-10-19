@@ -7,7 +7,7 @@ Quest - Klart
 Storage - Klart
 Items - Klart
 Weapons & Armor - Klart
-Equip items
+Equip items - Klart
 Equip Skills
 Enemies
 Combat Sim

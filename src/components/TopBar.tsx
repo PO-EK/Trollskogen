@@ -2,10 +2,7 @@ function TopBar() {
   return (
     <header className="top-bar">
       <h2>Trollskogen</h2>
-      <p>
-        Version 0.0.8 - 2026-10-15: Equipment and stats overlay added. Smeden
-        har nya saker.
-      </p>
+      <p>Version 0.0.9 - 2026-10-19: Utrusta dig med Skills på Färdigheter.</p>
     </header>
   );
 }

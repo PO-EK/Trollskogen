@@ -42,6 +42,8 @@ export type Player = {
   Mana: number;
   ManaMax: number;
   Equipment: Partial<Record<EquipmentSlot, ContainerItem>>;
+  EquippedSkills: (string | null)[]; // was string[]
+
   // Inventory
   BackpackWidth: number;
   BackpackHeight: number;
@@ -57,7 +59,6 @@ export type Player = {
   UnlockedLocations: string[];
   // In the Player type:
   KnownSkills: string[]; // spells/skills the player has learned
-  EquippedSkills: string[]; // chosen for the free slots, in order
 };
 
 export type QuestState = {
@@ -111,10 +112,11 @@ export const createNewPlayer = (): Player => ({
     },
   ],
 
+  EquippedSkills: [],
   Inventory: [
     {
-      containerItemId: "yxa1",
-      itemId: "battle_axe",
+      containerItemId: "testweap1",
+      itemId: "iron_sword",
       x: 0,
       y: 0,
     },
@@ -122,6 +124,13 @@ export const createNewPlayer = (): Player => ({
   Quests: [],
   StoryFlags: {},
   UnlockedLocations: ["intro", "playerHQ", "village", "ruins", "blacksmith"],
-  KnownSkills: [],
-  EquippedSkills: [],
+  KnownSkills: [
+    "warcry",
+    "evade",
+    "meditate",
+    "curse",
+    "fireball",
+    "tackle",
+    "harden",
+  ],
 });

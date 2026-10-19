@@ -7,7 +7,7 @@ import type {
   WeaponItem,
   WeaponStat,
 } from "../../data/itemTypes";
-import type { DamageType, Skill } from "../../data/skillTypes";
+import type { Skill } from "../../data/skillTypes";
 import { getDamageRange } from "../../game/weaponDamage";
 import "./ItemCard.css";
 
@@ -25,15 +25,16 @@ const SLOT_LABELS: Record<EquipmentSlot, string> = {
 const STAT_LABELS: Record<WeaponStat, string> = {
   Str: "Styrka",
   Dex: "Smidighet",
+  Con: "Fysik",
   Int: "Intelligens",
 };
 
-const DAMAGE_TYPE_LABELS: Record<DamageType, string> = {
+/* const DAMAGE_TYPE_LABELS: Record<DamageType, string> = {
   slashing: "Skärande",
   piercing: "Stickande",
   crushing: "Krossande",
   fire: "Eld",
-};
+}; */
 
 const CATEGORY_LABELS = {
   general: "Föremål",
@@ -41,7 +42,7 @@ const CATEGORY_LABELS = {
   armour: "Rustning",
 } as const;
 
-function getSkillMeta(skill: Skill): string {
+/* function getSkillMeta(skill: Skill): string {
   const parts: string[] = [];
 
   if (skill.damage?.kind === "weapon") {
@@ -57,7 +58,7 @@ function getSkillMeta(skill: Skill): string {
   }
 
   return parts.join(" · ");
-}
+} */
 
 function WeaponDetails({ weapon }: { weapon: WeaponItem }) {
   const { player } = usePlayer();
@@ -81,7 +82,7 @@ function WeaponDetails({ weapon }: { weapon: WeaponItem }) {
         Skada ökar med {STAT_LABELS[weapon.stat]}
       </p>
 
-      <h4 className="item-card-section-title">Färdigheter</h4>
+      <h4 className="item-card-section-title">Attacker</h4>
       <ul className="item-card-skills">
         {weaponSkills.map((skill) => (
           <li
@@ -91,7 +92,7 @@ function WeaponDetails({ weapon }: { weapon: WeaponItem }) {
             title={skill.description}
           >
             <span className="item-card-skill-name">{skill.name}</span>
-            <span className="item-card-skill-meta">{getSkillMeta(skill)}</span>
+            {/* <span className="item-card-skill-meta">{getSkillMeta(skill)}</span> */}
           </li>
         ))}
       </ul>
@@ -142,12 +143,11 @@ function ItemCard({ itemId, price }: ItemCardProps) {
         <p className="item-card-slot">{SLOT_LABELS[item.slot]}</p>
       )}
 
+      <p className="item-card-description">{item.description}</p>
       <div className="item-card-divider" />
 
       {item.category === "weapon" && <WeaponDetails weapon={item} />}
       {item.category === "armour" && <ArmourDetails armour={item} />}
-
-      <p className="item-card-description">{item.description}</p>
 
       <div className="item-card-price">
         <span className="item-card-label">{priceLine.label}</span>

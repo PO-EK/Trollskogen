@@ -1,28 +1,40 @@
 import type { WeaponItem } from "../data/itemTypes";
 import type { DamageType, Skill } from "../data/skillTypes";
 import type { Player } from "../data/player";
-import { getSkill } from "../data/skills";
 import { FISTS } from "../data/weapons";
-import { rollDamage } from "./weaponDamage";
+import { getDamageRange, rollDamage } from "./weaponDamage";
 import { getFlatAttackBonus } from "./characterStats";
-export const MAX_SKILL_SLOTS = 6;
-const UNARMED_SKILL_IDS = ["punch"];
 
-/*
- * The skills available in battle: the weapon's skills first, then the
- * player's chosen spells/skills, cut off at the slot limit.
- * Computed on demand, so swapping weapons never leaves stale data behind.
- */
-export function getBattleSkills(
+// The damage range shown on a skill card, with your stats applied.
+export function getSkillDamageRange(
+  player: Player,
+  skill: Skill,
   weapon: WeaponItem | null,
-  equippedSkillIds: string[],
-): Skill[] {
-  const weaponSkillIds = weapon ? weapon.skills : UNARMED_SKILL_IDS;
+): { min: number; max: number } | null {
+  const damage = skill.damage;
 
-  return [...weaponSkillIds, ...equippedSkillIds]
-    .slice(0, MAX_SKILL_SLOTS)
-    .map(getSkill)
-    .filter((skill): skill is Skill => skill !== undefined);
+  if (!damage) {
+    return null;
+  }
+
+  if (damage.kind === "weapon") {
+    const range = getDamageRange(
+      player,
+      weapon ?? FISTS,
+      getFlatAttackBonus(player),
+    );
+
+    return {
+      min: Math.round(range.min * damage.multiplier),
+      max: Math.round(range.max * damage.multiplier),
+    };
+  }
+
+  return getDamageRange(player, {
+    minDamage: damage.min,
+    maxDamage: damage.max,
+    stat: damage.stat,
+  });
 }
 
 // Per-type multipliers on the target, e.g. { slashing: 0.5, crushing: 1.25 }.

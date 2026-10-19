@@ -1,0 +1,278 @@
+.skills-page {
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  color: #e8e0d0;
+  font-family: Georgia, serif;
+}
+
+.skills-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #5c4a32;
+}
+
+.skills-header h1 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.6rem;
+}
+
+.skills-close {
+  margin-left: auto;
+  padding: 8px 16px;
+
+  background: transparent;
+  color: #e8e0d0;
+
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.skills-close:hover {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.skills-section,
+.skills-library {
+  flex: none;
+}
+
+.skills-page h3 {
+  margin: 0 0 4px;
+  color: #d8b46a;
+  font-size: 1rem;
+}
+
+.skills-hint {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: #8a7e69;
+}
+
+.skills-card-grid,
+.skills-library-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+/* Your 4 slots */
+.skills-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.skills-slot {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 68px;
+  padding: 8px 26px 8px 10px;
+
+  display: flex;
+  align-items: center;
+
+  background: rgba(20, 16, 10, 0.45);
+  border: 2px dashed rgba(216, 180, 106, 0.45);
+  border-radius: 8px;
+
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s,
+    background 0.12s;
+}
+
+.skills-slot[data-filled="true"] {
+  border-style: solid;
+  background: rgba(20, 16, 10, 0.75);
+}
+
+/* While dragging: slots that accept the drop glow green. */
+.skills-slot[data-drop="valid"] {
+  border-color: #7fc06a;
+  box-shadow: 0 0 10px rgba(127, 192, 106, 0.45);
+}
+
+.skills-slot[data-drop="valid"][data-over="true"] {
+  background: rgba(127, 192, 106, 0.25);
+  box-shadow: 0 0 16px rgba(127, 192, 106, 0.8);
+}
+
+.skills-slot[data-drop="invalid"][data-over="true"] {
+  border-color: #c0503a;
+  background: rgba(192, 80, 58, 0.2);
+}
+
+.skills-slot-number {
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  font-size: 0.65rem;
+  color: rgba(216, 180, 106, 0.6);
+}
+
+.skills-slot-skill {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 10px;
+  cursor: grab;
+}
+
+.skills-slot-name {
+  font-weight: 300;
+  font-size: 1rem;
+  color: #f3e9d2;
+}
+
+.skills-slot-meta {
+  font-size: 0.7rem;
+  color: #a99d86;
+}
+
+.skills-slot-empty {
+  margin: auto;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #7d7260;
+}
+
+.skills-slot-clear {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 0 5px;
+
+  background: transparent;
+  color: #a99d86;
+  border: none;
+  cursor: pointer;
+}
+
+.skills-slot-clear:hover {
+  color: #e8663a;
+}
+
+/* Library: fills the rest of the page and scrolls on its own. */
+.skills-library {
+  flex: 1 1 0;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.skills-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+.skills-filter {
+  padding: 4px 12px;
+
+  background: transparent;
+  color: #e8e0d0;
+
+  border: 1px solid #8c6b3e;
+  border-radius: 999px;
+
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.skills-filter[data-active="true"] {
+  background: #30261b;
+  border-color: #c09a5b;
+  color: #d8b46a;
+}
+
+.skills-search {
+  min-width: 160px;
+  margin-left: auto;
+  padding: 4px 10px;
+
+  background: #17130e;
+  color: #e8e0d0;
+
+  border: 1px solid #5c4a32;
+  border-radius: 4px;
+
+  font-family: inherit;
+}
+
+.skills-library-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px;
+  align-content: start;
+}
+
+.skills-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-style: italic;
+  color: #7d7260;
+}
+.skills-card-grid.skills-card-grid--compact {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+}
+.skills-button {
+  padding: 4px 14px;
+
+  background: transparent;
+  color: #e8e0d0;
+
+  border: 1px solid #8c6b3e;
+  border-radius: 4px;
+
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.skills-button:hover:not(:disabled) {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.skills-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.skills-note {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #8a7e69;
+}
+
+/* Granted skills sit at the bottom, separated from the library. */
+.skills-granted {
+  padding-top: 14px;
+  border-top: 1px solid #5c4a32;
+}
+.skills-library-list {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.skills-card-grid.skills-card-grid--compact {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}

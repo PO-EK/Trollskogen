@@ -16,7 +16,7 @@ export type CharacterStats = {
   weaponName: string | null;
 };
 
-function getEquippedWeapon(player: Player): WeaponItem | null {
+export function getEquippedWeapon(player: Player): WeaponItem | null {
   const equipped = player.Equipment.mainHand;
 
   if (!equipped) {
