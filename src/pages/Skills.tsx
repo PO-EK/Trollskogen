@@ -3,7 +3,7 @@ import { usePlayer } from "../context/usePlayer";
 import SkillCard from "../components/skills/SkillCard";
 import type { Skill, SkillGroup } from "../data/skillTypes";
 import { getSkill } from "../data/skills";
-import { GROUP_LABELS, getSkillSummary } from "../game/labels";
+import { GROUP_LABELS } from "../game/labels";
 import {
   canSlotSkill,
   clearSlot,
