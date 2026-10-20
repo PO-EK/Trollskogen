@@ -18,3 +18,8 @@
   background: #30261b;
   border-color: #c09a5b;
 }
+
+.character-panel-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -1,4 +1,5 @@
 import type { ContainerItem } from "../data/containerItems";
+import type { CombatEncounter } from "../game/combatTypes";
 
 export type AdventureChoice = {
   text: string;
@@ -26,16 +27,15 @@ export type AdventureCondition =
     };
 
 export type AdventureEffect =
-  // Items are never placed directly into the player's inventory.
-  // Items enter the game world through containers such as location loot,
-  // chests, traders, etc., and the player must physically drag them.
   | { type: "spawnLoot"; itemId: string }
+  | ({ type: "startCombat" } & CombatEncounter)
   | {
       type: "openQuestContainer";
       questId: string;
       acceptedItemId: string;
     }
   | { type: "removeItem"; itemId: string }
+  | { type: "openLoot"; itemIds: string[] }
   | { type: "learnSkill"; skillId: string }
   | { type: "addGold"; amount: number }
   | { type: "openStorage" }

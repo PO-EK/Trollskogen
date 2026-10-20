@@ -7,10 +7,19 @@ import InventoryPanel from "./components/inventory/InventoryPanel";
 import WorldMap from "./pages/WorldMap";
 import Location from "./pages/Location";
 import Trading from "./pages/Trading";
+import Combat from "./pages/Combat";
 import { OVERLAYS } from "./pages/overlays";
 import type { OverlayId } from "./pages/overlays";
+import type { CombatEncounter, CombatResult } from "./game/combatTypes";
 
-type GameScreen = "worldMap" | "location" | "trading";
+type GameScreen = "worldMap" | "location" | "trading" | "combat";
+
+// The fight in progress. onFinish is created by Location and applies the
+// result to Location's own state.
+type ActiveCombat = {
+  encounter: CombatEncounter;
+  onFinish: (result: CombatResult) => void;
+};
 
 function App() {
   const [screen, setScreen] = useState<GameScreen>("worldMap");
@@ -20,10 +29,11 @@ function App() {
   );
 
   const [selectedTraderId, setSelectedTraderId] = useState<string | null>(null);
-
+  const [combat, setCombat] = useState<ActiveCombat | null>(null);
   // Which overlay page (character, skill tree...) is open, if any.
   const [overlay, setOverlay] = useState<OverlayId | null>(null);
-
+  // No swapping gear or skills in the middle of a fight.
+  const overlaysLocked = screen === "combat";
   // Escape closes whichever overlay is open.
   useEffect(() => {
     if (!overlay) {
@@ -51,7 +61,14 @@ function App() {
         <TopBar />
 
         <main className="game-layout">
-          <CharacterPanel onOpenOverlay={setOverlay} />
+          <CharacterPanel
+            locked={overlaysLocked}
+            onOpenOverlay={(id) => {
+              if (!overlaysLocked) {
+                setOverlay(id);
+              }
+            }}
+          />
 
           <section className="main-panel">
             {/*
@@ -71,7 +88,9 @@ function App() {
               )}
 
               {/* Location also stays mounted behind trading. */}
-              {(screen === "location" || screen === "trading") && (
+              {(screen === "location" ||
+                screen === "trading" ||
+                screen === "combat") && (
                 <div
                   style={{
                     display: screen === "location" ? "contents" : "none",
@@ -89,6 +108,11 @@ function App() {
                       setSelectedLocationId(locationId);
                       setScreen("location");
                     }}
+                    onStartCombat={(encounter, onFinish) => {
+                      setOverlay(null);
+                      setCombat({ encounter, onFinish });
+                      setScreen("combat");
+                    }}
                   />
                 </div>
               )}
@@ -97,6 +121,17 @@ function App() {
                 <Trading
                   traderId={selectedTraderId}
                   onReturn={() => setScreen("location")}
+                />
+              )}
+              {screen === "combat" && combat && (
+                <Combat
+                  encounter={combat.encounter}
+                  onFinish={(result) => {
+                    const { onFinish } = combat;
+                    setCombat(null);
+                    setScreen("location");
+                    onFinish(result);
+                  }}
                 />
               )}
             </div>

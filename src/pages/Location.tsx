@@ -9,6 +9,11 @@ import ItemGrid from "../components/inventory/ItemGrid";
 import ItemCard from "../components/inventory/ItemCard";
 import type { ContainerType } from "../data/containerTypes";
 import { performTransaction } from "../game/performTransaction";
+import type { CombatEncounter, CombatResult } from "../game/combatTypes";
+import { placeLoot } from "../game/lootPlacement";
+
+const LOOT_WIDTH = 5;
+const LOOT_HEIGHT = 3;
 
 type ActiveLocationContainer =
   | {
@@ -28,6 +33,10 @@ type LocationProps = {
   onReturn: () => void;
   onOpenTrader: (traderId: string) => void;
   onTravelTo: (locationId: string) => void;
+  onStartCombat: (
+    encounter: CombatEncounter,
+    onFinish: (result: CombatResult) => void,
+  ) => void;
 };
 
 function Location({
@@ -35,6 +44,7 @@ function Location({
   onReturn,
   onOpenTrader,
   onTravelTo,
+  onStartCombat,
 }: LocationProps) {
   const [currentNodeId, setCurrentNodeId] = useState("start");
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
@@ -169,6 +179,35 @@ function Location({
     return false;
   }
 
+  function applyCombatResult(
+    encounter: CombatEncounter,
+    startNodeId: string,
+    result: CombatResult,
+  ) {
+    // What the player has left. Losing leaves you at 1 HP.
+    setPlayer((p) => ({
+      ...p,
+      HP: Math.max(1, result.hp),
+      Mana: result.mana,
+    }));
+
+    setContainerItems([]);
+    setActiveContainer(null);
+    setHoveredItemId(null);
+
+    if (result.outcome === "win") {
+      setCurrentNodeId(encounter.winNodeId);
+      handleEffect({ type: "addExperience", amount: result.exp });
+      handleEffect({ type: "addGold", amount: result.gold });
+      handleEffect({ type: "openLoot", itemIds: result.loot });
+    } else if (result.outcome === "lose") {
+      setCurrentNodeId(encounter.loseNodeId);
+    } else {
+      // Fled: back to where the fight began unless the story says otherwise.
+      setCurrentNodeId(encounter.fleeNodeId ?? startNodeId);
+    }
+  }
+
   function handleEffect(effect: AdventureEffect) {
     switch (effect.type) {
       case "unlockLocation":
@@ -179,6 +218,26 @@ function Location({
             : [...p.UnlockedLocations, effect.locationId],
         }));
         break;
+
+      case "openLoot":
+        if (effect.itemIds.length === 0) {
+          break;
+        }
+
+        setContainerItems(placeLoot(effect.itemIds, LOOT_WIDTH, LOOT_HEIGHT));
+        setActiveContainer({ type: "loot", id: safeLocation.id });
+        break;
+
+      case "startCombat": {
+        const encounter: CombatEncounter = effect;
+        const startNodeId = currentNodeId;
+
+        // App keeps this function until the fight ends, then calls it.
+        onStartCombat(encounter, (result) =>
+          applyCombatResult(encounter, startNodeId, result),
+        );
+        break;
+      }
 
       case "lockLocation":
         setPlayer((p) => ({
@@ -362,8 +421,8 @@ function Location({
               <ItemGrid
                 containerId={activeContainer.id}
                 containerType={activeContainer.type}
-                width={3}
-                height={3}
+                width={activeContainer.type === "loot" ? LOOT_WIDTH : 3}
+                height={activeContainer.type === "loot" ? LOOT_HEIGHT : 3}
                 inventory={containerItems}
                 onInventoryChange={handleContainerItemsChanged}
                 onItemRemoved={handleContainerItemRemoved}

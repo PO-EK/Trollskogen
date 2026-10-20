@@ -2,11 +2,16 @@ import { usePlayer } from "../context/usePlayer";
 import type { OverlayId } from "../pages/overlays";
 import "./CharacterPanel.css";
 import { getMaxHP } from "../game/characterStats";
+
 type CharacterPanelProps = {
   onOpenOverlay: (overlay: OverlayId) => void;
+  locked?: boolean; // true during combat
 };
 
-function CharacterPanel({ onOpenOverlay }: CharacterPanelProps) {
+function CharacterPanel({
+  onOpenOverlay,
+  locked = false,
+}: CharacterPanelProps) {
   const { player } = usePlayer();
   const manaPercent = (player.Mana / player.ManaMax) * 100;
   const maxHP = getMaxHP(player);
@@ -46,12 +51,16 @@ function CharacterPanel({ onOpenOverlay }: CharacterPanelProps) {
 
       <button
         className="character-panel-button"
+        disabled={locked}
+        title={locked ? "Inte under strid" : undefined}
         onClick={() => onOpenOverlay("character")}
       >
         Karaktär
       </button>
       <button
         className="character-panel-button"
+        disabled={locked}
+        title={locked ? "Inte under strid" : undefined}
         onClick={() => onOpenOverlay("skills")}
       >
         Färdigheter

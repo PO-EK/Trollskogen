@@ -162,6 +162,14 @@ export const skills: Skill[] = [
     damage: { kind: "weapon", multiplier: 1.5 },
     cooldown: 2,
   },
+  {
+    id: "bite",
+    name: "Bit",
+    description: "Sätt tänderna i din fiende.",
+    target: "enemy",
+    damageType: "piercing",
+    damage: { kind: "weapon", multiplier: 1.2 },
+  },
 ];
 
 const skillMap = new Map(skills.map((skill) => [skill.id, skill]));

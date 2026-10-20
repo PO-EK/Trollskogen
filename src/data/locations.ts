@@ -58,4 +58,12 @@ export const locations: MapLocation[] = [
     icon: "🏚️",
     adventureId: "witchHut",
   },
+  {
+    id: "places",
+    name: "Trollskogen",
+    x: 50,
+    y: 90,
+    icon: "Trollskogen",
+    adventureId: "places",
+  },
 ];

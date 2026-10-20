@@ -8,8 +8,8 @@ Storage - Klart
 Items - Klart
 Weapons & Armor - Klart
 Equip items - Klart
-Equip Skills
-Enemies
+Equip Skills - Klart
+Enemies - Klart
 Combat Sim
 
 
