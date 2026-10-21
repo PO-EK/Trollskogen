@@ -23,12 +23,12 @@ export type SkillEffect =
       amount: number;
       turns: number;
     }
-  | { type: "heal"; amount: number }
-  | {
-      type: "status";
-      stat: "Bleed" | "Burn" | "Stunned" | "Poisoned";
-      turns: number;
-    };
+  | { type: "heal"; amount?: number; percentOfMax?: number } // percentOfMax: 25 = 25%
+  | { type: "damageMod"; percent: number; turns: number } // damage you deal, +/- %
+  | { type: "guard"; multiplier: number; turns: number } // damage you take x this
+  | { type: "evade"; chance: number; turns: number } // 0.5 = 50% of hits against you miss
+  | { type: "burn"; damage: number; turns: number }
+  | { type: "stun"; turns: number };
 
 export type Skill = {
   id: string;

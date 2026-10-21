@@ -11,11 +11,21 @@ import "./SkillCard.css";
 function describeEffect(effect: SkillEffect): string {
   switch (effect.type) {
     case "buff":
-      return `+${effect.amount} ${ATTRIBUTE_LABELS[effect.stat]} i ${effect.turns} rundor`;
+      return `${effect.amount > 0 ? "+" : ""}${effect.amount} ${ATTRIBUTE_LABELS[effect.stat]} i ${effect.turns} rundor`;
     case "heal":
-      return `Läker ${effect.amount} hälsa`;
-    case "status":
-      return `${effect.stat} i ${effect.turns} rundor`;
+      return effect.percentOfMax
+        ? `Läker ${effect.percentOfMax}% av max hälsa`
+        : `Läker ${effect.amount ?? 0} hälsa`;
+    case "damageMod":
+      return `${effect.percent > 0 ? "+" : ""}${effect.percent}% skada i ${effect.turns} rundor`;
+    case "guard":
+      return `Tar ×${effect.multiplier} skada i ${effect.turns} rundor`;
+    case "evade":
+      return `${Math.round(effect.chance * 100)}% att undvika attacker i ${effect.turns} rundor`;
+    case "burn":
+      return `Brand: ${effect.damage} skada per runda i ${effect.turns} rundor`;
+    case "stun":
+      return `Bedövar i ${effect.turns} rundor`;
   }
 }
 

@@ -65,7 +65,7 @@ export type QuestState = {
   questId: string;
   completed: boolean;
 };
-const maxHP = getMaxHP({ Con: 15 } as Player);
+const maxHP = getMaxHP({ Con: 10 } as Player);
 export const createNewPlayer = (): Player => ({
   Name: "Admin",
 
@@ -75,9 +75,9 @@ export const createNewPlayer = (): Player => ({
   Exp: 54,
   ExpMax: 100,
 
-  Str: 22,
-  Dex: 17,
-  Con: 15,
+  Str: 10,
+  Dex: 10,
+  Con: 10,
   Int: 10,
 
   HP: maxHP,
@@ -116,21 +116,28 @@ export const createNewPlayer = (): Player => ({
   Inventory: [
     {
       containerItemId: "testweap1",
-      itemId: "iron_sword",
+      itemId: "old_axe",
       x: 0,
       y: 0,
     },
   ],
   Quests: [],
   StoryFlags: {},
-  UnlockedLocations: ["intro", "playerHQ", "village", "ruins", "places"],
+  UnlockedLocations: [
+    "intro",
+    "playerHQ",
+    "village",
+    "ruins",
+    "places",
+    "blacksmith",
+  ],
   KnownSkills: [
-    "warcry",
-    "evade",
-    "meditate",
-    "curse",
-    "fireball",
+    "firebolt",
     "tackle",
-    "harden",
+    "warcry",
+    "guard",
+    "speed",
+    "heal_quick",
+    "meditate",
   ],
 });

@@ -46,6 +46,7 @@ export function rollSkillDamage(
   weapon: WeaponItem | null,
   resistances: Resistances = {},
   random: () => number = Math.random,
+  extraMultiplier = 1,
 ): number {
   const damage = skill.damage;
 
@@ -72,5 +73,5 @@ export function rollSkillDamage(
     : 1;
 
   // A hit always does at least 1 damage.
-  return Math.max(1, Math.round(base * resistance));
+  return Math.max(1, Math.round(base * resistance * extraMultiplier));
 }

@@ -10,11 +10,13 @@ Weapons & Armor - Klart
 Equip items - Klart
 Equip Skills - Klart
 Enemies - Klart
-Combat Sim
+Combat Stub - Klart
+Combat Engine - Klart
+Level up
 
 
 
-Story:
+Quests/Story Locations:
 
 Intro - Klart
 Ruins - Klart
@@ -23,3 +25,20 @@ Snickare
 Värdhuset
 Jägaren
 Häxan
+
+Enemies Stats + Art:
+
+Rövare - Klart
+Spejare
+Legoknäckt
+Rövarhövding
+
+Järv
+Varg
+Vildgalt
+Brjörn
+
+Vättar
+Myling
+Skogsrå
+Troll

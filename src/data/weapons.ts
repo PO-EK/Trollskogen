@@ -83,7 +83,7 @@ export const weapons: WeaponItem[] = [
     minDamage: 22,
     maxDamage: 28,
     stat: "Str",
-    skills: ["slash_quick", "slash_area", "slash_hard"],
+    skills: ["slash_quick", "slash_hard"],
   },
 ];
 // Below the weapons array. Not an item, just the unarmed fallback.
