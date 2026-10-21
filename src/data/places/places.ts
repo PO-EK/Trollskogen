@@ -8,16 +8,16 @@ export const places: Record<string, AdventureNode> = {
     text: "Du står framför den stora skogen. Vad vill du slåss emot?",
     choices: [
       {
-        text: "Du ser en varg - Lätt",
+        text: "En varg - Lätt",
         nextNodeId: "attackWolf",
       },
       {
-        text: "Du ser en bandit - Medium",
+        text: "En bandit - Medium",
         nextNodeId: "attackBandit",
       },
 
       {
-        text: "Du ser Legoknäkt - Svår",
+        text: "En Legoknäkt - Svår",
         nextNodeId: "attackTroll",
       },
       {
@@ -33,11 +33,11 @@ export const places: Record<string, AdventureNode> = {
   },
   attackBandit: {
     id: "attackBandit",
-    text: "Du ser en man i rustning som rör sig mot dig. Du tror först att det är en rövare eller rånare men han beter sig konstigt, han drar med benet och verkar helt förvirrad. När du går närmare så ser du att hans skin verkar grönt, som om det ruttnat, och hans röda ögon är full av hat. Han höjer sitt vapen och attackerar dig.",
+    text: "En man i klädd i läder och bälten hoppar ut framför dig och höjer sin yxa. 'Ge mig ditt guld så dödar jag dig!' ropar han hotfullt.",
 
     choices: [
       {
-        text: "Försvara dig!",
+        text: "Menar du inte 'ELLER så dödar jag dig'?",
         effects: [
           {
             type: "startCombat",
@@ -49,7 +49,7 @@ export const places: Record<string, AdventureNode> = {
         ],
       },
       {
-        text: "Ge upp och gå hem!",
+        text: "Titta bakom dig! (Spring iväg)",
 
         effects: [
           {
@@ -61,7 +61,7 @@ export const places: Record<string, AdventureNode> = {
   },
   attackTroll: {
     id: "attackTroll",
-    text: "Ett stort troll dyker upp, han är ful och ser inte så smart ut. Han luktar inte så bra, heller.",
+    text: "Ett soldat i rustning dyker upp, han är ful och ser inte så smart ut. Han luktar inte så bra, heller.",
 
     choices: [
       {
