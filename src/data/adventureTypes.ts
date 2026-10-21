@@ -42,6 +42,8 @@ export type AdventureEffect =
   | { type: "removeGold"; amount: number }
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
+  | { type: "restoreMana"; amount: number }
+  | { type: "fullHeal" }
   | { type: "damage"; amount: number }
   | { type: "setStoryFlag"; flag: string; value: boolean }
   | { type: "openTrader"; traderId: string }

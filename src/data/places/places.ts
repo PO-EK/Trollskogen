@@ -5,18 +5,19 @@ export const places: Record<string, AdventureNode> = {
   start: {
     id: "start",
 
-    text: "Du står framför den stora skogen.",
+    text: "Du står framför den stora skogen. Vad vill du slåss emot?",
     choices: [
       {
-        text: "Du ser en bandit - Attackera",
-        nextNodeId: "attackBandit",
-      },
-      {
-        text: "Du ser en varg - Attackera",
+        text: "Du ser en varg - Lätt",
         nextNodeId: "attackWolf",
       },
       {
-        text: "Du ser ett Troll - Attackera",
+        text: "Du ser en bandit - Medium",
+        nextNodeId: "attackBandit",
+      },
+
+      {
+        text: "Du ser Legoknäkt - Svår",
         nextNodeId: "attackTroll",
       },
       {
@@ -41,7 +42,7 @@ export const places: Record<string, AdventureNode> = {
           {
             type: "startCombat",
             enemyId: "bandit",
-            extraLoot: [drop("iron_sword")],
+            extraLoot: [drop("health_potion")],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
           },
@@ -60,7 +61,7 @@ export const places: Record<string, AdventureNode> = {
   },
   attackTroll: {
     id: "attackTroll",
-    text: "Ett stort troll dyker upp, han är ful och ser inte så smart ut. Dessutom luktar han inte så bra.",
+    text: "Ett stort troll dyker upp, han är ful och ser inte så smart ut. Han luktar inte så bra, heller.",
 
     choices: [
       {
@@ -68,7 +69,7 @@ export const places: Record<string, AdventureNode> = {
         effects: [
           {
             type: "startCombat",
-            enemyId: "troll",
+            enemyId: "mercenary",
             extraLoot: [drop("battle_axe")],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
@@ -89,13 +90,13 @@ export const places: Record<string, AdventureNode> = {
 
   fightWon: {
     id: "fightWon",
-    text: "Fienden ligger slagen på marken. Du söker igenom hans saker.",
+    text: "Fienden ligger slagen på marken. Dags att loota!.",
     choices: [{ text: "Fortsätt", nextNodeId: "start" }],
   },
   fightLost: {
     id: "fightLost",
     text: "Allt blir svart...",
-    choices: [{ text: "Vakna", nextNodeId: "start" }],
+    choices: [{ text: "Någon räddar dig", nextNodeId: "start" }],
   },
 
   attackWolf: {
@@ -109,7 +110,7 @@ export const places: Record<string, AdventureNode> = {
           {
             type: "startCombat",
             enemyId: "wolf",
-            extraLoot: [drop("health_potion")],
+            extraLoot: [drop("cloth")],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
           },

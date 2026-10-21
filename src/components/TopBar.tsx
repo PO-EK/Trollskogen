@@ -3,7 +3,7 @@ function TopBar() {
     <header className="top-bar">
       <h2>Trollskogen</h2>
       <p>
-        Version 0.1.0 - 2026-10-20: 12 nya fiender + Combat Test vid Trollskogen
+        Version 0.1.1 - 2026-10-21: Combat Engine klar, 3 fiender i Trollskogen
       </p>
     </header>
   );

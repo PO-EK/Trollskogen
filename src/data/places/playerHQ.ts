@@ -58,6 +58,11 @@ export const playerHQ: Record<string, AdventureNode> = {
     text: "Du sparkar av dig stövlarna och tar av dig tillräckligt med kläder för att känna dig bekväm. Du sätter dig på sängen och känner genast skillnaden mot din sovrulle.",
     choices: [
       {
+        text: "Vila en stund - Läka dina sår.",
+        nextNodeId: "start",
+        effects: [{ type: "fullHeal" }],
+      },
+      {
         text: "Tillbaka",
         nextNodeId: "start",
       },

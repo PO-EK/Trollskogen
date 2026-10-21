@@ -1,4 +1,9 @@
 import enemyPH from "../assets/enemyPH.png";
+import banditImage from "../assets/enemies/bandit.png";
+import ambusherImage from "../assets/enemies/scout.png";
+import mercenaryImage from "../assets/enemies/mercenery.png";
+import wolfImage from "../assets/enemies/wolf.png";
+
 import { items } from "./items";
 import type { DamageType } from "./skillTypes";
 import { getSkill } from "./skills";
@@ -56,7 +61,7 @@ export const enemies = {
     id: "bandit",
     type: "human",
     name: "Rövare",
-    image: enemyPH,
+    image: banditImage,
     hp: 60,
     minDamage: 18,
     maxDamage: 24,
@@ -65,14 +70,14 @@ export const enemies = {
     isBoss: false,
     exp: 20,
     gold: 10,
-    loot: [drop("old_axe", 0.25)],
+    loot: [drop("iron_sword", 0.25), drop("torch", 0.75)],
   },
 
   ambusher: {
     id: "ambusher",
     type: "human",
     name: "Spejare",
-    image: enemyPH,
+    image: ambusherImage,
     hp: 40,
     minDamage: 20,
     maxDamage: 38,
@@ -88,16 +93,16 @@ export const enemies = {
     id: "mercenary",
     type: "human",
     name: "Legoknekt",
-    image: enemyPH,
-    hp: 86,
+    image: mercenaryImage,
+    hp: 120,
     minDamage: 32,
     maxDamage: 40,
     skills: ["slash_quick", "stab_hard", "rally"],
     resistances: { ...neutralResistances, crushing: 0.5, piercing: 1.5 },
     isBoss: false,
     exp: 60,
-    gold: 50,
-    loot: [drop("iron_sword", 0.5)],
+    gold: 500,
+    loot: [drop("battle_axe", 0.5)],
   },
 
   banditChief: {
@@ -128,7 +133,7 @@ export const enemies = {
     id: "wolf",
     type: "animal",
     name: "Svartvarg",
-    image: enemyPH,
+    image: wolfImage,
     hp: 28,
     minDamage: 14,
     maxDamage: 18,

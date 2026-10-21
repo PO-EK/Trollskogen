@@ -12,8 +12,8 @@ import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
 import { placeLoot } from "../game/lootPlacement";
 
-const LOOT_WIDTH = 5;
-const LOOT_HEIGHT = 3;
+const LOOT_WIDTH = 4;
+const LOOT_HEIGHT = 4;
 
 type ActiveLocationContainer =
   | {
@@ -323,6 +323,20 @@ function Location({
           HP: Math.min(p.HP + effect.amount, p.HPMax),
         }));
         break;
+      case "restoreMana":
+        setPlayer((p) => ({
+          ...p,
+          Mana: Math.min(p.Mana + effect.amount, p.ManaMax),
+        }));
+        break;
+
+      case "fullHeal":
+        setPlayer((p) => ({
+          ...p,
+          HP: p.HPMax,
+          Mana: p.ManaMax,
+        }));
+        break;
 
       case "damage":
         setPlayer((p) => ({
@@ -421,8 +435,8 @@ function Location({
               <ItemGrid
                 containerId={activeContainer.id}
                 containerType={activeContainer.type}
-                width={activeContainer.type === "loot" ? LOOT_WIDTH : 3}
-                height={activeContainer.type === "loot" ? LOOT_HEIGHT : 3}
+                width={activeContainer.type === "loot" ? LOOT_WIDTH : 4}
+                height={activeContainer.type === "loot" ? LOOT_HEIGHT : 4}
                 inventory={containerItems}
                 onInventoryChange={handleContainerItemsChanged}
                 onItemRemoved={handleContainerItemRemoved}
