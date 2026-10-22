@@ -1,7 +1,7 @@
 import { rollLoot } from "../data/enemy";
 import type { Enemy, EnemyId } from "../data/enemy";
 import type { Player } from "../data/player";
-import type { Skill, SkillEffect } from "../data/skillTypes";
+import type { Skill, SkillEffect, StatusKind } from "../data/skillTypes";
 import { getSkill } from "../data/skills";
 import { rollSkillDamage } from "./battleSkills";
 import {
@@ -18,6 +18,8 @@ import type {
   CombatResult,
 } from "./combatTypes";
 import { getBattleSkills } from "./skillLoadout";
+import type { ItemUse } from "../data/itemTypes";
+import { CURE_LABELS } from "./labels";
 
 // ---------------------------------------------------------------------
 // Types
@@ -31,14 +33,28 @@ export type Status =
   | { kind: "damageMod"; percent: number; turnsLeft: number }
   | { kind: "guard"; multiplier: number; turnsLeft: number }
   | { kind: "evade"; chance: number; turnsLeft: number }
-  | { kind: "burn"; damage: number; turnsLeft: number }
+  | {
+      kind: "burn";
+      damage: number; // per layer
+      turnsLeft: number;
+      stacks: number;
+      maxStacks: number;
+    }
+  | {
+      kind: "bleed";
+      damage: number; // per layer
+      turnsLeft: number;
+      stacks: number;
+      maxStacks: number;
+    }
   | { kind: "stun"; turnsLeft: number };
 
 export type Fighter = {
   hp: number;
   maxHp: number;
   mana: number; // enemies ignore it
-  cooldowns: Record<string, number>; // skill id -> turns until usable again
+  maxMana: number; // enemies have 0
+  cooldowns: Record<string, number>;
   statuses: Status[];
 };
 
@@ -64,8 +80,8 @@ export type CombatContext = {
 type Action =
   | { kind: "skill"; skill: Skill }
   | { kind: "basic" } // an enemy with no usable skill
+  | { kind: "item"; use: ItemUse }
   | { kind: "skip" }; // stunned
-
 // ---------------------------------------------------------------------
 // Math
 // ---------------------------------------------------------------------
@@ -112,14 +128,30 @@ function statusKey(status: Status): string {
 
   return status.kind;
 }
+type StackableStatus = Extract<Status, { kind: "burn" | "bleed" }>;
+
+function isStackable(status: Status): status is StackableStatus {
+  return status.kind === "burn" || status.kind === "bleed";
+}
 
 function addStatus(statuses: Status[], status: Status): Status[] {
   const key = statusKey(status);
+  const existing = statuses.find((candidate) => statusKey(candidate) === key);
+  const others = statuses.filter((candidate) => statusKey(candidate) !== key);
 
-  return [
-    ...statuses.filter((existing) => statusKey(existing) !== key),
-    status,
-  ];
+  if (
+    existing &&
+    isStackable(existing) &&
+    isStackable(status) &&
+    existing.kind === status.kind
+  ) {
+    return [
+      ...others,
+      { ...status, stacks: Math.min(existing.stacks + 1, status.maxStacks) },
+    ];
+  }
+
+  return [...others, status];
 }
 
 function effectToStatus(effect: SkillEffect): Status | null {
@@ -146,10 +178,28 @@ function effectToStatus(effect: SkillEffect): Status | null {
     case "evade":
       return { kind: "evade", chance: effect.chance, turnsLeft: effect.turns };
     case "burn":
-      return { kind: "burn", damage: effect.damage, turnsLeft: effect.turns };
+      return {
+        kind: "burn",
+        damage: effect.damage,
+        turnsLeft: effect.turns,
+        stacks: 1,
+        maxStacks: effect.maxStacks ?? 1,
+      };
+    case "bleed":
+      return {
+        kind: "bleed",
+        damage: effect.damage,
+        turnsLeft: effect.turns,
+        stacks: 1,
+        maxStacks: effect.maxStacks ?? 1,
+      };
     case "stun":
       return { kind: "stun", turnsLeft: effect.turns };
     case "heal":
+    case "restoreMana":
+    case "cure":
+      return null;
+    default:
       return null;
   }
 }
@@ -204,13 +254,14 @@ function getEffectivePlayer(player: Player, statuses: Status[]): Player {
   return effective;
 }
 
-// After the opponent's action: burn damage, then count everything down.
+// After the opponent's action: burn and bleed damage, then count everything down.
 function tickFighter(
   fighter: Fighter,
   side: Side,
   ctx: CombatContext,
-): { fighter: Fighter; burnDamage: number } {
+): { fighter: Fighter; burnDamage: number; bleedDamage: number } {
   let burnDamage = 0;
+  let bleedDamage = 0;
   const statuses: Status[] = [];
 
   for (const status of fighter.statuses) {
@@ -221,7 +272,15 @@ function tickFighter(
 
     if (status.kind === "burn") {
       const resistance = side === "enemy" ? ctx.enemy.resistances.fire : 1;
-      burnDamage += Math.max(1, Math.round(status.damage * resistance));
+      burnDamage += Math.max(
+        1,
+        Math.round(status.damage * status.stacks * resistance),
+      );
+    }
+
+    // Bleeding is physical: no resistance, no armor.
+    if (status.kind === "bleed") {
+      bleedDamage += status.damage * status.stacks;
     }
 
     if (status.turnsLeft > 1) {
@@ -230,8 +289,13 @@ function tickFighter(
   }
 
   return {
-    fighter: { ...fighter, hp: fighter.hp - burnDamage, statuses },
+    fighter: {
+      ...fighter,
+      hp: fighter.hp - burnDamage - bleedDamage,
+      statuses,
+    },
     burnDamage,
+    bleedDamage,
   };
 }
 
@@ -250,22 +314,79 @@ function tickOwnClock(fighter: Fighter): Fighter {
   return { ...fighter, statuses };
 }
 
+function scaledAmount(
+  amount: number | undefined,
+  percentOfMax: number | undefined,
+  max: number,
+): number {
+  return (amount ?? 0) + Math.round(((percentOfMax ?? 0) / 100) * max);
+}
+
+type ApplyResult = {
+  fighter: Fighter;
+  healed: number;
+  manaRestored: number;
+  cured: StatusKind[];
+  applied: SkillEffect[]; // the effects that took hold, after the chance rolls
+};
+
 function applyEffects(
   fighter: Fighter,
   effects: SkillEffect[],
-): { fighter: Fighter; healed: number } {
+  random: () => number = Math.random,
+): ApplyResult {
   let next = fighter;
   let healed = 0;
+  let manaRestored = 0;
+  const cured: StatusKind[] = [];
+  const applied: SkillEffect[] = [];
 
   for (const effect of effects) {
+    if (effect.applyChance !== undefined && random() >= effect.applyChance) {
+      continue;
+    }
+
+    applied.push(effect);
+
     if (effect.type === "heal") {
-      const amount =
-        (effect.amount ?? 0) +
-        Math.round(((effect.percentOfMax ?? 0) / 100) * next.maxHp);
-      const hp = Math.min(next.maxHp, next.hp + amount);
+      const hp = Math.min(
+        next.maxHp,
+        next.hp + scaledAmount(effect.amount, effect.percentOfMax, next.maxHp),
+      );
 
       healed += hp - next.hp;
       next = { ...next, hp };
+      continue;
+    }
+
+    if (effect.type === "restoreMana") {
+      const mana = Math.min(
+        next.maxMana,
+        next.mana +
+          scaledAmount(effect.amount, effect.percentOfMax, next.maxMana),
+      );
+
+      manaRestored += mana - next.mana;
+      next = { ...next, mana };
+      continue;
+    }
+
+    if (effect.type === "cure") {
+      for (const kind of effect.statuses) {
+        if (
+          next.statuses.some((status) => status.kind === kind) &&
+          !cured.includes(kind)
+        ) {
+          cured.push(kind);
+        }
+      }
+
+      next = {
+        ...next,
+        statuses: next.statuses.filter(
+          (status) => !effect.statuses.includes(status.kind),
+        ),
+      };
       continue;
     }
 
@@ -276,7 +397,28 @@ function applyEffects(
     }
   }
 
-  return { fighter: next, healed };
+  return { fighter: next, healed, manaRestored, cured, applied };
+}
+
+// "läkte för 100 hp och botade branden"
+function describeItemResult(applied: ApplyResult): string {
+  const parts: string[] = [];
+
+  if (applied.healed > 0) {
+    parts.push(`läkte för ${applied.healed} hp`);
+  }
+
+  if (applied.manaRestored > 0) {
+    parts.push(`återfick ${applied.manaRestored} magi`);
+  }
+
+  if (applied.cured.length > 0) {
+    parts.push(
+      `botade ${applied.cured.map((kind) => CURE_LABELS[kind]).join(" och ")}`,
+    );
+  }
+
+  return parts.join(" och ");
 }
 
 // A skill with "Väntetid 2" is usable again 2 turns after it was used.
@@ -350,7 +492,11 @@ function rollEnemyHit(
 // One action: hit -> tick the other side -> own countdown -> new
 // statuses -> ONE death check
 // ---------------------------------------------------------------------
+function getStacks(fighter: Fighter, kind: "burn" | "bleed"): number {
+  const status = fighter.statuses.find((candidate) => candidate.kind === kind);
 
+  return status && isStackable(status) ? status.stacks : 0;
+}
 function performAction(
   state: CombatState,
   ctx: CombatContext,
@@ -385,7 +531,7 @@ function performAction(
     }
   }
 
-  // 1. The hit
+  // 1. The action itself
   let missed = false;
 
   if (action.kind === "skip") {
@@ -394,6 +540,15 @@ function performAction(
         ? "Du är bedövad och förlorar din tur!"
         : `${ctx.enemy.name} är bedövad och förlorar sin tur!`,
       "info",
+    );
+  } else if (action.kind === "item") {
+    // Items work on the user straight away and use up the turn.
+    const applied = applyEffects(attacker, action.use.effects, random);
+    const result = describeItemResult(applied);
+
+    attacker = applied.fighter;
+    say(
+      `${subject(actor)} ${action.use.verb}${result ? ` och ${result}` : ""}.`,
     );
   } else {
     const used = `${subject(actor)} ${skill ? `använder ${skill.name}` : "anfaller"}`;
@@ -443,12 +598,20 @@ function performAction(
     );
   }
 
-  // 3. The actor's own damage buffs count down (not on a skipped turn)
-  if (action.kind !== "skip") {
+  if (tick.bleedDamage > 0) {
+    say(
+      `${subject(defender)} tar ${tick.bleedDamage} skada av blödning.`,
+      "info",
+    );
+  }
+
+  // 3. The actor's own damage buffs count down, but only after attacking
+  if (action.kind === "skill" || action.kind === "basic") {
     attacker = tickOwnClock(attacker);
   }
 
-  // 4. New statuses and healing from the skill, applied after the tick
+  // 4. New statuses and healing from the skill, applied after the tick.
+  // Each effect rolls its own chance.
   if (skill?.effects && !missed && target.hp > 0) {
     const recipientSide: Side = skill.target === "self" ? actor : defender;
     const who = subject(recipientSide);
@@ -456,6 +619,7 @@ function performAction(
     const applied = applyEffects(
       recipientSide === actor ? attacker : target,
       skill.effects,
+      random,
     );
 
     if (recipientSide === actor) {
@@ -464,9 +628,27 @@ function performAction(
       target = applied.fighter;
     }
 
-    for (const effect of skill.effects) {
+    for (const effect of applied.applied) {
       if (effect.type === "burn") {
-        say(`${who} fattar eld!`, "info");
+        const stacks = getStacks(applied.fighter, "burn");
+
+        say(
+          stacks > 1
+            ? `${who} brinner värre! (${stacks} lager)`
+            : `${who} fattar eld!`,
+          "info",
+        );
+      }
+
+      if (effect.type === "bleed") {
+        const stacks = getStacks(applied.fighter, "bleed");
+
+        say(
+          stacks > 1
+            ? `${who} blöder värre! (${stacks} lager)`
+            : `${who} börjar blöda!`,
+          "info",
+        );
       }
 
       if (effect.type === "stun") {
@@ -476,6 +658,10 @@ function performAction(
 
     if (applied.healed > 0) {
       say(`${who} återfår ${applied.healed} hälsa.`, "info");
+    }
+
+    if (applied.manaRestored > 0) {
+      say(`${who} återfår ${applied.manaRestored} magi.`, "info");
     }
   }
 
@@ -564,6 +750,7 @@ export function createCombat(ctx: CombatContext): CombatState {
       hp: ctx.player.HP,
       maxHp,
       mana: ctx.player.Mana,
+      maxMana: ctx.player.ManaMax,
       cooldowns: {},
       statuses: [],
     },
@@ -571,6 +758,7 @@ export function createCombat(ctx: CombatContext): CombatState {
       hp: ctx.enemy.hp,
       maxHp: ctx.enemy.hp,
       mana: 0,
+      maxMana: 0,
       cooldowns: {},
       statuses: [],
     },
@@ -635,6 +823,58 @@ export function playerFlee(
       { text: `Du flyr från ${ctx.enemy.name}!`, tone: "player" },
     ],
   };
+}
+// Why an item can't be used right now, or null if it can.
+export function getItemBlockReason(
+  state: CombatState,
+  use: ItemUse,
+): string | null {
+  if (state.phase !== "playerTurn") {
+    return "Det är inte din tur.";
+  }
+
+  const { hp, maxHp, mana, maxMana, statuses } = state.player;
+  let reason: string | null = null;
+
+  for (const effect of use.effects) {
+    if (effect.type === "heal") {
+      if (hp < maxHp) {
+        return null;
+      }
+
+      reason = reason ?? "Du har full hälsa.";
+    } else if (effect.type === "restoreMana") {
+      if (mana < maxMana) {
+        return null;
+      }
+
+      reason = reason ?? "Du har full magi.";
+    } else if (effect.type === "cure") {
+      if (statuses.some((status) => effect.statuses.includes(status.kind))) {
+        return null;
+      }
+
+      reason = reason ?? "Det finns inget att bota.";
+    } else {
+      return null; // anything else always does something
+    }
+  }
+
+  return reason;
+}
+
+// Using an item takes your turn. The caller deletes the item.
+export function playerUseItem(
+  state: CombatState,
+  ctx: CombatContext,
+  use: ItemUse,
+  random: () => number = Math.random,
+): CombatState {
+  if (getItemBlockReason(state, use) !== null) {
+    return state;
+  }
+
+  return performAction(state, ctx, "player", { kind: "item", use }, random);
 }
 
 export function enemyAct(

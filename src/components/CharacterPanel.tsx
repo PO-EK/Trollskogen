@@ -13,9 +13,16 @@ function CharacterPanel({
   locked = false,
 }: CharacterPanelProps) {
   const { player } = usePlayer();
-  const manaPercent = (player.Mana / player.ManaMax) * 100;
   const maxHP = getMaxHP(player);
-  const hpPercent = (player.HP / maxHP) * 100;
+
+  const manaPercent =
+    player.ManaMax > 0
+      ? Math.max(0, Math.min(100, (player.Mana / player.ManaMax) * 100))
+      : 0;
+
+  const hpPercent =
+    maxHP > 0 ? Math.max(0, Math.min(100, (player.HP / maxHP) * 100)) : 0;
+
   return (
     <aside className="character-panel">
       <div className="character-header">

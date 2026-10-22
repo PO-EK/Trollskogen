@@ -121,10 +121,80 @@
 }
 
 /* Player */
+.combat-player-bg {
+  background: rgba(20, 16, 10, 0.6);
+  border: 2px solid #5c4a32;
+  border-radius: 8px;
+  padding: 5px;
+}
 .combat-player-bars {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
   gap: 14px;
+}
+
+.combat-player-bars .combat-button {
+  margin-top: 0;
+}
+
+/* The drop slot for potions and bandages */
+.combat-item-slot {
+  width: 84px;
+  height: 72px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+
+  background: rgba(20, 16, 10, 0.45);
+  border: 2px dashed rgba(216, 180, 106, 0.45);
+  border-radius: 8px;
+
+  font-size: 0.6rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(216, 180, 106, 0.7);
+
+  user-select: none;
+  touch-action: none;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s,
+    background 0.12s;
+}
+
+.combat-item-slot-icon {
+  font-size: 1.4rem;
+}
+
+/* While dragging: green if the item can be used right now. */
+.combat-item-slot[data-drag-state="valid"] {
+  border-color: #7fc06a;
+  box-shadow: 0 0 10px rgba(127, 192, 106, 0.45);
+}
+
+.combat-item-slot[data-drag-state="valid"][data-over="true"] {
+  background: rgba(127, 192, 106, 0.25);
+  box-shadow: 0 0 16px rgba(127, 192, 106, 0.8);
+}
+
+.combat-item-slot[data-drag-state="invalid"][data-over="true"] {
+  border-color: #c0503a;
+  background: rgba(192, 80, 58, 0.2);
+  color: #e8a09a;
+}
+
+.combat-item-slot-reason {
+  font-size: 0.6rem;
+  line-height: 1.15;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .combat-row-label {
@@ -154,7 +224,7 @@
   align-items: flex-start;
   gap: 1px;
   padding: 6px 10px;
-
+  margin-top: 15px;
   background: rgba(20, 16, 10, 0.7);
   color: #e8e0d0;
 
@@ -215,7 +285,7 @@
 }
 
 .combat-skill-empty {
-  display: flex;
+  /* display: flex;
   align-items: center;
   justify-content: center;
   padding: 6px 10px;
@@ -225,12 +295,14 @@
 
   font-size: 0.75rem;
   font-style: italic;
-  color: #7d7260;
+  color: #7d7260; */
+  visibility: hidden;
 }
 
 /* Bottom row: whose turn it is, and Fly / Fortsätt */
 .combat-actions {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -240,11 +312,12 @@
 .combat-turn {
   font-style: italic;
   color: #d8b46a;
+  font-size: 36px;
 }
 
 .combat-button {
   padding: 8px 20px;
-
+  margin-top: 10px;
   background: transparent;
   color: #e8e0d0;
 
@@ -265,7 +338,23 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* Layers, in the opposite corner from the turns left */
+.combat-status-stacks {
+  position: absolute;
+  left: -6px;
+  top: -7px;
+  min-width: 14px;
+  padding: 0 3px;
 
+  background: #17130e;
+  border: 1px solid #5c4a32;
+  border-radius: 8px;
+
+  font-size: 0.65rem;
+  line-height: 14px;
+  text-align: center;
+  color: #e8a09a;
+}
 @media (max-width: 700px) {
   .combat-middle {
     grid-template-columns: 1fr;

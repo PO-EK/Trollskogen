@@ -1,4 +1,16 @@
 import type { DamageType, Skill, SkillGroup } from "../data/skillTypes";
+import type { StatusKind } from "../data/skillTypes";
+
+// Used after "botar" / "botade": "Botar branden"
+export const CURE_LABELS: Record<StatusKind, string> = {
+  burn: "branden",
+  bleed: "blödningen",
+  stun: "bedövningen",
+  guard: "skyddet",
+  evade: "undvikandet",
+  damageMod: "försvagningen",
+  stat: "effekten",
+};
 
 export const ATTRIBUTE_LABELS: Record<"Str" | "Dex" | "Con" | "Int", string> = {
   Str: "Styrka",
@@ -26,9 +38,9 @@ export const GROUP_LABELS: Record<SkillGroup, string> = {
 export function getSkillSummary(skill: Skill): string {
   const parts: string[] = [];
 
-  if (skill.damage?.kind === "weapon") {
+  /* if (skill.damage?.kind === "weapon") {
     parts.push(`×${skill.damage.multiplier}`);
-  }
+  } */
 
   if (skill.damageType) {
     parts.push(DAMAGE_TYPE_LABELS[skill.damageType]);

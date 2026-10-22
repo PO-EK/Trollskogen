@@ -1,3 +1,16 @@
+import type { SkillEffect } from "./skillTypes";
+
+// What an item does when it is used in combat.
+export type ItemUse = {
+  verb: string; // the log reads "Du <verb> och läkte för 100 hp."
+  effects: SkillEffect[];
+};
+
+export type GeneralItem = BaseItem & {
+  category?: "general";
+  use?: ItemUse;
+};
+
 export type ItemShape = {
   x: number;
   y: number;
@@ -13,12 +26,6 @@ export type BaseItem = {
   imageOffsetY?: number;
   baseValue: number;
   imageScale?: number;
-};
-
-// Everything that is not a weapon or armour (potions, materials, quest items...).
-// category is optional, so none of your existing items need editing.
-export type GeneralItem = BaseItem & {
-  category?: "general";
 };
 
 export type WeaponSlot = "mainHand" | "offHand";

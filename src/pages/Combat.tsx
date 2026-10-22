@@ -1,27 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "../context/usePlayer";
+import { useItemDrag } from "../context/useItemDrag";
 import { getEnemy } from "../data/enemy";
+import type { ItemUse } from "../data/itemTypes";
 import type { Skill } from "../data/skillTypes";
 import {
   createCombat,
   enemyAct,
   getCombatResult,
+  getItemBlockReason,
   getSkillAvailability,
   playerFlee,
+  playerUseItem,
   playerUseSkill,
 } from "../game/combatEngine";
 import type { CombatContext, CombatState, Status } from "../game/combatEngine";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
+import { getItemUse } from "../game/itemUse";
 import { ATTRIBUTE_LABELS, getSkillSummary } from "../game/labels";
 import { getBattleSkills, getSkillGroup } from "../game/skillLoadout";
 import "./Combat.css";
 
-const ENEMY_TURN_DELAY = 700; // ms, so the log is readable
+const ENEMY_TURN_DELAY = 1500; // ms, so the log is readable
 
 // Placeholder icons. Swap `icon` for an <img> when you have the images.
 const STATUS_VISUALS: Record<Status["kind"], { icon: string; label: string }> =
   {
     burn: { icon: "🔥", label: "Brand" },
+    bleed: { icon: "🩸", label: "Blödning" },
     stun: { icon: "💫", label: "Bedövad" },
     guard: { icon: "🛡️", label: "Skydd" },
     evade: { icon: "💨", label: "Undvikande" },
@@ -32,7 +38,13 @@ const STATUS_VISUALS: Record<Status["kind"], { icon: string; label: string }> =
 function describeStatus(status: Status): string {
   switch (status.kind) {
     case "burn":
-      return `${status.damage} skada per runda`;
+    case "bleed": {
+      const total = status.damage * status.stacks;
+
+      return status.stacks > 1
+        ? `${total} skada per runda (${status.stacks} lager)`
+        : `${total} skada per runda`;
+    }
     case "stun":
       return "förlorar sin tur";
     case "guard":
@@ -49,6 +61,7 @@ function describeStatus(status: Status): string {
 function isHarmful(status: Status): boolean {
   switch (status.kind) {
     case "burn":
+    case "bleed":
     case "stun":
       return true;
     case "damageMod":
@@ -90,6 +103,9 @@ function StatusRow({ statuses }: { statuses: Status[] }) {
           >
             <span>{visual.icon}</span>
             <span className="combat-status-turns">{status.turnsLeft}</span>
+            {"stacks" in status && status.stacks > 1 && (
+              <span className="combat-status-stacks">×{status.stacks}</span>
+            )}
           </div>
         );
       })}
@@ -123,12 +139,95 @@ function SkillButton({ skill, state, onUse }: SkillButtonProps) {
     >
       <span className="combat-skill-name">{skill.name}</span>
       <span className="combat-skill-meta">{getSkillSummary(skill)}</span>
+      <span className="combat-skill-meta">{skill.description}</span>
       {availability.cooldownLeft > 0 && (
         <span className="combat-skill-cooldown">
           ⏳{availability.cooldownLeft}
         </span>
       )}
     </button>
+  );
+}
+
+type ItemSlotProps = {
+  state: CombatState;
+  onUseItem: (use: ItemUse) => void;
+};
+
+// Drop a potion or bandage from the backpack here, on your turn.
+function ItemSlot({ state, onUseItem }: ItemSlotProps) {
+  const {
+    draggedItem,
+    dragSourceType,
+    removeFromSource,
+    updatePointerPosition,
+    endDrag,
+  } = useItemDrag();
+  const [isOver, setIsOver] = useState(false);
+
+  const use =
+    draggedItem && dragSourceType === "player"
+      ? getItemUse(draggedItem.itemId)
+      : null;
+
+  // Why the dragged item can't be used, or null if it can.
+  let blockReason: string | null = null;
+
+  if (draggedItem) {
+    if (dragSourceType !== "player") {
+      blockReason = "Bara föremål från ryggsäcken.";
+    } else if (!use) {
+      blockReason = "Det går inte att använda i strid.";
+    } else {
+      blockReason = getItemBlockReason(state, use);
+    }
+  }
+
+  const dragState = draggedItem
+    ? blockReason
+      ? "invalid"
+      : "valid"
+    : undefined;
+
+  function handlePointerUp() {
+    setIsOver(false);
+
+    if (!draggedItem) {
+      return;
+    }
+
+    if (use && blockReason === null) {
+      onUseItem(use);
+      removeFromSource?.(); // the backpack deletes the item
+    }
+
+    endDrag();
+  }
+
+  return (
+    <div
+      className="combat-item-slot"
+      data-drag-state={dragState}
+      data-over={isOver}
+      title={blockReason ?? "Dra en dryck eller ett bandage hit"}
+      onPointerEnter={() => setIsOver(true)}
+      onPointerLeave={() => setIsOver(false)}
+      onPointerMove={(event) => {
+        if (draggedItem) {
+          updatePointerPosition({ x: event.clientX, y: event.clientY });
+        }
+      }}
+      onPointerUp={handlePointerUp}
+    >
+      {isOver && blockReason ? (
+        <span className="combat-item-slot-reason">{blockReason}</span>
+      ) : (
+        <>
+          <span className="combat-item-slot-icon">🧪</span>
+          <span>Föremål</span>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -193,6 +292,10 @@ function Combat({ encounter, onFinish }: CombatProps) {
     setState((current) => playerUseSkill(current, ctx, skillId));
   }
 
+  function handleUseItem(use: ItemUse) {
+    setState((current) => playerUseItem(current, ctx, use));
+  }
+
   function handleFlee() {
     setState((current) => playerFlee(current, ctx));
   }
@@ -213,9 +316,6 @@ function Combat({ encounter, onFinish }: CombatProps) {
   }
 
   const enemyPercent = (state.enemy.hp / state.enemy.maxHp) * 100;
-  const hpPercent = (state.player.hp / state.player.maxHp) * 100;
-  const manaPercent =
-    (state.player.mana / Math.max(1, ctx.player.ManaMax)) * 100;
 
   return (
     <div className="combat">
@@ -223,22 +323,13 @@ function Combat({ encounter, onFinish }: CombatProps) {
       <section className="combat-enemy">
         <div className="combat-enemy-title">
           <h2>{enemy.name}</h2>
+          <span className="combat-turn">
+            {getTurnLabel(state.phase, enemy.name)}
+          </span>
           <span className="combat-round">Runda {state.round}</span>
         </div>
-
-        <div className="resource-label">
-          <span>❤️ Hälsa </span>
-          <span>
-            {state.enemy.hp} / {state.enemy.maxHp}
-          </span>
-        </div>
-        <div className="resource-bar">
-          <div className="health-bar" style={{ width: `${enemyPercent}%` }} />
-        </div>
-
-        <StatusRow statuses={state.enemy.statuses} />
       </section>
-
+      <StatusRow statuses={state.enemy.statuses} />
       {/* Middle: enemy image and the log */}
       <div className="combat-middle">
         <img
@@ -254,88 +345,69 @@ function Combat({ encounter, onFinish }: CombatProps) {
             </p>
           ))}
         </div>
+        <div className="resource-label">
+          <span>❤️ Hälsa </span>
+          <span>
+            {state.enemy.hp} / {state.enemy.maxHp}
+          </span>
+        </div>
+        <div className="resource-bar">
+          <div className="health-bar" style={{ width: `${enemyPercent}%` }} />
+        </div>
       </div>
 
-      {/* You: bars, statuses, skills, actions */}
+      {/* You: skills, statuses, item slot, actions */}
       <section className="combat-player">
-        <div className="combat-player-bars">
-          <div>
-            <div className="resource-label">
-              <span>❤️ Hälsa </span>
-              <span>
-                {state.player.hp} / {state.player.maxHp}
-              </span>
-            </div>
-            <div className="resource-bar">
-              <div className="health-bar" style={{ width: `${hpPercent}%` }} />
-            </div>
-          </div>
-
-          <div>
-            <div className="resource-label">
-              <span>💧 Magi </span>
-              <span>
-                {state.player.mana} / {ctx.player.ManaMax}
-              </span>
-            </div>
-            <div className="resource-bar">
-              <div className="mana-bar" style={{ width: `${manaPercent}%` }} />
-            </div>
-          </div>
-        </div>
-
-        <StatusRow statuses={state.player.statuses} />
-
-        <p className="combat-row-label">Från utrustning</p>
-        <div className="combat-skill-row">
-          {granted.map((skill) => (
-            <SkillButton
-              key={skill.id}
-              skill={skill}
-              state={state}
-              onUse={handleUseSkill}
-            />
-          ))}
-        </div>
-
-        <p className="combat-row-label">Dina färdigheter</p>
-        <div className="combat-skill-row combat-skill-row--slots">
-          {chosen.map((skill, index) =>
-            skill ? (
+        <div className="combat-player-bg">
+          <div className="combat-skill-row">
+            {granted.map((skill) => (
               <SkillButton
                 key={skill.id}
                 skill={skill}
                 state={state}
                 onUse={handleUseSkill}
               />
+            ))}
+          </div>
+
+          <div className="combat-skill-row combat-skill-row--slots">
+            {chosen.map((skill, index) =>
+              skill ? (
+                <SkillButton
+                  key={skill.id}
+                  skill={skill}
+                  state={state}
+                  onUse={handleUseSkill}
+                />
+              ) : (
+                <div key={`empty-${index}`} className="combat-skill-empty">
+                  Tom plats
+                </div>
+              ),
+            )}
+          </div>
+          <div className="combat-player-bars">
+            <StatusRow statuses={state.player.statuses} />
+            {over ? (
+              <button className="combat-button" onClick={handleContinue}>
+                Fortsätt
+              </button>
             ) : (
-              <div key={`empty-${index}`} className="combat-skill-empty">
-                Tom plats
-              </div>
-            ),
-          )}
-        </div>
-
-        <div className="combat-actions">
-          <span className="combat-turn">
-            {getTurnLabel(state.phase, enemy.name)}
-          </span>
-
-          {over ? (
-            <button className="combat-button" onClick={handleContinue}>
-              Fortsätt
-            </button>
-          ) : (
-            // Room for an items button here later.
-            <button
-              className="combat-button"
-              disabled={enemy.isBoss || state.phase !== "playerTurn"}
-              title={enemy.isBoss ? "Du kan inte fly från en boss" : undefined}
-              onClick={handleFlee}
-            >
-              Fly
-            </button>
-          )}
+              <>
+                <ItemSlot state={state} onUseItem={handleUseItem} />
+                <button
+                  className="combat-button"
+                  disabled={enemy.isBoss || state.phase !== "playerTurn"}
+                  title={
+                    enemy.isBoss ? "Du kan inte fly från en boss" : undefined
+                  }
+                  onClick={handleFlee}
+                >
+                  Fly
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </section>
     </div>

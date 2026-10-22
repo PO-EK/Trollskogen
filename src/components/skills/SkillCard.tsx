@@ -3,11 +3,25 @@ import { usePlayer } from "../../context/usePlayer";
 import type { Skill, SkillEffect } from "../../data/skillTypes";
 import { getSkillDamageRange } from "../../game/battleSkills";
 import { getEquippedWeapon } from "../../game/characterStats";
-import { ATTRIBUTE_LABELS, DAMAGE_TYPE_LABELS } from "../../game/labels";
+import {
+  ATTRIBUTE_LABELS,
+  DAMAGE_TYPE_LABELS,
+  CURE_LABELS,
+} from "../../game/labels";
 import { getSkillGroup } from "../../game/skillLoadout";
 import "../inventory/ItemCard.css";
 import "./SkillCard.css";
+const stackText = (max?: number) =>
+  max && max > 1 ? `, upp till ${max} lager` : "";
 
+function describeWithChance(effect: SkillEffect): string {
+  const text = describeEffect(effect);
+  const chance = effect.applyChance;
+
+  return chance !== undefined && chance < 1
+    ? `${Math.round(chance * 100)}% chans: ${text}`
+    : text;
+}
 function describeEffect(effect: SkillEffect): string {
   switch (effect.type) {
     case "buff":
@@ -23,9 +37,19 @@ function describeEffect(effect: SkillEffect): string {
     case "evade":
       return `${Math.round(effect.chance * 100)}% att undvika attacker i ${effect.turns} rundor`;
     case "burn":
-      return `Brand: ${effect.damage} skada per runda i ${effect.turns} rundor`;
+      return `Brand: ${effect.damage} skada per runda i ${effect.turns} rundor${stackText(effect.maxStacks)}`;
+    case "bleed":
+      return `Blödning: ${effect.damage} skada per runda i ${effect.turns} rundor${stackText(effect.maxStacks)}`;
     case "stun":
       return `Bedövar i ${effect.turns} rundor`;
+    case "restoreMana":
+      return effect.percentOfMax
+        ? `Återställer ${effect.percentOfMax}% av max magi`
+        : `Återställer ${effect.amount ?? 0} magi`;
+    case "cure":
+      return `Botar ${effect.statuses.map((kind) => CURE_LABELS[kind]).join(", ")}`;
+    default:
+      return "Okänd effekt";
   }
 }
 
@@ -108,7 +132,7 @@ function SkillCard({
         <Row label="Väntetid" value={`${skill.cooldown} rundor`} />
       ) : null}
       {skill.effects?.map((effect, index) => (
-        <Row key={index} label="Effekt" value={describeEffect(effect)} />
+        <Row key={index} label="Effekt" value={describeWithChance(effect)} />
       ))}
 
       <p className="item-card-description">{skill.description}</p>

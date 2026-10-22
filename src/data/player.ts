@@ -65,20 +65,20 @@ export type QuestState = {
   questId: string;
   completed: boolean;
 };
-const maxHP = getMaxHP({ Con: 10 } as Player);
+const maxHP = getMaxHP({ Con: 15 } as Player);
 export const createNewPlayer = (): Player => ({
   Name: "Admin",
 
-  Gold: 1280,
+  Gold: 360,
 
   Level: 1,
   Exp: 54,
   ExpMax: 100,
 
-  Str: 10,
+  Str: 12,
   Dex: 10,
-  Con: 10,
-  Int: 10,
+  Con: 15,
+  Int: 22,
 
   HP: maxHP,
 
@@ -86,8 +86,8 @@ export const createNewPlayer = (): Player => ({
   Mana: 50,
   ManaMax: 50,
   Equipment: {},
-  BackpackWidth: 6,
-  BackpackHeight: 6,
+  BackpackWidth: 5,
+  BackpackHeight: 4,
 
   StorageWidth: 7,
   StorageHeight: 7,
@@ -112,14 +112,12 @@ export const createNewPlayer = (): Player => ({
     },
   ],
 
-  EquippedSkills: [],
+  EquippedSkills: ["flamethrower", "cutting_wind"],
   Inventory: [
-    {
-      containerItemId: "testweap1",
-      itemId: "old_axe",
-      x: 0,
-      y: 0,
-    },
+    { containerItemId: "testPotion", itemId: "health_potion", x: 0, y: 0 },
+    { containerItemId: "testMana", itemId: "mana_potion", x: 1, y: 0 },
+    { containerItemId: "testBandage", itemId: "bandage", x: 0, y: 2 },
+    { containerItemId: "startingWeapon", itemId: "iron_spear", x: 4, y: 0 },
   ],
   Quests: [],
   StoryFlags: {},
@@ -139,5 +137,9 @@ export const createNewPlayer = (): Player => ({
     "speed",
     "heal_quick",
     "meditate",
+    "flamethrower",
+    "curse_weak",
+    "magic_missle",
+    "cutting_wind",
   ],
 });

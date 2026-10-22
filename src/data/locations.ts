@@ -11,8 +11,8 @@ export const locations: MapLocation[] = [
   {
     id: "intro",
     name: "Spela intro igen",
-    x: 15,
-    y: 15,
+    x: 10,
+    y: 10,
     icon: "📜",
     adventureId: "intro",
   },
@@ -36,8 +36,8 @@ export const locations: MapLocation[] = [
   {
     id: "blacksmith",
     name: "Smeden",
-    x: 45,
-    y: 45,
+    x: 35,
+    y: 43,
     icon: "S",
     adventureId: "smeden",
   },
@@ -45,8 +45,8 @@ export const locations: MapLocation[] = [
   {
     id: "ruins",
     name: "Nedbränd gård",
-    x: 85,
-    y: 85,
+    x: 75,
+    y: 80,
     icon: "🏚️",
     adventureId: "ruins",
   },

@@ -3,6 +3,7 @@ import ironSwordImage from "../assets/items/shortsword.png";
 import type { WeaponItem, WeaponStats } from "./itemTypes";
 import woodtorchImage from "../assets/items/fakla.png";
 import battleAxeImage from "../assets/items/battleaxe.png";
+import ironSpearImage from "../assets/items/spear1.png";
 // In the old_axe entry:
 //   skills: ["slash"],
 
@@ -26,6 +27,25 @@ export const weapons: WeaponItem[] = [
     skills: ["slash_quick", "stab_quick"],
   },
   {
+    id: "iron_spear",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Spjut",
+    description: "En soldats trogna spjut.",
+    image: ironSpearImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+      { x: 0, y: 3 },
+    ],
+    baseValue: 55,
+    minDamage: 8,
+    maxDamage: 12,
+    stat: "Dex",
+    skills: ["stab_quick", "stab_hard", "staff_bash"],
+  },
+  {
     id: "wood_torch",
     category: "weapon",
     slot: "offHand",
@@ -38,8 +58,8 @@ export const weapons: WeaponItem[] = [
       { x: 0, y: 2 },
     ],
     baseValue: 6,
-    minDamage: 4,
-    maxDamage: 8,
+    minDamage: 2,
+    maxDamage: 5,
     stat: "Str",
     skills: ["torch_bash"],
   },
@@ -57,8 +77,8 @@ export const weapons: WeaponItem[] = [
       { x: 1, y: 2 },
     ],
     baseValue: 25,
-    minDamage: 8,
-    maxDamage: 15,
+    minDamage: 5,
+    maxDamage: 8,
     stat: "Str",
     imageOffsetX: 10,
     imageOffsetY: -5,

@@ -8,6 +8,7 @@ import firewoodImage from "../assets/items/firewood.png";
 import storageKeyImage from "../assets/items/storageKey.png";
 import manaPotionImage from "../assets/items/mana_potion.png";
 import clothImage from "../assets/items/cloth.png";
+import clothBandage from "../assets/items/bandage.png";
 import leatherImage from "../assets/items/leather.png";
 import woodlogImage from "../assets/items/woodlog.png";
 
@@ -54,25 +55,6 @@ const generalItems: GeneralItem[] = [
     baseValue: 12,
   },
   {
-    id: "health_potion",
-    name: "Läkande dryck",
-    description: "Magisk vätska som snabbt läker sår, smakar som jordgubbar.",
-    image: healthPotionImage,
-    shape: [
-      { x: 0, y: 0 },
-      { x: 0, y: 1 },
-    ],
-    baseValue: 40,
-  },
-  {
-    id: "mana_potion",
-    name: "Magisk dryck",
-    description: "Fyller på dina magiska kraft.",
-    image: manaPotionImage,
-    shape: [{ x: 0, y: 0 }],
-    baseValue: 25,
-  },
-  {
     id: "firewood",
     name: "Vedträd",
     description: "Redo för att elda.",
@@ -95,6 +77,48 @@ const generalItems: GeneralItem[] = [
       { x: 1, y: 0 },
     ],
     baseValue: 0,
+  },
+  {
+    id: "health_potion",
+    name: "Läkande dryck",
+    description: "Magisk vätska som snabbt läker sår, smakar som jordgubbar.",
+    image: healthPotionImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 40,
+    use: {
+      verb: "drack en läkande dryck",
+      effects: [{ type: "heal", percentOfMax: 50 }],
+    },
+  },
+  {
+    id: "mana_potion",
+    name: "Magisk dryck",
+    description: "Fyller på din magi.",
+    image: manaPotionImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 25,
+    use: {
+      verb: "drack en magisk dryck",
+      effects: [{ type: "restoreMana", percentOfMax: 100 }],
+    },
+  },
+  {
+    id: "bandage",
+    name: "Bandage",
+    description: "Lindar sår och brännskador.",
+    image: clothBandage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 15,
+    use: {
+      verb: "lindade dig med ett bandage",
+      effects: [{ type: "cure", statuses: ["bleed", "burn"] }],
+    },
   },
 ];
 
