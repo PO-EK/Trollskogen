@@ -279,7 +279,7 @@ function Skills({ onClose }: SkillsProps) {
           ))}
         </div>
       </section>
-      <section className="skills-section">
+      {/* <section className="skills-section">
         <h3>Från utrustning</h3>
         <p className="skills-hint">
           Läggs till automatiskt när du utrustar vapen och rustning.
@@ -294,7 +294,7 @@ function Skills({ onClose }: SkillsProps) {
             />
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

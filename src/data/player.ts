@@ -5,16 +5,35 @@ import {
   BASELINE_STAT,
   HP_BONUS_PER_CON_POINT,
   HP_PER_CON_POINT,
+  MANA_PER_INT_POINT,
+  MANA_BONUS_PER_INT_POINT,
 } from "../game/balance";
-export function getMaxHP(player: Player): number {
-  const flat = HP_PER_CON_POINT * player.Con;
+
+export function getMaxHP(con: number): number {
+  const flat = HP_PER_CON_POINT * con;
   const multiplier = Math.max(
     0,
-    1 + HP_BONUS_PER_CON_POINT * (player.Con - BASELINE_STAT),
+    1 + HP_BONUS_PER_CON_POINT * (con - BASELINE_STAT),
   );
 
   return Math.max(1, Math.ceil(flat * multiplier));
 }
+export function getMaxMana(int: number): number {
+  const flat = MANA_PER_INT_POINT * int;
+  const multiplier = Math.max(
+    0,
+    1 + MANA_BONUS_PER_INT_POINT * (int - BASELINE_STAT),
+  );
+
+  return Math.max(1, Math.ceil(flat * multiplier));
+}
+
+const playerStr = 10;
+const playerDex = 10;
+const playerCon = 10;
+const playerInt = 10;
+const maxHP = getMaxHP(playerCon);
+const maxMana = getMaxMana(playerInt);
 
 export type Player = {
   Id?: string;
@@ -28,7 +47,8 @@ export type Player = {
   Level: number;
   Exp: number;
   ExpMax: number;
-
+  SkillPoints: number;
+  LearnedNodes: string[];
   // stats
   Str: number;
   Dex: number;
@@ -65,26 +85,29 @@ export type QuestState = {
   questId: string;
   completed: boolean;
 };
-const maxHP = getMaxHP({ Con: 15 } as Player);
+
 export const createNewPlayer = (): Player => ({
   Name: "Admin",
 
   Gold: 360,
 
   Level: 1,
-  Exp: 54,
-  ExpMax: 100,
+  Exp: 0,
+  ExpMax: 30,
+  SkillPoints: 0,
+  LearnedNodes: [],
 
-  Str: 12,
-  Dex: 10,
-  Con: 15,
-  Int: 22,
+  Str: playerStr,
+  Dex: playerDex,
+  Con: playerCon,
+  Int: playerInt,
 
   HP: maxHP,
-
   HPMax: maxHP,
-  Mana: 50,
-  ManaMax: 50,
+
+  Mana: maxMana,
+  ManaMax: maxMana,
+
   Equipment: {},
   BackpackWidth: 5,
   BackpackHeight: 4,
@@ -129,17 +152,5 @@ export const createNewPlayer = (): Player => ({
     "places",
     "blacksmith",
   ],
-  KnownSkills: [
-    "firebolt",
-    "tackle",
-    "warcry",
-    "guard",
-    "speed",
-    "heal_quick",
-    "meditate",
-    "flamethrower",
-    "curse_weak",
-    "magic_missle",
-    "cutting_wind",
-  ],
+  KnownSkills: ["safeguard"],
 });

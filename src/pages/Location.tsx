@@ -11,6 +11,7 @@ import type { ContainerType } from "../data/containerTypes";
 import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
 import { placeLoot } from "../game/lootPlacement";
+import { recalculatePlayerStats } from "../game/characterStats";
 
 const LOOT_WIDTH = 4;
 const LOOT_HEIGHT = 4;
@@ -208,6 +209,30 @@ function Location({
     }
   }
 
+  function addExperience(amount: number) {
+    setPlayer((p) => {
+      let exp = p.Exp + amount;
+      let expMax = p.ExpMax;
+      let level = p.Level;
+      let skillPoints = p.SkillPoints;
+
+      while (exp >= expMax) {
+        exp -= expMax;
+        level += 1;
+        expMax = Math.ceil(expMax * 1.1);
+        skillPoints += 1;
+      }
+
+      return recalculatePlayerStats({
+        ...p,
+        Exp: exp,
+        ExpMax: expMax,
+        Level: level,
+        SkillPoints: skillPoints,
+      });
+    });
+  }
+
   function handleEffect(effect: AdventureEffect) {
     switch (effect.type) {
       case "unlockLocation":
@@ -311,10 +336,7 @@ function Location({
         break;
 
       case "addExperience":
-        setPlayer((p) => ({
-          ...p,
-          Exp: p.Exp + effect.amount,
-        }));
+        addExperience(effect.amount);
         break;
 
       case "heal":

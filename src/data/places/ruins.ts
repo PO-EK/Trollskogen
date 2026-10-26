@@ -175,6 +175,10 @@ export const ruins: Record<string, AdventureNode> = {
             locationId: "ruins",
           },
           {
+            type: "addExperience",
+            amount: 42,
+          },
+          {
             type: "endAdventure",
           },
         ],

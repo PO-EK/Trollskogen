@@ -1,0 +1,249 @@
+.skilltree-page {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  color: #e8e0d0;
+  font-family: Georgia, serif;
+}
+
+.skilltree-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #5c4a32;
+}
+
+.skilltree-header h1 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.6rem;
+}
+
+.skilltree-points {
+  padding: 4px 12px;
+  background: rgba(20, 16, 10, 0.7);
+  border: 1px solid #8c6b3e;
+  border-radius: 999px;
+  color: #a99d86;
+}
+
+.skilltree-points strong {
+  color: #d8b46a;
+}
+
+.skilltree-page .skills-close {
+  margin-left: auto;
+}
+
+/* Branch tabs */
+.tree-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tree-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+
+  background: transparent;
+  color: #e8e0d0;
+
+  border: 1px solid #8c6b3e;
+  border-radius: 999px;
+
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.tree-tab[data-active="true"] {
+  background: #30261b;
+  border-color: #c09a5b;
+  color: #d8b46a;
+}
+
+.tree-tab-value {
+  font-weight: 700;
+  color: #d8b46a;
+}
+
+.tree-tab-count {
+  font-size: 0.7rem;
+  color: #8a7e69;
+}
+
+/* Tree and details */
+.skilltree-body {
+  flex: 1;
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 16px;
+}
+
+.skilltree-scroll {
+  min-height: 0;
+  overflow: auto;
+
+  background: rgba(20, 16, 10, 0.6);
+  border: 2px solid #5c4a32;
+  border-radius: 8px;
+}
+
+.skilltree-details {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.skilltree-note {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #8a7e69;
+}
+
+.tree-canvas {
+  position: relative;
+  margin: 0 auto;
+}
+
+.tree-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tree-line {
+  fill: none;
+  stroke: #4a3d2a;
+  stroke-width: 2;
+}
+
+.tree-line[data-open="true"] {
+  stroke: #c09a5b;
+}
+
+/* Nodes */
+.tree-node {
+  --accent: #8c6b3e;
+
+  position: absolute;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 10px;
+
+  background: rgba(20, 16, 10, 0.85);
+  color: #e8e0d0;
+
+  border: 2px solid #5c4a32;
+  border-left: 5px solid var(--accent);
+  border-radius: 8px;
+
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Skill nodes are colored by the kind of skill */
+.tree-node[data-group="weapon"] {
+  --accent: #d2603f;
+}
+
+.tree-node[data-group="spell"] {
+  --accent: #9a86e0;
+}
+
+.tree-node[data-group="support"] {
+  --accent: #7fc06a;
+}
+
+/* Attribute nodes are small circles, colored by attribute */
+.tree-node[data-kind="attribute"] {
+  align-items: center;
+  padding: 0;
+  gap: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+
+.tree-node[data-attribute="Str"] {
+  --accent: #d2603f;
+}
+
+.tree-node[data-attribute="Dex"] {
+  --accent: #e0b64a;
+}
+
+.tree-node[data-attribute="Con"] {
+  --accent: #7fc06a;
+}
+
+.tree-node[data-attribute="Int"] {
+  --accent: #9a86e0;
+}
+
+.tree-attr-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.tree-attr-plus {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #d8b46a;
+}
+
+.tree-node-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tree-node-cost {
+  font-size: 0.7rem;
+  color: #d8b46a;
+}
+
+/* States */
+.tree-node[data-state="locked"] {
+  opacity: 0.45;
+}
+
+.tree-node[data-state="available"] {
+  box-shadow: 0 0 10px rgba(216, 180, 106, 0.45);
+}
+
+.tree-node[data-state="learned"] {
+  background: rgba(40, 60, 30, 0.6);
+  box-shadow: 0 0 8px rgba(127, 192, 106, 0.35);
+}
+
+.tree-node[data-selected="true"] {
+  outline: 2px solid #d8b46a;
+  outline-offset: 2px;
+}
+
+/* Can't afford it yet */
+.tree-node[data-state="available"][data-affordable="false"] .tree-node-cost {
+  color: #e8663a;
+}
+
+@media (max-width: 800px) {
+  .skilltree-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+}

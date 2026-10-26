@@ -5,16 +5,9 @@ export const blacksmith: Trader = {
   name: "Smeden",
   description: "En kraftig smed som säljer vapen och rustningar.",
   inventoryWidth: 8,
-  inventoryHeight: 4,
+  inventoryHeight: 5,
 
   inventory: [
-    {
-      containerItemId: "blacksmith-old-axe-1",
-      itemId: "old_axe",
-      x: 0,
-      y: 0,
-      buyPrice: 40,
-    },
     {
       containerItemId: "blacksmithIronBody",
       itemId: "iron_body",
@@ -42,13 +35,6 @@ export const blacksmith: Trader = {
       x: 2,
       y: 0,
       buyPrice: 80,
-    },
-    {
-      containerItemId: "firewood-1",
-      itemId: "firewood",
-      x: 2,
-      y: 2,
-      buyPrice: 8,
     },
     {
       containerItemId: "smedenSword",

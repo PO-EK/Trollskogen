@@ -6,13 +6,18 @@ import {
   BASELINE_STAT,
   HP_BONUS_PER_CON_POINT,
   HP_PER_CON_POINT,
+  HP_PER_LEVEL,
+  MANA_BONUS_PER_INT_POINT,
+  MANA_PER_INT_POINT,
+  MANA_PER_LEVEL,
 } from "./balance";
 import { getStatMultiplier } from "./weaponDamage";
 
 export type CharacterStats = {
-  attack: number; // average damage per hit, rounded up
+  attack: number;
   defense: number;
   maxHP: number;
+  maxMana: number;
   weaponName: string | null;
 };
 
@@ -78,15 +83,30 @@ export function getAttack(player: Player): number {
   );
 }
 
-// 10 HP per Fysik point, then a percentage bonus per point above baseline.
 export function getMaxHP(player: Player): number {
   const flat = HP_PER_CON_POINT * player.Con;
+
   const multiplier = Math.max(
     0,
     1 + HP_BONUS_PER_CON_POINT * (player.Con - BASELINE_STAT),
   );
 
-  return Math.max(1, Math.ceil(flat * multiplier));
+  const attributeHP = Math.max(1, Math.ceil(flat * multiplier));
+
+  return attributeHP + (player.Level - 1) * HP_PER_LEVEL;
+}
+
+export function getMaxMana(player: Player): number {
+  const flat = MANA_PER_INT_POINT * player.Int;
+
+  const multiplier = Math.max(
+    0,
+    1 + MANA_BONUS_PER_INT_POINT * (player.Int - BASELINE_STAT),
+  );
+
+  const attributeMana = Math.max(1, Math.ceil(flat * multiplier));
+
+  return attributeMana + (player.Level - 1) * MANA_PER_LEVEL;
 }
 
 export function getCharacterStats(player: Player): CharacterStats {
@@ -94,6 +114,20 @@ export function getCharacterStats(player: Player): CharacterStats {
     attack: getAttack(player),
     defense: getDefense(player),
     maxHP: getMaxHP(player),
+    maxMana: getMaxMana(player),
     weaponName: getEquippedWeapon(player)?.name ?? null,
+  };
+}
+
+export function recalculatePlayerStats(player: Player): Player {
+  const maxHP = getMaxHP(player);
+  const maxMana = getMaxMana(player);
+
+  return {
+    ...player,
+    HPMax: maxHP,
+    ManaMax: maxMana,
+    HP: Math.min(player.HP, maxHP),
+    Mana: Math.min(player.Mana, maxMana),
   };
 }

@@ -166,6 +166,10 @@ export const village: Record<string, AdventureNode> = {
             type: "unlockLocation",
             locationId: "blacksmith",
           },
+          {
+            type: "addExperience",
+            amount: 31,
+          },
         ],
       },
       {

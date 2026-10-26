@@ -85,6 +85,13 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
+.exp-bar {
+  height: 100%;
+  background: linear-gradient(to bottom, #dddbbb, #cfdd0a);
+  box-shadow: 0 0 6px rgba(20, 16, 16, 0.35);
+  transition: width 250ms ease;
+}
+
 /* Health fill */
 .health-bar {
   height: 100%;
@@ -99,4 +106,11 @@
   background: linear-gradient(to bottom, #55b9f2, #2055b5);
   box-shadow: 0 0 6px rgba(85, 185, 242, 0.35);
   transition: width 250ms ease;
+}
+
+.levelUp {
+  padding: 4px 0;
+  color: #d8b46a;
+  font-weight: bold;
+  border-bottom: 1px solid #3d352a;
 }

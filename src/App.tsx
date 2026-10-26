@@ -24,6 +24,32 @@ type ActiveCombat = {
 function App() {
   const [screen, setScreen] = useState<GameScreen>("worldMap");
 
+  // Disable the browser context menu throughout the app.
+  useEffect(() => {
+    function preventContextMenu(event: MouseEvent) {
+      event.preventDefault();
+    }
+
+    document.addEventListener("contextmenu", preventContextMenu);
+    return () =>
+      document.removeEventListener("contextmenu", preventContextMenu);
+  }, []);
+
+  // Disable browser-native text selection and dragging of text or images.
+  useEffect(() => {
+    function preventNativeInteraction(event: Event) {
+      event.preventDefault();
+    }
+
+    document.addEventListener("selectstart", preventNativeInteraction);
+    document.addEventListener("dragstart", preventNativeInteraction);
+
+    return () => {
+      document.removeEventListener("selectstart", preventNativeInteraction);
+      document.removeEventListener("dragstart", preventNativeInteraction);
+    };
+  }, []);
+
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(
     null,
   );
