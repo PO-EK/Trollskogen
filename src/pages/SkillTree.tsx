@@ -8,7 +8,7 @@ import { ATTRIBUTE_LABELS } from "../game/labels";
 import { getSkillGroup } from "../game/skillLoadout";
 import { getBranchLayout } from "../game/skillTreeLayout";
 import {
-  canLearn,
+  /* canLearn, */
   getNodeState,
   isLearned,
   learnNode,
