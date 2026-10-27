@@ -4,6 +4,7 @@ import type { AttributeName, TreeNode } from "../data/skillTree";
 // Pixel sizes of the two node shapes.
 export const NODE_SIZE = {
   attribute: { width: 46, height: 46 },
+  attributeLarge: { width: 64, height: 64 },
   skill: { width: 122, height: 54 },
 };
 
@@ -83,11 +84,22 @@ function layoutBranch(nodes: TreeNode[]): BranchLayout {
   const allX = [...xs.values()];
   const minX = Math.min(...allX);
   const maxX = Math.max(...allX);
-  const rowBox = Math.max(NODE_SIZE.attribute.height, NODE_SIZE.skill.height);
+  const rowBox = Math.max(
+    ...nodes.map(
+      (node) =>
+        (node.kind === "attribute" && (node.attributeAmount ?? 1) > 1
+          ? NODE_SIZE.attributeLarge
+          : NODE_SIZE[node.kind]
+        ).height,
+    ),
+  );
 
   return {
     nodes: nodes.map((node) => {
-      const size = NODE_SIZE[node.kind];
+      const size =
+        node.kind === "attribute" && (node.attributeAmount ?? 1) > 1
+          ? NODE_SIZE.attributeLarge
+          : NODE_SIZE[node.kind];
 
       return {
         node,

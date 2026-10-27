@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "../context/usePlayer";
-import { useItemDrag } from "../context/useItemDrag";
 import { getEnemy } from "../data/enemy";
 import type { ItemUse } from "../data/itemTypes";
 import type { Skill } from "../data/skillTypes";
@@ -16,10 +15,10 @@ import {
 } from "../game/combatEngine";
 import type { CombatContext, CombatState, Status } from "../game/combatEngine";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
-import { getItemUse } from "../game/itemUse";
 import { ATTRIBUTE_LABELS, getSkillSummary } from "../game/labels";
 import { getBattleSkills, getSkillGroup } from "../game/skillLoadout";
 import "./Combat.css";
+import ItemUseSlot from "../components/inventory/ItemUseSlot";
 
 const ENEMY_TURN_DELAY = 1500; // ms, so the log is readable
 
@@ -146,88 +145,6 @@ function SkillButton({ skill, state, onUse }: SkillButtonProps) {
         </span>
       )}
     </button>
-  );
-}
-
-type ItemSlotProps = {
-  state: CombatState;
-  onUseItem: (use: ItemUse) => void;
-};
-
-// Drop a potion or bandage from the backpack here, on your turn.
-function ItemSlot({ state, onUseItem }: ItemSlotProps) {
-  const {
-    draggedItem,
-    dragSourceType,
-    removeFromSource,
-    updatePointerPosition,
-    endDrag,
-  } = useItemDrag();
-  const [isOver, setIsOver] = useState(false);
-
-  const use =
-    draggedItem && dragSourceType === "player"
-      ? getItemUse(draggedItem.itemId)
-      : null;
-
-  // Why the dragged item can't be used, or null if it can.
-  let blockReason: string | null = null;
-
-  if (draggedItem) {
-    if (dragSourceType !== "player") {
-      blockReason = "Bara föremål från ryggsäcken.";
-    } else if (!use) {
-      blockReason = "Det går inte att använda i strid.";
-    } else {
-      blockReason = getItemBlockReason(state, use);
-    }
-  }
-
-  const dragState = draggedItem
-    ? blockReason
-      ? "invalid"
-      : "valid"
-    : undefined;
-
-  function handlePointerUp() {
-    setIsOver(false);
-
-    if (!draggedItem) {
-      return;
-    }
-
-    if (use && blockReason === null) {
-      onUseItem(use);
-      removeFromSource?.(); // the backpack deletes the item
-    }
-
-    endDrag();
-  }
-
-  return (
-    <div
-      className="combat-item-slot"
-      data-drag-state={dragState}
-      data-over={isOver}
-      title={blockReason ?? "Dra en dryck eller ett bandage hit"}
-      onPointerEnter={() => setIsOver(true)}
-      onPointerLeave={() => setIsOver(false)}
-      onPointerMove={(event) => {
-        if (draggedItem) {
-          updatePointerPosition({ x: event.clientX, y: event.clientY });
-        }
-      }}
-      onPointerUp={handlePointerUp}
-    >
-      {isOver && blockReason ? (
-        <span className="combat-item-slot-reason">{blockReason}</span>
-      ) : (
-        <>
-          <span className="combat-item-slot-icon">🧪</span>
-          <span>Föremål</span>
-        </>
-      )}
-    </div>
   );
 }
 
@@ -394,7 +311,14 @@ function Combat({ encounter, onFinish }: CombatProps) {
               </button>
             ) : (
               <>
-                <ItemSlot state={state} onUseItem={handleUseItem} />
+                <ItemUseSlot
+                  getBlockReason={(use) => getItemBlockReason(state, use)}
+                  // true = the slot deletes the item from the backpack for us
+                  onUse={(_item, use) => {
+                    handleUseItem(use);
+                    return true;
+                  }}
+                />
                 <button
                   className="combat-button"
                   disabled={enemy.isBoss || state.phase !== "playerTurn"}

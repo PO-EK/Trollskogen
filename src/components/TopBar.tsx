@@ -3,7 +3,7 @@ function TopBar() {
     <header className="top-bar">
       <h2>Trollskogen</h2>
       <p>
-        Version 0.1.3 - 2026-10-26: Du kan nu levla upp och spendera
+        Version 0.1.4 - 2026-10-27: Använd eller Kasta items, ändrade skilltree.
         skillpoints.
       </p>
     </header>

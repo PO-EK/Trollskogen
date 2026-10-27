@@ -12,6 +12,10 @@ import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
 import { placeLoot } from "../game/lootPlacement";
 import { recalculatePlayerStats } from "../game/characterStats";
+import {
+  addItemToInventory,
+  findFirstAvailableItemPosition,
+} from "../game/inventory";
 
 const LOOT_WIDTH = 4;
 const LOOT_HEIGHT = 4;
@@ -52,6 +56,10 @@ function Location({
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const [rewardSummary, setRewardSummary] = useState<{
+    exp: number;
+    gold: number;
+  } | null>(null);
 
   const location = locations.find((location) => location.id === locationId);
 
@@ -197,13 +205,16 @@ function Location({
     setHoveredItemId(null);
 
     if (result.outcome === "win") {
+      setRewardSummary({ exp: result.exp, gold: result.gold });
       setCurrentNodeId(encounter.winNodeId);
       handleEffect({ type: "addExperience", amount: result.exp });
       handleEffect({ type: "addGold", amount: result.gold });
       handleEffect({ type: "openLoot", itemIds: result.loot });
     } else if (result.outcome === "lose") {
+      setRewardSummary(null);
       setCurrentNodeId(encounter.loseNodeId);
     } else {
+      setRewardSummary(null);
       // Fled: back to where the fight began unless the story says otherwise.
       setCurrentNodeId(encounter.fleeNodeId ?? startNodeId);
     }
@@ -403,8 +414,29 @@ function Location({
     setContainerItems([]);
     setActiveContainer(null);
     setHoveredItemId(null);
+    setRewardSummary(null);
 
     if (choice.effects) {
+      const opensLoot = choice.effects.some(
+        (effect) => effect.type === "openLoot" || effect.type === "spawnLoot",
+      );
+      if (opensLoot) {
+        const exp = choice.effects.reduce(
+          (total, effect) =>
+            total + (effect.type === "addExperience" ? effect.amount : 0),
+          0,
+        );
+        const gold = choice.effects.reduce(
+          (total, effect) =>
+            total + (effect.type === "addGold" ? effect.amount : 0),
+          0,
+        );
+
+        if (exp > 0 || gold > 0) {
+          setRewardSummary({ exp, gold });
+        }
+      }
+
       for (const effect of choice.effects) {
         handleEffect(effect);
       }
@@ -425,14 +457,99 @@ function Location({
     );
   }
 
+  function handleTakeAll() {
+    if (activeContainer?.type !== "loot") {
+      return;
+    }
+
+    let updatedPlayer = player;
+    const remainingItems: ContainerItem[] = [];
+
+    for (const lootItem of containerItems) {
+      const fitsInBackpack =
+        findFirstAvailableItemPosition(
+          lootItem.itemId,
+          updatedPlayer.Inventory,
+          updatedPlayer.BackpackWidth,
+          updatedPlayer.BackpackHeight,
+        ) !== null;
+      const fitsInStorage =
+        findFirstAvailableItemPosition(
+          lootItem.itemId,
+          updatedPlayer.Storage,
+          updatedPlayer.StorageWidth,
+          updatedPlayer.StorageHeight,
+        ) !== null;
+
+      if (!fitsInBackpack && !fitsInStorage) {
+        remainingItems.push(lootItem);
+        continue;
+      }
+
+      updatedPlayer = addItemToInventory(
+        updatedPlayer,
+        lootItem.itemId,
+        lootItem.containerItemId,
+      );
+    }
+
+    if (updatedPlayer !== player) {
+      setPlayer(updatedPlayer);
+    }
+    setContainerItems(remainingItems);
+  }
+
+  const canTakeAnyLoot =
+    activeContainer?.type === "loot" &&
+    containerItems.some(
+      (lootItem) =>
+        findFirstAvailableItemPosition(
+          lootItem.itemId,
+          player.Inventory,
+          player.BackpackWidth,
+          player.BackpackHeight,
+        ) !== null ||
+        findFirstAvailableItemPosition(
+          lootItem.itemId,
+          player.Storage,
+          player.StorageWidth,
+          player.StorageHeight,
+        ) !== null,
+    );
+
   return (
     <div className="location">
       <h1 className="location-header">{location.name}</h1>
 
       <p className="location-text">{currentNode.text}</p>
 
+      {rewardSummary && (
+        <div className="location-reward-summary">
+          <span>Erfarenhet: +{rewardSummary.exp} XP</span>
+          {rewardSummary.gold > 0 && (
+            <span>Guld hittat: +{rewardSummary.gold} Kroner</span>
+          )}
+        </div>
+      )}
+
       {activeContainer && (
         <div>
+          {activeContainer.type === "loot" && (
+            <div className="location-loot-actions">
+              <button
+                className="location-choice"
+                disabled={!canTakeAnyLoot}
+                onClick={handleTakeAll}
+              >
+                Ta allt
+              </button>
+              {containerItems.length > 0 && !canTakeAnyLoot && (
+                <p className="location-loot-message">
+                  Föremålen får inte plats i ryggsäcken eller förvaringen.
+                </p>
+              )}
+            </div>
+          )}
           <div style={{ display: "flex", justifyContent: "center" }}>
             {activeContainer.type === "storage" ? (
               <ItemGrid

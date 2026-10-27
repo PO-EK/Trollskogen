@@ -90,13 +90,32 @@ export const places: Record<string, AdventureNode> = {
 
   fightWon: {
     id: "fightWon",
-    text: "Fienden ligger slagen på marken. Dags att loota!.",
-    choices: [{ text: "Fortsätt", nextNodeId: "start" }],
+    text: "Dina fiende ligger besegrad, du har vunnit. Du börjar leta efter användbara föremål.",
+    choices: [
+      { text: "Leta upp fler fiender!", nextNodeId: "start" },
+      {
+        text: "Gå hem.",
+        effects: [
+          {
+            type: "endAdventure",
+          },
+        ],
+      },
+    ],
   },
   fightLost: {
     id: "fightLost",
     text: "Allt blir svart...",
-    choices: [{ text: "Någon räddar dig", nextNodeId: "start" }],
+    choices: [
+      {
+        text: "Någon räddar dig...",
+        effects: [
+          {
+            type: "endAdventure",
+          },
+        ],
+      },
+    ],
   },
 
   attackWolf: {

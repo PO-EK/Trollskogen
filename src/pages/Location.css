@@ -69,3 +69,45 @@
   padding-top: 10px;
   padding-bottom: 20px;
 }
+
+.location-reward-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  font-weight: bold;
+}
+
+.location-loot-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.location-loot-actions .location-choice {
+  width: 180px;
+}
+
+.location-choice:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.location-choice:disabled:hover {
+  background: transparent;
+  border-color: #8c6b3e;
+}
+
+.location-loot-message {
+  margin: 0;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  text-align: center;
+}

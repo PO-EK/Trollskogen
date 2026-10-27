@@ -1,0 +1,56 @@
+.item-delete-slot {
+  width: 84px;
+  height: 72px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+
+  background: rgba(20, 16, 10, 0.45);
+  border: 2px dashed rgba(192, 80, 58, 0.55);
+  border-radius: 8px;
+
+  font-size: 0.6rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(232, 160, 154, 0.8);
+
+  user-select: none;
+  touch-action: none;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s,
+    background 0.12s;
+}
+
+.item-delete-slot-icon {
+  font-size: 1.4rem;
+}
+
+.item-delete-slot[data-drag-state="valid"] {
+  border-color: #c0503a;
+  box-shadow: 0 0 10px rgba(192, 80, 58, 0.45);
+}
+
+.item-delete-slot[data-drag-state="valid"][data-over="true"] {
+  background: rgba(192, 80, 58, 0.25);
+  box-shadow: 0 0 16px rgba(192, 80, 58, 0.8);
+}
+
+.item-delete-slot[data-drag-state="invalid"][data-over="true"] {
+  border-color: #8a8a8a;
+  background: rgba(120, 120, 120, 0.2);
+  color: #bdbdbd;
+}
+
+.item-delete-slot-reason {
+  font-size: 0.6rem;
+  line-height: 1.15;
+  text-transform: none;
+  letter-spacing: 0;
+}

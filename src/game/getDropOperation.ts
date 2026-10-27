@@ -43,6 +43,9 @@ export function getDropOperation(
   if (sourceType === "storage" && destinationType === "storage") {
     return "move";
   }
+  if (sourceType === "player" && destinationType === "useSlot") {
+    return "use";
+  }
 
   return null;
 }

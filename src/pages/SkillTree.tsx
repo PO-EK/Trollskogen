@@ -24,7 +24,9 @@ function getNodeLabel(node: TreeNode): string {
     return getSkill(node.skillId)?.name ?? node.skillId;
   }
 
-  return node.attribute ? `+1 ${ATTRIBUTE_LABELS[node.attribute]}` : node.id;
+  return node.attribute
+    ? `+${node.attributeAmount ?? 1} ${ATTRIBUTE_LABELS[node.attribute]}`
+    : node.id;
 }
 
 type SkillTreeProps = {
@@ -97,7 +99,9 @@ function SkillTree({ onClose }: SkillTreeProps) {
               </span>
               <span className="item-card-value">
                 {player[node.attribute]}
-                {state === "learned" ? "" : ` → ${player[node.attribute] + 1}`}
+                {state === "learned"
+                  ? ""
+                  : ` → ${player[node.attribute] + (node.attributeAmount ?? 1)}`}
               </span>
             </div>
             <div className="item-card-row">
@@ -196,6 +200,7 @@ function SkillTree({ onClose }: SkillTreeProps) {
                   data-state={state}
                   data-group={skill ? getSkillGroup(skill) : undefined}
                   data-attribute={node.attribute}
+                  data-attribute-amount={node.attributeAmount ?? 1}
                   data-selected={selected?.id === node.id}
                   data-affordable={player.SkillPoints >= node.cost}
                   style={{
@@ -212,7 +217,9 @@ function SkillTree({ onClose }: SkillTreeProps) {
                       <span className="tree-attr-icon">
                         {getIcon(node.attribute)}
                       </span>
-                      <span className="tree-attr-plus">+1</span>
+                      <span className="tree-attr-plus">
+                        +{node.attributeAmount ?? 1}
+                      </span>
                     </>
                   ) : (
                     <>

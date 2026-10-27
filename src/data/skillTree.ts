@@ -6,7 +6,8 @@ export type TreeNode = {
   id: string; // saved in the player's file: don't rename after players have saves
   kind: "attribute" | "skill";
   branch: AttributeName; // which of the four trees it sits in
-  attribute?: AttributeName; // attribute nodes: what they give +1 in
+  attribute?: AttributeName;
+  attributeAmount?: number;
   skillId?: string; // skill nodes: the skill they teach
   requires: TreeNode[]; // needs ANY ONE of these first. None = the branch root
   cost: number; // skill points
@@ -25,7 +26,7 @@ export const SKILL_TREE_BRANCHES: {
 const DEFAULT_COST = 1;
 const nodes: TreeNode[] = [];
 
-type NodeOptions = { cost?: number };
+type NodeOptions = { cost?: number; amount?: number };
 
 // A +1 attribute node. With no `requires` it is the root of its branch.
 function attr(
@@ -39,6 +40,7 @@ function attr(
     kind: "attribute",
     branch: requires[0]?.branch ?? attribute,
     attribute,
+    attributeAmount: options.amount ?? 1,
     requires,
     cost: options.cost ?? DEFAULT_COST,
   };
@@ -47,17 +49,31 @@ function attr(
   return node;
 }
 
-// A node that teaches a skill. It needs at least one requirement, and it
-// joins the branch of the first one.
+// Skills follow a parent, or use an explicit branch when starting a tree.
+function skill(
+  skillId: string,
+  branch: AttributeName,
+  options?: NodeOptions,
+): TreeNode;
 function skill(
   skillId: string,
   requires: [TreeNode, ...TreeNode[]],
+  options?: NodeOptions,
+): TreeNode;
+function skill(
+  skillId: string,
+  branchOrRequires: AttributeName | [TreeNode, ...TreeNode[]],
   options: NodeOptions = {},
 ): TreeNode {
+  const requires = typeof branchOrRequires === "string" ? [] : branchOrRequires;
+  const branch =
+    typeof branchOrRequires === "string"
+      ? branchOrRequires
+      : branchOrRequires[0].branch;
   const node: TreeNode = {
     id: skillId, // a skill can only appear once in the whole tree
     kind: "skill",
-    branch: requires[0].branch,
+    branch,
     skillId,
     requires,
     cost: options.cost ?? DEFAULT_COST,
@@ -72,9 +88,11 @@ function skill(
 //
 //   attr("id", "Str")                   a branch root (+1 Str)
 //   attr("id", "Str", [parent])         +1 Str, after `parent`
+//   attr("id", "Str", [parent], { amount: 3, cost: 3 })  +3 Str
 //   skill("skill_id", [parent])         teaches a skill, after `parent`
 //   skill("skill_id", [a, b])           needs a OR b first
 //   skill("skill_id", [parent], { cost: 2 })
+//   skill("skill_id", "Int")            skill root of the Int branch
 //
 // A node can only follow nodes written ABOVE it. The order you write
 // nodes in is their left-to-right order in a row.
@@ -82,47 +100,56 @@ function skill(
 // =====================================================================
 
 // ---- Styrka ----
-const str1 = attr("str-1", "Str");
-const warcry = skill("warcry", [str1]);
+const warcry = skill("warcry", "Str");
 const str3 = attr("str-3", "Str", [warcry]);
 const str4 = attr("str-4", "Str", [warcry]);
 const tackle = skill("tackle", [str3]);
 const kick = skill("kick", [str4]);
-const str5 = attr("str-5", "Str", [tackle]);
-const str6 = attr("str-6", "Str", [kick]);
-const str7 = attr("str-7", "Str", [str5, str6]);
-attr("str8", "Str", [str7]);
+attr("str-5", "Str", [tackle], { amount: 3, cost: 3 });
+attr("str-6", "Str", [kick], { amount: 3, cost: 3 });
 
 // ---- Smidighet ----
-const dex1 = attr("dex-1", "Dex");
-const speed = skill("speed", [dex1]);
+const speed = skill("speed", "Dex");
 const dex2 = attr("dex-2", "Dex", [speed]);
 const dex3 = attr("dex-3", "Dex", [dex2]);
-const rend = skill("rend", [dex3]);
+skill("rend", [dex3]);
 const quickStep = skill("quick_step", [dex3]);
-attr("dex-4", "Dex", [rend, quickStep]);
+skill("deep_cut", [dex3]);
+attr("dex-4", "Dex", [quickStep], { amount: 3, cost: 3 });
 
 // ---- Fysik ----
-const con1 = attr("con-1", "Con");
-const firstAid = skill("iron_skin", [con1]);
-const con2 = attr("con-2", "Con", [firstAid]);
+const ironSkin = skill("iron_skin", "Con");
+const con2 = attr("con-2", "Con", [ironSkin]);
 const con3 = attr("con-3", "Con", [con2]);
 const healLight = skill("heal_light", [con3]);
-const ironSkin = skill("first_aid", [con3]);
-const secondWind = skill("second_wind", [con3]);
-attr("con-4", "Con", [healLight, ironSkin, secondWind]);
+const firstAid = skill("first_aid", [con3]);
+skill("second_wind", [con3]);
+attr("con-4", "Con", [healLight]);
+attr("con-5", "Con", [firstAid], { amount: 3, cost: 3 });
 
 // ---- Intelligens ----
-const int1 = attr("int-1", "Int");
-const magicArrow = skill("magicArrow", [int1]);
-const meditate = skill("meditate", [magicArrow]);
-const light = attr("light", "Int", [meditate]);
+const manashield = skill("mana_shield", "Int");
+const BigInt = attr("Int", "Int", [manashield], { amount: 3, cost: 1 });
+const meditate = skill("meditate", [BigInt]);
 const fire = attr("fire", "Int", [meditate]);
+const light = attr("light", "Int", [meditate]);
 const dark = attr("dark", "Int", [meditate]);
-const holySpear = skill("holy_spear", [light]);
+
 const firebolt = skill("fire_bolt", [fire]);
-const curse = skill("curse_weak", [dark]);
-attr("int-end", "Int", [holySpear, firebolt, curse]);
+const fireInt = attr("fire", "Int", [firebolt]);
+const inferno = skill("inferno", [fireInt]);
+
+const healQuick = skill("heal_quick", [light]);
+const lightInt = attr("light", "Int", [healQuick]);
+const holySpear = skill("holy_spear", [lightInt]);
+
+const curse = skill("shadow_bolt", [dark]);
+const darkInt = attr("dark", "Int", [curse]);
+const curseStrong = skill("curse_strong", [darkInt]);
+
+attr("int-fire-3", "Int", [inferno], { amount: 3, cost: 3 });
+attr("int-light-3", "Int", [holySpear], { amount: 3, cost: 3 });
+attr("int-end", "Int", [curseStrong], { amount: 3, cost: 3 });
 // =====================================================================
 
 export const SKILL_TREE_NODES: readonly TreeNode[] = nodes;

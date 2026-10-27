@@ -7,4 +7,5 @@ export type DragOperation =
   | "retrieve"
   | "quest"
   | "equip"
-  | "unequip";
+  | "unequip"
+  | "use";

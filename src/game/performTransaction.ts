@@ -6,6 +6,14 @@ import type { Trader, TraderInventoryItem } from "../data/traders/tradersTypes";
 import { canEquipInSlot, parseEquipSlotId } from "./equipment";
 import { getDropOperation } from "./getDropOperation";
 import type { TransactionResult } from "./transactionTypes";
+import { applyEffects } from "../game/effects";
+import {
+  getItemUse,
+  getPlayerVitals,
+  getWorldBlockReason,
+  USE_SLOT_ID,
+} from "./itemUse";
+import { findFirstAvailableItemPosition } from "./inventory";
 
 type PerformTransactionArgs = {
   item: ContainerItem;
@@ -116,6 +124,15 @@ export function performTransaction({
 
     case "unequip":
       return performUnequip({
+        item,
+        sourceId,
+        destinationId,
+        position,
+        player,
+        trader,
+      });
+    case "use":
+      return performUse({
         item,
         sourceId,
         destinationId,
@@ -530,11 +547,30 @@ function performEquip({
     return invalid(player, trader);
   }
 
-  // Occupied slot: the player has to unequip first.
-  if (player.Equipment[slot]) {
+  const equipped = player.Equipment[slot];
+  const remainingInventory = player.Inventory.filter(
+    (inventoryItem) =>
+      inventoryItem.containerItemId !== ownedItem.containerItemId,
+  );
+  const returnedEquipmentPosition = equipped
+    ? findFirstAvailableItemPosition(
+        equipped.itemId,
+        remainingInventory,
+        player.BackpackWidth,
+        player.BackpackHeight,
+      )
+    : null;
+
+  if (equipped && !returnedEquipmentPosition) {
     return invalid(player, trader);
   }
 
+  const inventory = equipped
+    ? [
+        ...remainingInventory,
+        { ...equipped, ...returnedEquipmentPosition },
+      ]
+    : remainingInventory;
   const equipment = { ...player.Equipment };
   equipment[slot] = { ...ownedItem, x: 0, y: 0 };
 
@@ -542,10 +578,7 @@ function performEquip({
     success: true,
     player: {
       ...player,
-      Inventory: player.Inventory.filter(
-        (inventoryItem) =>
-          inventoryItem.containerItemId !== ownedItem.containerItemId,
-      ),
+      Inventory: inventory,
       Equipment: equipment,
     },
     trader,
@@ -585,6 +618,50 @@ function performUnequip({
         { ...equipped, x: position.x, y: position.y },
       ],
       Equipment: equipment,
+    },
+    trader,
+  };
+}
+// Backpack -> use slot, outside combat. The effects act on the player
+// directly and the item is consumed. (In combat the engine applies them.)
+function performUse({
+  item,
+  sourceId,
+  destinationId,
+  player,
+  trader,
+}: TransactionHandlerArgs): PerformTransactionOutput {
+  if (sourceId !== "player" || destinationId !== USE_SLOT_ID) {
+    return invalid(player, trader);
+  }
+
+  // Trust our own state, not the dragged copy.
+  const ownedItem = player.Inventory.find(
+    (inventoryItem) => inventoryItem.containerItemId === item.containerItemId,
+  );
+
+  if (!ownedItem) {
+    return invalid(player, trader);
+  }
+
+  const use = getItemUse(ownedItem.itemId);
+
+  if (!use || getWorldBlockReason(player, use) !== null) {
+    return invalid(player, trader);
+  }
+
+  const result = applyEffects(getPlayerVitals(player), use.effects);
+
+  return {
+    success: true,
+    player: {
+      ...player,
+      HP: result.fighter.hp,
+      Mana: result.fighter.mana,
+      Inventory: player.Inventory.filter(
+        (inventoryItem) =>
+          inventoryItem.containerItemId !== ownedItem.containerItemId,
+      ),
     },
     trader,
   };

@@ -1,7 +1,7 @@
 import { rollLoot } from "../data/enemy";
 import type { Enemy, EnemyId } from "../data/enemy";
 import type { Player } from "../data/player";
-import type { Skill, SkillEffect, StatusKind } from "../data/skillTypes";
+import type { Skill } from "../data/skillTypes";
 import { getSkill } from "../data/skills";
 import { rollSkillDamage } from "./battleSkills";
 import {
@@ -19,43 +19,24 @@ import type {
 } from "./combatTypes";
 import { getBattleSkills } from "./skillLoadout";
 import type { ItemUse } from "../data/itemTypes";
-import { CURE_LABELS } from "./labels";
+import {
+  applyEffects,
+  describeItemResult,
+  getUseBlockReason,
+  isStackable,
+} from "./effects";
+import type { Status, Vitals } from "./effects";
+
+export type { Status } from "./effects";
 
 // ---------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------
 
-type AttributeName = "Str" | "Dex" | "Con" | "Int";
 type Side = "player" | "enemy";
 
-export type Status =
-  | { kind: "stat"; stat: AttributeName; amount: number; turnsLeft: number }
-  | { kind: "damageMod"; percent: number; turnsLeft: number }
-  | { kind: "guard"; multiplier: number; turnsLeft: number }
-  | { kind: "evade"; chance: number; turnsLeft: number }
-  | {
-      kind: "burn";
-      damage: number; // per layer
-      turnsLeft: number;
-      stacks: number;
-      maxStacks: number;
-    }
-  | {
-      kind: "bleed";
-      damage: number; // per layer
-      turnsLeft: number;
-      stacks: number;
-      maxStacks: number;
-    }
-  | { kind: "stun"; turnsLeft: number };
-
-export type Fighter = {
-  hp: number;
-  maxHp: number;
-  mana: number; // enemies ignore it
-  maxMana: number; // enemies have 0
+export type Fighter = Vitals & {
   cooldowns: Record<string, number>;
-  statuses: Status[];
 };
 
 export type LogEntry = { text: string; tone: Side | "info" };
@@ -103,106 +84,7 @@ function rollInt(min: number, max: number, random: () => number): number {
   return min + Math.floor(random() * (max - min + 1));
 }
 
-// ---------------------------------------------------------------------
-// Statuses
-// ---------------------------------------------------------------------
-
-/*
- * "N turns" means N times it matters:
- * - burn, guard, evade and stun count down after the OPPONENT's action
- *   (burn ticks, guard blocks N hits, stun skips N turns)
- * - stat buffs and damageMod count down after the owner's OWN action
- *   (they boost the next N actions)
- */
 const OWN_ACTION_KINDS: Status["kind"][] = ["stat", "damageMod"];
-
-// Casting the same status again refreshes it instead of stacking.
-function statusKey(status: Status): string {
-  if (status.kind === "stat") {
-    return `stat:${status.stat}:${status.amount >= 0 ? "up" : "down"}`;
-  }
-
-  if (status.kind === "damageMod") {
-    return `damageMod:${status.percent >= 0 ? "up" : "down"}`;
-  }
-
-  return status.kind;
-}
-type StackableStatus = Extract<Status, { kind: "burn" | "bleed" }>;
-
-function isStackable(status: Status): status is StackableStatus {
-  return status.kind === "burn" || status.kind === "bleed";
-}
-
-function addStatus(statuses: Status[], status: Status): Status[] {
-  const key = statusKey(status);
-  const existing = statuses.find((candidate) => statusKey(candidate) === key);
-  const others = statuses.filter((candidate) => statusKey(candidate) !== key);
-
-  if (
-    existing &&
-    isStackable(existing) &&
-    isStackable(status) &&
-    existing.kind === status.kind
-  ) {
-    return [
-      ...others,
-      { ...status, stacks: Math.min(existing.stacks + 1, status.maxStacks) },
-    ];
-  }
-
-  return [...others, status];
-}
-
-function effectToStatus(effect: SkillEffect): Status | null {
-  switch (effect.type) {
-    case "buff":
-      return {
-        kind: "stat",
-        stat: effect.stat,
-        amount: effect.amount,
-        turnsLeft: effect.turns,
-      };
-    case "damageMod":
-      return {
-        kind: "damageMod",
-        percent: effect.percent,
-        turnsLeft: effect.turns,
-      };
-    case "guard":
-      return {
-        kind: "guard",
-        multiplier: effect.multiplier,
-        turnsLeft: effect.turns,
-      };
-    case "evade":
-      return { kind: "evade", chance: effect.chance, turnsLeft: effect.turns };
-    case "burn":
-      return {
-        kind: "burn",
-        damage: effect.damage,
-        turnsLeft: effect.turns,
-        stacks: 1,
-        maxStacks: effect.maxStacks ?? 1,
-      };
-    case "bleed":
-      return {
-        kind: "bleed",
-        damage: effect.damage,
-        turnsLeft: effect.turns,
-        stacks: 1,
-        maxStacks: effect.maxStacks ?? 1,
-      };
-    case "stun":
-      return { kind: "stun", turnsLeft: effect.turns };
-    case "heal":
-    case "restoreMana":
-    case "cure":
-      return null;
-    default:
-      return null;
-  }
-}
 
 function isStunned(fighter: Fighter): boolean {
   return fighter.statuses.some((status) => status.kind === "stun");
@@ -312,113 +194,6 @@ function tickOwnClock(fighter: Fighter): Fighter {
   });
 
   return { ...fighter, statuses };
-}
-
-function scaledAmount(
-  amount: number | undefined,
-  percentOfMax: number | undefined,
-  max: number,
-): number {
-  return (amount ?? 0) + Math.round(((percentOfMax ?? 0) / 100) * max);
-}
-
-type ApplyResult = {
-  fighter: Fighter;
-  healed: number;
-  manaRestored: number;
-  cured: StatusKind[];
-  applied: SkillEffect[]; // the effects that took hold, after the chance rolls
-};
-
-function applyEffects(
-  fighter: Fighter,
-  effects: SkillEffect[],
-  random: () => number = Math.random,
-): ApplyResult {
-  let next = fighter;
-  let healed = 0;
-  let manaRestored = 0;
-  const cured: StatusKind[] = [];
-  const applied: SkillEffect[] = [];
-
-  for (const effect of effects) {
-    if (effect.applyChance !== undefined && random() >= effect.applyChance) {
-      continue;
-    }
-
-    applied.push(effect);
-
-    if (effect.type === "heal") {
-      const hp = Math.min(
-        next.maxHp,
-        next.hp + scaledAmount(effect.amount, effect.percentOfMax, next.maxHp),
-      );
-
-      healed += hp - next.hp;
-      next = { ...next, hp };
-      continue;
-    }
-
-    if (effect.type === "restoreMana") {
-      const mana = Math.min(
-        next.maxMana,
-        next.mana +
-          scaledAmount(effect.amount, effect.percentOfMax, next.maxMana),
-      );
-
-      manaRestored += mana - next.mana;
-      next = { ...next, mana };
-      continue;
-    }
-
-    if (effect.type === "cure") {
-      for (const kind of effect.statuses) {
-        if (
-          next.statuses.some((status) => status.kind === kind) &&
-          !cured.includes(kind)
-        ) {
-          cured.push(kind);
-        }
-      }
-
-      next = {
-        ...next,
-        statuses: next.statuses.filter(
-          (status) => !effect.statuses.includes(status.kind),
-        ),
-      };
-      continue;
-    }
-
-    const status = effectToStatus(effect);
-
-    if (status) {
-      next = { ...next, statuses: addStatus(next.statuses, status) };
-    }
-  }
-
-  return { fighter: next, healed, manaRestored, cured, applied };
-}
-
-// "läkte för 100 hp och botade branden"
-function describeItemResult(applied: ApplyResult): string {
-  const parts: string[] = [];
-
-  if (applied.healed > 0) {
-    parts.push(`läkte för ${applied.healed} hp`);
-  }
-
-  if (applied.manaRestored > 0) {
-    parts.push(`återfick ${applied.manaRestored} magi`);
-  }
-
-  if (applied.cured.length > 0) {
-    parts.push(
-      `botade ${applied.cured.map((kind) => CURE_LABELS[kind]).join(" och ")}`,
-    );
-  }
-
-  return parts.join(" och ");
 }
 
 // A skill with "Väntetid 2" is usable again 2 turns after it was used.
@@ -860,7 +635,7 @@ export function getItemBlockReason(
     }
   }
 
-  return reason;
+  return getUseBlockReason(state.player, use);
 }
 
 // Using an item takes your turn. The caller deletes the item.

@@ -188,11 +188,13 @@ export const skills: Skill[] = [
   },
   // ---- Spell skills ----
   {
-    id: "safeguard",
-    name: "Stålmuskler",
-    description: "Spänner musklerna och tar mindre skada.",
+    id: "mana_shield",
+    name: "Magisk Sköld",
+    description: "Använd magi för att blockera skada.",
     target: "self",
-    effects: [{ type: "guard", multiplier: 0.8, turns: 1 }],
+    effects: [{ type: "guard", multiplier: 0.5, turns: 4 }],
+    manaCost: 15,
+    cooldown: 4,
   },
   {
     id: "speed",
@@ -243,7 +245,7 @@ export const skills: Skill[] = [
     target: "enemy",
     damageType: "crushing",
     damage: { kind: "spell", min: 15, max: 20, stat: "Str" },
-    effects: [{ type: "stun", turns: 3, applyChance: 0.5 }],
+    effects: [{ type: "stun", turns: 3, applyChance: 0.6 }],
     cooldown: 3,
   },
   {
@@ -253,9 +255,9 @@ export const skills: Skill[] = [
     target: "enemy",
     damageType: "fire",
     damage: { kind: "spell", min: 14, max: 16, stat: "Int" },
-    manaCost: 12,
+    manaCost: 25,
     effects: [
-      { type: "burn", damage: 8, turns: 3, applyChance: 0.5, maxStacks: 3 },
+      { type: "burn", damage: 8, turns: 10, applyChance: 1, maxStacks: 3 },
     ],
   },
   {
@@ -264,11 +266,8 @@ export const skills: Skill[] = [
     description: "Skjut magiska pilar från dina händer.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "spell", min: 8, max: 12, stat: "Int" },
-    manaCost: 8,
-    effects: [
-      { type: "bleed", damage: 3, turns: 5, applyChance: 0.6, maxStacks: 10 },
-    ],
+    damage: { kind: "spell", min: 10, max: 12, stat: "Int" },
+    manaCost: 12,
   },
   {
     id: "curse_weak",
@@ -276,9 +275,21 @@ export const skills: Skill[] = [
     description: "Yttra de förbjudna orden.",
     target: "enemy",
     damageType: "dark",
-    damage: { kind: "spell", min: 10, max: 14, stat: "Int" },
-    manaCost: 12,
-    effects: [{ type: "damageMod", percent: 20, turns: 3 }],
+    damage: { kind: "spell", min: 8, max: 14, stat: "Int" },
+    manaCost: 35,
+    effects: [{ type: "damageMod", percent: -40, turns: 5 }],
+    cooldown: 5,
+  },
+  {
+    id: "curse_strong",
+    name: "Förbandelse",
+    description: "Yttra de förbjudna orden.",
+    target: "enemy",
+    damageType: "dark",
+    damage: { kind: "spell", min: 18, max: 24, stat: "Int" },
+    manaCost: 55,
+    effects: [{ type: "damageMod", percent: -60, turns: 6 }],
+    cooldown: 6,
   },
   {
     id: "holy_spear",
@@ -286,8 +297,9 @@ export const skills: Skill[] = [
     description: "Skapa ett spjut av ren energi.",
     target: "enemy",
     damageType: "light",
-    damage: { kind: "spell", min: 20, max: 34, stat: "Int" },
-    manaCost: 24,
+    damage: { kind: "spell", min: 30, max: 45, stat: "Int" },
+    manaCost: 40,
+    cooldown: 3,
   },
   /* AI GEN Skills */
   {
@@ -355,10 +367,10 @@ export const skills: Skill[] = [
     target: "self",
     effects: [
       { type: "cure", statuses: ["burn", "bleed"] },
-      { type: "heal", percentOfMax: 10 },
+      { type: "heal", percentOfMax: 20 },
     ],
-    manaCost: 6,
-    cooldown: 3,
+    manaCost: 16,
+    cooldown: 5,
   },
   {
     id: "second_wind",

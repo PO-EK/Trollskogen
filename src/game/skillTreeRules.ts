@@ -44,7 +44,8 @@ export function learnNode(player: Player, node: TreeNode): Player {
   };
 
   if (node.attribute) {
-    next[node.attribute] = next[node.attribute] + 1;
+    next[node.attribute] =
+      next[node.attribute] + (node.attributeAmount ?? 1);
   }
 
   if (node.skillId && !next.KnownSkills.includes(node.skillId)) {

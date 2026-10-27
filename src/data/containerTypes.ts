@@ -4,4 +4,5 @@ export type ContainerType =
   | "storage"
   | "quest"
   | "loot"
-  | "equipment";
+  | "equipment"
+  | "useSlot";

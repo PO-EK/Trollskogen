@@ -8,6 +8,7 @@ import {
   MANA_PER_INT_POINT,
   MANA_BONUS_PER_INT_POINT,
 } from "../game/balance";
+import { addItemToInventory } from "../game/inventory";
 
 export function getMaxHP(con: number): number {
   const flat = HP_PER_CON_POINT * con;
@@ -86,71 +87,56 @@ export type QuestState = {
   completed: boolean;
 };
 
-export const createNewPlayer = (): Player => ({
-  Name: "Admin",
+export const createNewPlayer = (): Player => {
+  let player: Player = {
+    Name: "Admin",
 
-  Gold: 360,
+    Gold: 360,
 
-  Level: 1,
-  Exp: 0,
-  ExpMax: 30,
-  SkillPoints: 0,
-  LearnedNodes: [],
+    Level: 1,
+    Exp: 0,
+    ExpMax: 30,
+    SkillPoints: 2,
+    LearnedNodes: [],
 
-  Str: playerStr,
-  Dex: playerDex,
-  Con: playerCon,
-  Int: playerInt,
+    Str: playerStr,
+    Dex: playerDex,
+    Con: playerCon,
+    Int: playerInt,
 
-  HP: maxHP,
-  HPMax: maxHP,
+    HP: maxHP,
+    HPMax: maxHP,
 
-  Mana: maxMana,
-  ManaMax: maxMana,
+    Mana: maxMana,
+    ManaMax: maxMana,
 
-  Equipment: {},
-  BackpackWidth: 5,
-  BackpackHeight: 4,
+    Equipment: {},
+    BackpackWidth: 6,
+    BackpackHeight: 8,
 
-  StorageWidth: 7,
-  StorageHeight: 7,
-  Storage: [
-    {
-      containerItemId: "startItem1",
-      itemId: "cloth",
-      x: 0,
-      y: 0,
-    },
-    {
-      containerItemId: "startItem2",
-      itemId: "woodlog",
-      x: 3,
-      y: 0,
-    },
-    {
-      containerItemId: "startItem3",
-      itemId: "leather",
-      x: 0,
-      y: 4,
-    },
-  ],
+    StorageWidth: 7,
+    StorageHeight: 7,
+    Storage: [],
 
-  EquippedSkills: ["flamethrower", "cutting_wind"],
-  Inventory: [
-    { containerItemId: "testPotion", itemId: "health_potion", x: 0, y: 0 },
-    { containerItemId: "testMana", itemId: "mana_potion", x: 1, y: 0 },
-    { containerItemId: "testBandage", itemId: "bandage", x: 0, y: 2 },
-    { containerItemId: "startingWeapon", itemId: "iron_spear", x: 4, y: 0 },
-  ],
-  Quests: [],
-  StoryFlags: {},
-  UnlockedLocations: [
-    "intro",
-    "playerHQ",
-    "village",
-    "ruins",
-    "places",
-    "blacksmith",
-  ],
-  KnownSkills: ["safeguard"],
-});
+    EquippedSkills: ["kick", "magicArrow", "first_aid"],
+    Inventory: [],
+    Quests: [],
+    StoryFlags: {},
+    UnlockedLocations: [
+      "intro",
+      "playerHQ",
+      "village",
+      "ruins",
+      "places",
+      "blacksmith",
+    ],
+    KnownSkills: ["kick", "magicArrow", "first_aid"],
+  };
+
+  player = addItemToInventory(player, "iron_spear", "startingWeapon");
+  player = addItemToInventory(player, "health_potion", "testPotion");
+  player = addItemToInventory(player, "mana_potion", "testMana");
+  player = addItemToInventory(player, "bandage", "testBandage");
+
+  return player;
+};

@@ -4,6 +4,7 @@ import { useItemDrag } from "../context/useItemDrag";
 import { items } from "../data/items";
 import type { EquipmentSlot } from "../data/itemTypes";
 import { canEquipInSlot, equipSlotId, SLOT_LABELS } from "../game/equipment";
+import { findFirstAvailableItemPosition } from "../game/inventory";
 import { performTransaction } from "../game/performTransaction";
 
 type EquipSlotProps = {
@@ -38,7 +39,18 @@ function EquipSlot({ slot, onHoveredItemChange }: EquipSlotProps) {
     );
 
     dragState =
-      draggedDefinition && !equipped && canEquipInSlot(draggedDefinition, slot)
+      draggedDefinition &&
+      canEquipInSlot(draggedDefinition, slot) &&
+      (!equipped ||
+        findFirstAvailableItemPosition(
+          equipped.itemId,
+          player.Inventory.filter(
+            (inventoryItem) =>
+              inventoryItem.containerItemId !== draggedItem.containerItemId,
+          ),
+          player.BackpackWidth,
+          player.BackpackHeight,
+        ) !== null)
         ? "valid"
         : "invalid";
   }

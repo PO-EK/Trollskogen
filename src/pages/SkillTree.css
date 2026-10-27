@@ -180,6 +180,19 @@
   border-radius: 50%;
 }
 
+.tree-node[data-kind="attribute"][data-attribute-amount="3"] {
+  border-width: 3px;
+  box-shadow: inset 0 0 12px rgba(216, 180, 106, 0.12);
+}
+
+.tree-node[data-kind="attribute"][data-attribute-amount="3"] .tree-attr-icon {
+  font-size: 1.2rem;
+}
+
+.tree-node[data-kind="attribute"][data-attribute-amount="3"] .tree-attr-plus {
+  font-size: 0.8rem;
+}
+
 .tree-node[data-attribute="Str"] {
   --accent: #d2603f;
 }

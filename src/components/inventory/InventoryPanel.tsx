@@ -7,18 +7,42 @@ import ItemGrid from "./ItemGrid";
 import "./InventoryPanel.css";
 import { performTransaction } from "../../game/performTransaction";
 import ItemCard from "./ItemCard";
+import ItemDeleteSlot from "./ItemDeleteSlot";
+import ItemUseSlot from "./ItemUseSlot";
+import type { ItemUse } from "../../data/itemTypes";
+import { getWorldBlockReason, USE_SLOT_ID } from "../../game/itemUse";
 
-function InventoryPanel() {
+type InventoryPanelProps = {
+  inCombat?: boolean; // the slot in the fight handles items there
+};
+
+function InventoryPanel({ inCombat = false }: InventoryPanelProps) {
   const { player, setPlayer } = usePlayer();
   const { traders, setTraders } = useTrader();
 
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  function handleUseItem(
+    item: ContainerItem,
+    _use: ItemUse,
+    sourceId: string,
+    sourceType: ContainerType,
+  ): boolean {
+    const result = performTransaction({
+      item,
+      sourceId,
+      sourceType,
+      destinationId: USE_SLOT_ID,
+      destinationType: "useSlot",
+      position: { x: 0, y: 0 },
+      player,
+    });
 
-  /*
-   * Returns true if ItemGrid should remove the item from its source container.
-   * Returns false if the transaction already updated the source,
-   * or if the drop was rejected.
-   */
+    if (result.success) {
+      setPlayer(result.player);
+    }
+
+    return false;
+  }
   function handleCrossContainerDrop(
     item: ContainerItem,
     position: { x: number; y: number },
@@ -73,8 +97,17 @@ function InventoryPanel() {
   return (
     <aside className="inventory-panel">
       <h3 className="gold">🪙 {player.Gold} Kroner</h3>
-      <div className="inventory-panel-title">Ryggsäcken</div>
 
+      <div className="inventory-action-slots">
+        {!inCombat && (
+          <ItemUseSlot
+            getBlockReason={(use) => getWorldBlockReason(player, use)}
+            onUse={handleUseItem}
+          />
+        )}
+        <ItemDeleteSlot />
+      </div>
+      <div className="inventory-panel-title">Ryggsäcken</div>
       <div className="inventory-grid-wrapper">
         <ItemGrid
           containerId="player"
