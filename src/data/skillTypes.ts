@@ -24,11 +24,12 @@ export type StatusKind =
   | "evade"
   | "burn"
   | "bleed"
-  | "stun";
+  | "stun"
+  | "weak"
+  | "offguard";
 
-// Added to every effect: the chance (0 to 1) that it takes hold when the
-// skill hits. Without it the effect always applies.
-type EffectChance = { applyChance?: number };
+// Every chance is a percentage from 0 to 100. Omit it for guaranteed effects.
+type EffectChance = { chance?: number };
 
 export type SkillEffect = EffectChance &
   (
@@ -42,12 +43,24 @@ export type SkillEffect = EffectChance &
     | { type: "restoreMana"; amount?: number; percentOfMax?: number }
     | { type: "cure"; statuses: StatusKind[] }
     | { type: "damageMod"; percent: number; turns: number }
-    | { type: "guard"; multiplier: number; turns: number }
+    | { type: "guard"; percent: number; turns: number }
     | { type: "evade"; chance: number; turns: number }
     // damage is per layer; maxStacks > 1 lets repeated hits stack
-    | { type: "burn"; damage: number; turns: number; maxStacks?: number }
-    | { type: "bleed"; damage: number; turns: number; maxStacks?: number }
+    | {
+        type: "burn";
+        damage: number;
+        turns?: number | null;
+        maxStacks?: number;
+      }
+    | {
+        type: "bleed";
+        damage: number;
+        turns?: number | null;
+        maxStacks?: number;
+      }
     | { type: "stun"; turns: number }
+    | { type: "weak"; percent: number; turns: number }
+    | { type: "offguard"; percent: number; turns: number }
   );
 
 export type Skill = {

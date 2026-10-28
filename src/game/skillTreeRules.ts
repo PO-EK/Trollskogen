@@ -1,15 +1,12 @@
 import type { Player } from "../data/player";
 import type { TreeNode } from "../data/skillTree";
-import { recalculatePlayerStats } from "./characterStats";
+import { applyAttributeBonuses } from "./characterStats";
+import { ATTRIBUTE_LABELS } from "./labels";
 
 export type NodeState = "learned" | "available" | "locked";
 
-// A skill learned some other way (the story) also counts as taken.
 export function isLearned(player: Player, node: TreeNode): boolean {
-  return (
-    player.LearnedNodes.includes(node.id) ||
-    (node.skillId !== undefined && player.KnownSkills.includes(node.skillId))
-  );
+  return player.LearnedNodes.includes(node.id);
 }
 
 export function getNodeState(player: Player, node: TreeNode): NodeState {
@@ -31,6 +28,16 @@ export function canLearn(player: Player, node: TreeNode): boolean {
   );
 }
 
+// "+1 Styrka, +1 Fysik", for showing what a node gives.
+export function describeBonuses(node: TreeNode): string {
+  return (node.bonuses ?? [])
+    .map(
+      (bonus) =>
+        `${bonus.amount > 0 ? "+" : ""}${bonus.amount} ${ATTRIBUTE_LABELS[bonus.attribute]}`,
+    )
+    .join(", ");
+}
+
 // Returns the player unchanged if the node can't be taken.
 export function learnNode(player: Player, node: TreeNode): Player {
   if (!canLearn(player, node)) {
@@ -43,15 +50,19 @@ export function learnNode(player: Player, node: TreeNode): Player {
     LearnedNodes: [...player.LearnedNodes, node.id],
   };
 
-  if (node.attribute) {
-    next[node.attribute] =
-      next[node.attribute] + (node.attributeAmount ?? 1);
-  }
-
   if (node.skillId && !next.KnownSkills.includes(node.skillId)) {
     next.KnownSkills = [...next.KnownSkills, node.skillId];
   }
 
-  // Recalculate maximum HP and mana after learning the node.
-  return recalculatePlayerStats(next);
+  const bonuses =
+    node.bonuses ??
+    (node.attribute
+      ? [{ attribute: node.attribute, amount: node.attributeAmount ?? 1 }]
+      : []);
+
+  if (bonuses.length > 0) {
+    return applyAttributeBonuses(next, bonuses);
+  }
+
+  return next;
 }

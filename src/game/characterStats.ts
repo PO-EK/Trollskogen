@@ -21,6 +21,11 @@ export type CharacterStats = {
   weaponName: string | null;
 };
 
+export type AttributeBonus = {
+  attribute: "Str" | "Dex" | "Con" | "Int";
+  amount: number;
+};
+
 export function getEquippedWeapon(player: Player): WeaponItem | null {
   const equipped = player.Equipment.mainHand;
 
@@ -130,4 +135,27 @@ export function recalculatePlayerStats(player: Player): Player {
     HP: Math.min(player.HP, maxHP),
     Mana: Math.min(player.Mana, maxMana),
   };
+}
+
+export function restorePlayerResources(player: Player): Player {
+  const updated = recalculatePlayerStats(player);
+
+  return {
+    ...updated,
+    HP: updated.HPMax,
+    Mana: updated.ManaMax,
+  };
+}
+
+export function applyAttributeBonuses(
+  player: Player,
+  bonuses: readonly AttributeBonus[],
+): Player {
+  const updated = { ...player };
+
+  for (const bonus of bonuses) {
+    updated[bonus.attribute] += bonus.amount;
+  }
+
+  return restorePlayerResources(updated);
 }

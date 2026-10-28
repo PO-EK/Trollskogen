@@ -4,26 +4,34 @@ import { CURE_LABELS } from "./labels";
 
 type AttributeName = "Str" | "Dex" | "Con" | "Int";
 
+// A missing or null duration lasts until the combat ends.
 export type Status =
-  | { kind: "stat"; stat: AttributeName; amount: number; turnsLeft: number }
-  | { kind: "damageMod"; percent: number; turnsLeft: number }
-  | { kind: "guard"; multiplier: number; turnsLeft: number }
-  | { kind: "evade"; chance: number; turnsLeft: number }
+  | {
+      kind: "stat";
+      stat: AttributeName;
+      amount: number;
+      turnsLeft?: number | null;
+    }
+  | { kind: "damageMod"; percent: number; turnsLeft?: number | null }
+  | { kind: "guard"; percent: number; turnsLeft?: number | null }
+  | { kind: "evade"; chance: number; turnsLeft?: number | null }
   | {
       kind: "burn";
       damage: number; // per layer
-      turnsLeft: number;
+      turnsLeft?: number | null;
       stacks: number;
       maxStacks: number;
     }
   | {
       kind: "bleed";
       damage: number; // per layer
-      turnsLeft: number;
+      turnsLeft?: number | null;
       stacks: number;
       maxStacks: number;
     }
-  | { kind: "stun"; turnsLeft: number };
+  | { kind: "stun"; turnsLeft?: number | null }
+  | { kind: "weak"; percent: number; turnsLeft?: number | null }
+  | { kind: "offguard"; percent: number; turnsLeft?: number | null };
 
 // Anything effects can act on: a fighter in combat, or the player outside it.
 export type Vitals = {
@@ -88,10 +96,22 @@ function effectToStatus(effect: SkillEffect): Status | null {
         percent: effect.percent,
         turnsLeft: effect.turns,
       };
+    case "weak":
+      return {
+        kind: "weak",
+        percent: effect.percent,
+        turnsLeft: effect.turns,
+      };
     case "guard":
       return {
         kind: "guard",
-        multiplier: effect.multiplier,
+        percent: effect.percent,
+        turnsLeft: effect.turns,
+      };
+    case "offguard":
+      return {
+        kind: "offguard",
+        percent: effect.percent,
         turnsLeft: effect.turns,
       };
     case "evade":
@@ -151,7 +171,7 @@ export function applyEffects<T extends Vitals>(
   const applied: SkillEffect[] = [];
 
   for (const effect of effects) {
-    if (effect.applyChance !== undefined && random() >= effect.applyChance) {
+    if (effect.chance !== undefined && random() * 100 >= effect.chance) {
       continue;
     }
 

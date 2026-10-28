@@ -84,26 +84,34 @@ function rollInt(min: number, max: number, random: () => number): number {
   return min + Math.floor(random() * (max - min + 1));
 }
 
-const OWN_ACTION_KINDS: Status["kind"][] = ["stat", "damageMod"];
+const OWN_ACTION_KINDS: Status["kind"][] = ["stat", "damageMod", "weak"];
 
 function isStunned(fighter: Fighter): boolean {
   return fighter.statuses.some((status) => status.kind === "stun");
 }
 
-function getDamageMultiplier(statuses: Status[]): number {
-  return statuses.reduce(
-    (total, status) =>
-      status.kind === "damageMod" ? total * (1 + status.percent / 100) : total,
-    1,
-  );
+function getOutgoingDamageFactor(statuses: Status[]): number {
+  return statuses.reduce((total, status) => {
+    if (status.kind === "damageMod") {
+      return total * (1 + status.percent / 100);
+    }
+
+    return status.kind === "weak"
+      ? total * (1 - status.percent / 100)
+      : total;
+  }, 1);
 }
 
-function getGuardMultiplier(statuses: Status[]): number {
-  return statuses.reduce(
-    (total, status) =>
-      status.kind === "guard" ? total * status.multiplier : total,
-    1,
-  );
+function getIncomingDamageFactor(statuses: Status[]): number {
+  return statuses.reduce((total, status) => {
+    if (status.kind === "guard") {
+      return total * (1 - status.percent / 100);
+    }
+
+    return status.kind === "offguard"
+      ? total * (1 + status.percent / 100)
+      : total;
+  }, 1);
 }
 
 // Dodge and evade statuses are independent sources of avoiding a hit.
@@ -112,7 +120,7 @@ function getAvoidChance(baseDodge: number, statuses: Status[]): number {
 
   for (const status of statuses) {
     if (status.kind === "evade") {
-      hitChance *= 1 - status.chance;
+      hitChance *= 1 - status.chance / 100;
     }
   }
 
@@ -136,7 +144,7 @@ function getEffectivePlayer(player: Player, statuses: Status[]): Player {
   return effective;
 }
 
-// After the opponent's action: burn and bleed damage, then count everything down.
+// After the opponent's action: apply damage-over-time and tick finite statuses.
 function tickFighter(
   fighter: Fighter,
   side: Side,
@@ -165,7 +173,9 @@ function tickFighter(
       bleedDamage += status.damage * status.stacks;
     }
 
-    if (status.turnsLeft > 1) {
+    if (status.turnsLeft == null) {
+      statuses.push(status);
+    } else if (status.turnsLeft > 1) {
       statuses.push({ ...status, turnsLeft: status.turnsLeft - 1 });
     }
   }
@@ -185,6 +195,10 @@ function tickFighter(
 function tickOwnClock(fighter: Fighter): Fighter {
   const statuses = fighter.statuses.flatMap((status): Status[] => {
     if (!OWN_ACTION_KINDS.includes(status.kind)) {
+      return [status];
+    }
+
+    if (status.turnsLeft == null) {
       return [status];
     }
 
@@ -228,8 +242,8 @@ function rollPlayerHit(
     getEquippedWeapon(ctx.player),
     ctx.enemy.resistances,
     random,
-    getDamageMultiplier(attacker.statuses) *
-      getGuardMultiplier(target.statuses),
+    getOutgoingDamageFactor(attacker.statuses) *
+      getIncomingDamageFactor(target.statuses),
   );
 }
 
@@ -256,9 +270,9 @@ function rollEnemyHit(
     1,
     Math.round(
       base *
-        getDamageMultiplier(attacker.statuses) *
+        getOutgoingDamageFactor(attacker.statuses) *
         (1 - reduction) *
-        getGuardMultiplier(target.statuses),
+        getIncomingDamageFactor(target.statuses),
     ),
   );
 }

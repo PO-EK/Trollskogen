@@ -96,7 +96,7 @@ export const createNewPlayer = (): Player => {
     Level: 1,
     Exp: 0,
     ExpMax: 30,
-    SkillPoints: 2,
+    SkillPoints: 5,
     LearnedNodes: [],
 
     Str: playerStr,
@@ -118,7 +118,7 @@ export const createNewPlayer = (): Player => {
     StorageHeight: 7,
     Storage: [],
 
-    EquippedSkills: ["kick", "magicArrow", "first_aid"],
+    EquippedSkills: [],
     Inventory: [],
     Quests: [],
     StoryFlags: {},
@@ -130,10 +130,10 @@ export const createNewPlayer = (): Player => {
       "places",
       "blacksmith",
     ],
-    KnownSkills: ["kick", "magicArrow", "first_aid"],
+    KnownSkills: [],
   };
 
-  player = addItemToInventory(player, "iron_spear", "startingWeapon");
+  player = addItemToInventory(player, "old_axe", "startingWeapon");
   player = addItemToInventory(player, "health_potion", "testPotion");
   player = addItemToInventory(player, "mana_potion", "testMana");
   player = addItemToInventory(player, "bandage", "testBandage");

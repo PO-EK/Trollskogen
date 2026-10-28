@@ -1,5 +1,5 @@
 import { SKILL_TREE_NODES } from "../data/skillTree";
-import type { AttributeName, TreeNode } from "../data/skillTree";
+import type { TreeNode } from "../data/skillTree";
 
 // Pixel sizes of the two node shapes.
 export const NODE_SIZE = {
@@ -59,23 +59,19 @@ function layoutBranch(nodes: TreeNode[]): BranchLayout {
   const xs = new Map<TreeNode, number>();
 
   for (const row of rows) {
-    // Each node wants to sit under the middle of its requirements.
     const desired = row.map((node, index) =>
       node.requires.length === 0
         ? index
         : mean(node.requires.map((required) => xs.get(required) ?? 0)),
     );
 
-    // Push apart so nodes never overlap, keeping the written order.
     const placed: number[] = [];
 
     desired.forEach((x) => {
       const previous = placed[placed.length - 1];
-
       placed.push(previous === undefined ? x : Math.max(x, previous + 1));
     });
 
-    // Re-center the row under what it wanted.
     const shift = mean(desired) - mean(placed);
 
     row.forEach((node, index) => xs.set(node, (placed[index] ?? 0) + shift));
@@ -115,17 +111,43 @@ function layoutBranch(nodes: TreeNode[]): BranchLayout {
   };
 }
 
-const cache = new Map<AttributeName, BranchLayout>();
+const cache = new Map<string, BranchLayout>();
 
-export function getBranchLayout(branch: AttributeName): BranchLayout {
-  let layout = cache.get(branch);
+export function getBranchLayout(treeId: string): BranchLayout {
+  let layout = cache.get(treeId);
 
   if (!layout) {
     layout = layoutBranch(
-      SKILL_TREE_NODES.filter((node) => node.branch === branch),
+      SKILL_TREE_NODES.filter((node) => node.treeId === treeId),
     );
-    cache.set(branch, layout);
+    cache.set(treeId, layout);
   }
 
   return layout;
+}
+
+export function getCombinedBranchLayout(treeIds: string[]): BranchLayout {
+  const gap = SLOT_WIDTH;
+  const nodes: PlacedNode[] = [];
+  let width = 0;
+  let height = 0;
+
+  for (const treeId of treeIds) {
+    const layout = getBranchLayout(treeId);
+
+    nodes.push(
+      ...layout.nodes.map((entry) => ({
+        ...entry,
+        cx: entry.cx + width,
+      })),
+    );
+    width += layout.width + gap;
+    height = Math.max(height, layout.height);
+  }
+
+  return {
+    nodes,
+    width: Math.max(0, width - gap),
+    height,
+  };
 }

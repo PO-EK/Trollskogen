@@ -11,7 +11,10 @@ import type { ContainerType } from "../data/containerTypes";
 import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
 import { placeLoot } from "../game/lootPlacement";
-import { recalculatePlayerStats } from "../game/characterStats";
+import {
+  recalculatePlayerStats,
+  restorePlayerResources,
+} from "../game/characterStats";
 import {
   addItemToInventory,
   findFirstAvailableItemPosition,
@@ -364,11 +367,7 @@ function Location({
         break;
 
       case "fullHeal":
-        setPlayer((p) => ({
-          ...p,
-          HP: p.HPMax,
-          Mana: p.ManaMax,
-        }));
+        setPlayer((p) => restorePlayerResources(p));
         break;
 
       case "damage":

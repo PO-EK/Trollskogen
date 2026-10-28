@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
 import SkillCard from "../components/skills/SkillCard";
-import { SKILL_TREE_BRANCHES, SKILL_TREE_NODES } from "../data/skillTree";
-import type { AttributeName, TreeNode } from "../data/skillTree";
+import { SKILL_TREE_NODES, SKILL_TREE_TREES } from "../data/skillTree";
+import type { TreeNode } from "../data/skillTree";
 import { getSkill } from "../data/skills";
 import { ATTRIBUTE_LABELS } from "../game/labels";
 import { getSkillGroup } from "../game/skillLoadout";
@@ -15,13 +15,19 @@ import {
 } from "../game/skillTreeRules";
 import "./SkillTree.css";
 
-function getIcon(attribute: AttributeName): string {
-  return SKILL_TREE_BRANCHES.find((b) => b.attribute === attribute)?.icon ?? "";
+function getIcon(treeId: string): string {
+  return SKILL_TREE_TREES.find((tree) => tree.id === treeId)?.icon ?? "";
 }
 
 function getNodeLabel(node: TreeNode): string {
   if (node.skillId) {
     return getSkill(node.skillId)?.name ?? node.skillId;
+  }
+
+  if (node.bonuses && node.bonuses.length > 1) {
+    return node.bonuses
+      .map((bonus) => `+${bonus.amount} ${ATTRIBUTE_LABELS[bonus.attribute]}`)
+      .join(" + ");
   }
 
   return node.attribute
@@ -35,10 +41,13 @@ type SkillTreeProps = {
 
 function SkillTree({ onClose }: SkillTreeProps) {
   const { player, setPlayer } = usePlayer();
-  const [branch, setBranch] = useState<AttributeName>("Str");
+  const [treeId, setTreeId] = useState<string>(SKILL_TREE_TREES[0].id);
   const [selected, setSelected] = useState<TreeNode | null>(null);
 
-  const layout = getBranchLayout(branch);
+  const tree =
+    SKILL_TREE_TREES.find((entry) => entry.id === treeId) ??
+    SKILL_TREE_TREES[0];
+  const layout = getBranchLayout(tree.id);
   const placed = new Map(layout.nodes.map((entry) => [entry.node, entry]));
 
   const edges = layout.nodes.flatMap((child) =>
@@ -82,28 +91,39 @@ function SkillTree({ onClose }: SkillTreeProps) {
       note = `Du behöver ${node.cost} färdighetspoäng (du har ${player.SkillPoints}).`;
     }
 
+    const displayBonuses =
+      node.bonuses ??
+      (node.attribute
+        ? [{ attribute: node.attribute, amount: node.attributeAmount ?? 1 }]
+        : []);
+
     return (
       <>
         {skill ? (
           <SkillCard skill={skill} action={action} />
-        ) : node.attribute ? (
+        ) : displayBonuses.length > 0 ? (
           <div className="item-card skill-card">
             <div className="item-card-header">
               <h3 className="item-card-name">{getNodeLabel(node)}</h3>
               {action && <div className="skill-card-action">{action}</div>}
             </div>
             <div className="item-card-divider" />
-            <div className="item-card-row">
-              <span className="item-card-label">
-                {ATTRIBUTE_LABELS[node.attribute]}
-              </span>
-              <span className="item-card-value">
-                {player[node.attribute]}
-                {state === "learned"
-                  ? ""
-                  : ` → ${player[node.attribute] + (node.attributeAmount ?? 1)}`}
-              </span>
-            </div>
+            {displayBonuses.map((bonus) => (
+              <div
+                className="item-card-row"
+                key={`${node.id}-${bonus.attribute}`}
+              >
+                <span className="item-card-label">
+                  {ATTRIBUTE_LABELS[bonus.attribute]}
+                </span>
+                <span className="item-card-value">
+                  {player[bonus.attribute]}
+                  {state === "learned"
+                    ? ""
+                    : ` → ${player[bonus.attribute] + bonus.amount}`}
+                </span>
+              </div>
+            ))}
             <div className="item-card-row">
               <span className="item-card-label">Kostnad</span>
               <span className="item-card-value">{node.cost} p</span>
@@ -129,9 +149,9 @@ function SkillTree({ onClose }: SkillTreeProps) {
       </div>
 
       <div className="tree-tabs">
-        {SKILL_TREE_BRANCHES.map((entry) => {
+        {SKILL_TREE_TREES.map((entry) => {
           const nodes = SKILL_TREE_NODES.filter(
-            (node) => node.branch === entry.attribute,
+            (node) => node.treeId === entry.id,
           );
           const learned = nodes.filter((node) =>
             isLearned(player, node),
@@ -139,18 +159,17 @@ function SkillTree({ onClose }: SkillTreeProps) {
 
           return (
             <button
-              key={entry.attribute}
+              key={entry.id}
               className="tree-tab"
-              data-active={branch === entry.attribute}
+              data-active={treeId === entry.id}
               onClick={() => {
-                setBranch(entry.attribute);
+                setTreeId(entry.id);
                 setSelected(null);
               }}
             >
               <span>
-                {entry.icon} {ATTRIBUTE_LABELS[entry.attribute]}
+                {entry.icon} {entry.name}
               </span>
-              <span className="tree-tab-value">{player[entry.attribute]}</span>
               <span className="tree-tab-count">
                 {learned}/{nodes.length}
               </span>
@@ -212,13 +231,15 @@ function SkillTree({ onClose }: SkillTreeProps) {
                   title={`${getNodeLabel(node)} (${node.cost} p)`}
                   onClick={() => setSelected(node)}
                 >
-                  {node.attribute && node.kind === "attribute" ? (
+                  {node.kind === "attribute" ? (
                     <>
                       <span className="tree-attr-icon">
-                        {getIcon(node.attribute)}
+                        {getIcon(node.treeId)}
                       </span>
                       <span className="tree-attr-plus">
-                        +{node.attributeAmount ?? 1}
+                        {node.bonuses && node.bonuses.length > 1
+                          ? `+${node.bonuses.length}`
+                          : `+${node.attributeAmount ?? 1}`}
                       </span>
                     </>
                   ) : (

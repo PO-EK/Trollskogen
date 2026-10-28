@@ -10,6 +10,8 @@ export const CURE_LABELS: Record<StatusKind, string> = {
   evade: "undvikandet",
   damageMod: "försvagningen",
   stat: "effekten",
+  weak: "försvagningen",
+  offguard: "obalansen",
 };
 
 export const ATTRIBUTE_LABELS: Record<"Str" | "Dex" | "Con" | "Int", string> = {

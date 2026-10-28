@@ -2,191 +2,314 @@ import { getSkill } from "./skills";
 
 export type AttributeName = "Str" | "Dex" | "Con" | "Int";
 
+export type AttributeBonus = {
+  attribute: AttributeName;
+  amount: number;
+};
+
+export type SkillTreeDefinition = {
+  id: string;
+  name: string;
+  icon: string;
+  lockedAttribute: AttributeName; // the tree's main attribute, used for its tab
+};
+
 export type TreeNode = {
-  id: string; // saved in the player's file: don't rename after players have saves
-  kind: "attribute" | "skill";
-  branch: AttributeName; // which of the four trees it sits in
-  attribute?: AttributeName;
+  id: string; // "<tree>:<node>", saved in the player's file
+  kind: "attribute" | "skill"; // "skill" if it teaches one, otherwise "attribute"
+  treeId: string;
+  attribute?: AttributeName; // first bonus (kept for older code)
   attributeAmount?: number;
-  skillId?: string; // skill nodes: the skill they teach
-  requires: TreeNode[]; // needs ANY ONE of these first. None = the branch root
+  bonuses?: AttributeBonus[]; // everything the node gives
+  skillId?: string;
+  requires: TreeNode[]; // needs ANY ONE of these first. None = a starting node
   cost: number; // skill points
 };
 
-export const SKILL_TREE_BRANCHES: {
-  attribute: AttributeName;
-  icon: string;
-}[] = [
-  { attribute: "Str", icon: "⚔️" },
-  { attribute: "Dex", icon: "🏹" },
-  { attribute: "Con", icon: "🛡️" },
-  { attribute: "Int", icon: "🔮" },
-];
-
-const DEFAULT_COST = 1;
+export const SKILL_TREE_TREES: SkillTreeDefinition[] = [];
 const nodes: TreeNode[] = [];
 
-type NodeOptions = { cost?: number; amount?: number };
+const DEFAULT_COST = 1;
 
-// A +1 attribute node. With no `requires` it is the root of its branch.
-function attr(
+// What you write for one node.
+type NodeDef<Id extends string> = {
+  id: Id; // unique inside its tree
+  requires?: NoInfer<Id>[]; // needs ANY ONE of these first. Leave out = a starting node
+  skill?: string; // teaches this skill
+  attributes?: Partial<Record<AttributeName, number>>; // e.g. { Str: 1, Con: 1 }
+  cost?: number; // skill points, default 1
+};
+
+function tree<Id extends string>(
   id: string,
-  attribute: AttributeName,
-  requires: TreeNode[] = [],
-  options: NodeOptions = {},
-): TreeNode {
-  const node: TreeNode = {
-    id,
-    kind: "attribute",
-    branch: requires[0]?.branch ?? attribute,
-    attribute,
-    attributeAmount: options.amount ?? 1,
-    requires,
-    cost: options.cost ?? DEFAULT_COST,
-  };
+  meta: { name: string; icon: string; lockedAttribute: AttributeName },
+  defs: NodeDef<Id>[],
+): void {
+  SKILL_TREE_TREES.push({ id, ...meta });
 
-  nodes.push(node);
-  return node;
-}
+  // 1. Build the nodes.
+  const built = new Map<string, TreeNode>();
 
-// Skills follow a parent, or use an explicit branch when starting a tree.
-function skill(
-  skillId: string,
-  branch: AttributeName,
-  options?: NodeOptions,
-): TreeNode;
-function skill(
-  skillId: string,
-  requires: [TreeNode, ...TreeNode[]],
-  options?: NodeOptions,
-): TreeNode;
-function skill(
-  skillId: string,
-  branchOrRequires: AttributeName | [TreeNode, ...TreeNode[]],
-  options: NodeOptions = {},
-): TreeNode {
-  const requires = typeof branchOrRequires === "string" ? [] : branchOrRequires;
-  const branch =
-    typeof branchOrRequires === "string"
-      ? branchOrRequires
-      : branchOrRequires[0].branch;
-  const node: TreeNode = {
-    id: skillId, // a skill can only appear once in the whole tree
-    kind: "skill",
-    branch,
-    skillId,
-    requires,
-    cost: options.cost ?? DEFAULT_COST,
-  };
-
-  nodes.push(node);
-  return node;
-}
-
-// =====================================================================
-// THE TREE
-//
-//   attr("id", "Str")                   a branch root (+1 Str)
-//   attr("id", "Str", [parent])         +1 Str, after `parent`
-//   attr("id", "Str", [parent], { amount: 3, cost: 3 })  +3 Str
-//   skill("skill_id", [parent])         teaches a skill, after `parent`
-//   skill("skill_id", [a, b])           needs a OR b first
-//   skill("skill_id", [parent], { cost: 2 })
-//   skill("skill_id", "Int")            skill root of the Int branch
-//
-// A node can only follow nodes written ABOVE it. The order you write
-// nodes in is their left-to-right order in a row.
-// Nobody needs a name? Don't assign it: just call attr(...) / skill(...).
-// =====================================================================
-
-// ---- Styrka ----
-const warcry = skill("warcry", "Str");
-const str3 = attr("str-3", "Str", [warcry]);
-const str4 = attr("str-4", "Str", [warcry]);
-const tackle = skill("tackle", [str3]);
-const kick = skill("kick", [str4]);
-attr("str-5", "Str", [tackle], { amount: 3, cost: 3 });
-attr("str-6", "Str", [kick], { amount: 3, cost: 3 });
-
-// ---- Smidighet ----
-const speed = skill("speed", "Dex");
-const dex2 = attr("dex-2", "Dex", [speed]);
-const dex3 = attr("dex-3", "Dex", [dex2]);
-skill("rend", [dex3]);
-const quickStep = skill("quick_step", [dex3]);
-skill("deep_cut", [dex3]);
-attr("dex-4", "Dex", [quickStep], { amount: 3, cost: 3 });
-
-// ---- Fysik ----
-const ironSkin = skill("iron_skin", "Con");
-const con2 = attr("con-2", "Con", [ironSkin]);
-const con3 = attr("con-3", "Con", [con2]);
-const healLight = skill("heal_light", [con3]);
-const firstAid = skill("first_aid", [con3]);
-skill("second_wind", [con3]);
-attr("con-4", "Con", [healLight]);
-attr("con-5", "Con", [firstAid], { amount: 3, cost: 3 });
-
-// ---- Intelligens ----
-const manashield = skill("mana_shield", "Int");
-const BigInt = attr("Int", "Int", [manashield], { amount: 3, cost: 1 });
-const meditate = skill("meditate", [BigInt]);
-const fire = attr("fire", "Int", [meditate]);
-const light = attr("light", "Int", [meditate]);
-const dark = attr("dark", "Int", [meditate]);
-
-const firebolt = skill("fire_bolt", [fire]);
-const fireInt = attr("fire", "Int", [firebolt]);
-const inferno = skill("inferno", [fireInt]);
-
-const healQuick = skill("heal_quick", [light]);
-const lightInt = attr("light", "Int", [healQuick]);
-const holySpear = skill("holy_spear", [lightInt]);
-
-const curse = skill("shadow_bolt", [dark]);
-const darkInt = attr("dark", "Int", [curse]);
-const curseStrong = skill("curse_strong", [darkInt]);
-
-attr("int-fire-3", "Int", [inferno], { amount: 3, cost: 3 });
-attr("int-light-3", "Int", [holySpear], { amount: 3, cost: 3 });
-attr("int-end", "Int", [curseStrong], { amount: 3, cost: 3 });
-// =====================================================================
-
-export const SKILL_TREE_NODES: readonly TreeNode[] = nodes;
-
-// Dev-only: catches typos and mistakes while you edit the tree above.
-if (import.meta.env.DEV) {
-  const ids = new Set<string>();
-
-  for (const node of nodes) {
-    if (ids.has(node.id)) {
-      console.error(`Skill tree: duplicate node id "${node.id}"`);
+  for (const def of defs) {
+    if (built.has(def.id)) {
+      console.error(`Skill tree "${id}": two nodes called "${def.id}"`);
     }
 
-    ids.add(node.id);
+    const bonuses: AttributeBonus[] = Object.entries(def.attributes ?? {})
+      .map(([attribute, amount]) => ({
+        attribute: attribute as AttributeName,
+        amount: amount ?? 0,
+      }))
+      .filter((bonus) => bonus.amount !== 0);
 
-    if (node.skillId && !getSkill(node.skillId)) {
-      console.error(`Skill tree: unknown skill "${node.skillId}"`);
+    built.set(def.id, {
+      id: `${id}:${def.id}`,
+      kind: def.skill ? "skill" : "attribute",
+      treeId: id,
+      skillId: def.skill,
+      attribute: bonuses[0]?.attribute,
+      attributeAmount: bonuses[0]?.amount,
+      bonuses,
+      requires: [],
+      cost: def.cost ?? DEFAULT_COST,
+    });
+  }
+
+  // 2. Connect them by id.
+  for (const def of defs) {
+    const node = built.get(def.id);
+
+    if (!node) {
+      continue;
     }
 
-    for (const required of node.requires) {
-      if (required.branch !== node.branch) {
+    for (const requiredId of def.requires ?? []) {
+      const required = built.get(requiredId);
+
+      if (required) {
+        node.requires.push(required);
+      } else {
         console.error(
-          `Skill tree: "${node.id}" is connected to another branch. Branches must stay separate.`,
+          `Skill tree "${id}": "${def.id}" requires unknown node "${requiredId}"`,
         );
       }
     }
   }
 
-  for (const { attribute } of SKILL_TREE_BRANCHES) {
-    const roots = nodes.filter(
-      (node) => node.branch === attribute && node.requires.length === 0,
+  // 3. Order them so every node comes after what it requires (the layout
+  // needs that), keeping the order you wrote them in as far as possible.
+  const placed = new Set<TreeNode>();
+  const remaining = [...built.values()];
+
+  while (remaining.length > 0) {
+    const index = remaining.findIndex((node) =>
+      node.requires.every((required) => placed.has(required)),
     );
 
-    if (roots.length !== 1) {
+    if (index === -1) {
       console.error(
-        `Skill tree: the ${attribute} branch should have exactly one root, found ${roots.length}`,
+        `Skill tree "${id}": these nodes require each other in a loop: ${remaining.map((node) => node.id).join(", ")}`,
       );
+      nodes.push(...remaining);
+      break;
+    }
+
+    const next = remaining.splice(index, 1)[0];
+
+    if (!next) {
+      break;
+    }
+
+    placed.add(next);
+    nodes.push(next);
+  }
+}
+
+// =====================================================================
+// THE TREES
+//
+//   { id: "root", attributes: { Str: 1, Con: 1 } }       a starting node
+//   { id: "a", requires: ["root"], skill: "warcry" }      teaches a skill
+//   { id: "b", requires: ["a"], attributes: { Str: 3 }, cost: 3 }
+//   { id: "c", requires: ["a"], skill: "x", attributes: { Dex: 1 } }  both
+//   { id: "d", requires: ["b", "c"] ... }                 any ONE of b, c
+//
+// Dead ends need no special node: stop writing and the path stops there.
+// Left to right in a row follows the order you write them in.
+// =====================================================================
+
+tree("warrior", { name: "Krigare", icon: "🛡️", lockedAttribute: "Str" }, [
+  { id: "root", attributes: { Str: 1, Con: 1 } },
+
+  // Styrka
+  { id: "warcry", requires: ["root"], skill: "warcry", attributes: { Str: 2 } },
+  { id: "str-3", requires: ["warcry"], attributes: { Str: 2 } },
+  { id: "str-4", requires: ["warcry"], attributes: { Str: 2 } },
+  { id: "berserk", requires: ["str-3"], skill: "berserk" },
+  { id: "takedown", requires: ["str-4"], skill: "takedown" },
+  { id: "str-5", requires: ["berserk"], attributes: { Str: 1 }, cost: 1 },
+  { id: "str-6", requires: ["takedown"], attributes: { Str: 1 }, cost: 1 },
+  { id: "power_strike", requires: ["str-5", "str-6"], skill: "power_strike" },
+  {
+    id: "str-end",
+    requires: ["power_strike"],
+    attributes: { Str: 3, Con: 1 },
+    cost: 1,
+  },
+  // Fysik
+  {
+    id: "iron-skin",
+    requires: ["root"],
+    skill: "iron_skin",
+    attributes: { Con: 2 },
+  },
+  { id: "con-2", requires: ["iron-skin"], attributes: { Con: 2 } },
+  { id: "con-3", requires: ["iron-skin"], attributes: { Con: 2 } },
+  { id: "steel_skin", requires: ["con-2"], skill: "steel_skin" },
+  { id: "first-aid", requires: ["con-3"], skill: "first_aid" },
+  {
+    id: "con-5",
+    requires: ["steel_skin"],
+    attributes: { Con: 1 },
+    cost: 1,
+  },
+  {
+    id: "con-6",
+    requires: ["first-aid"],
+    attributes: { Con: 1 },
+    cost: 1,
+  },
+  { id: "last_chance", requires: ["con-5", "con-6"], skill: "last_chance" },
+  {
+    id: "con-end",
+    requires: ["last_chance"],
+    attributes: { Con: 3, Str: 1 },
+    cost: 1,
+  },
+]);
+
+tree("hunter", { name: "Jägare", icon: "🏹", lockedAttribute: "Dex" }, [
+  { id: "root", attributes: { Dex: 1 } },
+
+  { id: "speed", requires: ["root"], skill: "speed" },
+  { id: "quick-step", requires: ["root"], skill: "quick_step" },
+
+  { id: "dex-2", requires: ["speed"], attributes: { Dex: 1 } },
+  { id: "dex-3", requires: ["dex-2"], attributes: { Dex: 1 } },
+  { id: "rend", requires: ["dex-3"], skill: "rend" },
+  { id: "deep-cut", requires: ["dex-3"], skill: "deep_cut" },
+  { id: "hybrid", requires: ["dex-3"], attributes: { Dex: 1, Con: 1 } },
+
+  { id: "dex-4", requires: ["quick-step"], attributes: { Dex: 3 }, cost: 1 },
+]);
+
+tree("mage", { name: "Trollkarl", icon: "🔮", lockedAttribute: "Int" }, [
+  { id: "mana-shield", skill: "mana_shield", attributes: { Int: 1 } },
+  { id: "int-boost", requires: ["mana-shield"], attributes: { Int: 3 } },
+  {
+    id: "meditate",
+    requires: ["int-boost"],
+    skill: "meditate",
+    attributes: { Int: 1 },
+  },
+
+  // Eld
+  { id: "fire", requires: ["meditate"], attributes: { Int: 1 } },
+  {
+    id: "fire-bolt",
+    requires: ["fire"],
+    skill: "fire_bolt",
+    attributes: { Int: 1 },
+  },
+  { id: "fire-int", requires: ["fire-bolt"], attributes: { Int: 1 } },
+  {
+    id: "inferno",
+    requires: ["fire-int"],
+    skill: "inferno",
+    attributes: { Int: 1 },
+  },
+  { id: "fire-3", requires: ["inferno"], attributes: { Int: 3 }, cost: 1 },
+
+  // Ljus: skill and attribute in the same node
+  { id: "light", requires: ["meditate"], attributes: { Int: 1 } },
+  {
+    id: "heal-quick",
+    requires: ["light"],
+    skill: "heal_quick",
+    attributes: { Int: 1 },
+    cost: 1,
+  },
+  { id: "light-int", requires: ["heal-quick"], attributes: { Int: 1 } },
+  {
+    id: "holy-spear",
+    requires: ["light-int"],
+    skill: "holy_spear",
+    attributes: { Int: 1 },
+    cost: 1,
+  },
+  { id: "light-3", requires: ["holy-spear"], attributes: { Int: 3 }, cost: 3 },
+
+  // Mörker
+  { id: "dark", requires: ["meditate"], attributes: { Int: 1 } },
+  {
+    id: "shadow_clone",
+    requires: ["dark"],
+    skill: "shadow_clone",
+    attributes: { Int: 1 },
+  },
+  { id: "dark-int", requires: ["shadow_clone"], attributes: { Int: 1 } },
+  {
+    id: "curse-strong",
+    requires: ["dark-int"],
+    skill: "curse_strong",
+    attributes: { Int: 1 },
+  },
+  {
+    id: "dark-end",
+    requires: ["curse-strong"],
+    attributes: { Int: 3 },
+    cost: 3,
+  },
+]);
+
+// =====================================================================
+
+export const SKILL_TREE_NODES: readonly TreeNode[] = nodes;
+
+// Dev-only: catches mistakes while you edit the trees above.
+if (import.meta.env.DEV) {
+  for (const node of nodes) {
+    if (node.skillId && !getSkill(node.skillId)) {
+      console.error(
+        `Skill tree: "${node.id}" teaches an unknown skill "${node.skillId}"`,
+      );
+    }
+
+    if (!node.skillId && (node.bonuses?.length ?? 0) === 0) {
+      console.error(
+        `Skill tree: "${node.id}" gives nothing (no skill, no attributes)`,
+      );
+    }
+  }
+
+  for (const entry of SKILL_TREE_TREES) {
+    const inTree = nodes.filter((node) => node.treeId === entry.id);
+
+    if (!inTree.some((node) => node.requires.length === 0)) {
+      console.error(
+        `Skill tree: "${entry.id}" has no starting node (a node without requires)`,
+      );
+    }
+
+    const skillIds = inTree.flatMap((node) =>
+      node.skillId ? [node.skillId] : [],
+    );
+    const repeated = skillIds.filter(
+      (skillId, index) => skillIds.indexOf(skillId) !== index,
+    );
+
+    for (const skillId of repeated) {
+      console.error(`Skill tree: "${entry.id}" teaches "${skillId}" twice`);
     }
   }
 }

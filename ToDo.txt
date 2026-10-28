@@ -16,7 +16,7 @@ Combat Engine - Klart
 Disable Right-Click + Select - Klart
 Level up - Klart
 Skill Tree - Klart
-
+Quest tracking
 
 Quests/Story Locations:
 

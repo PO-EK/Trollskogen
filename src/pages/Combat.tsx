@@ -32,6 +32,8 @@ const STATUS_VISUALS: Record<Status["kind"], { icon: string; label: string }> =
     evade: { icon: "💨", label: "Undvikande" },
     damageMod: { icon: "⚔️", label: "Skada" },
     stat: { icon: "✨", label: "Egenskap" },
+    weak: { icon: "📉", label: "Försvagad" },
+    offguard: { icon: "👁️", label: "Ur Ballans" },
   };
 
 function describeStatus(status: Status): string {
@@ -47,13 +49,17 @@ function describeStatus(status: Status): string {
     case "stun":
       return "förlorar sin tur";
     case "guard":
-      return `tar ×${status.multiplier} skada`;
+      return `tar ${status.percent}% mindre skada`;
     case "evade":
-      return `${Math.round(status.chance * 100)}% att undvika attacker`;
+      return `${status.chance}% att undvika attacker`;
     case "damageMod":
       return `${status.percent > 0 ? "+" : ""}${status.percent}% skada`;
     case "stat":
       return `${status.amount > 0 ? "+" : ""}${status.amount} ${ATTRIBUTE_LABELS[status.stat]}`;
+    case "weak":
+      return `${status.percent}% mindre skada`;
+    case "offguard":
+      return `${status.percent}% mer skada`;
   }
 }
 
@@ -65,6 +71,9 @@ function isHarmful(status: Status): boolean {
       return true;
     case "damageMod":
       return status.percent < 0;
+    case "weak":
+    case "offguard":
+      return true;
     case "stat":
       return status.amount < 0;
     default:
@@ -101,7 +110,9 @@ function StatusRow({ statuses }: { statuses: Status[] }) {
             title={`${visual.label}: ${describeStatus(status)}`}
           >
             <span>{visual.icon}</span>
-            <span className="combat-status-turns">{status.turnsLeft}</span>
+            <span className="combat-status-turns">
+              {status.turnsLeft ?? ""}
+            </span>
             {"stacks" in status && status.stacks > 1 && (
               <span className="combat-status-stacks">×{status.stacks}</span>
             )}

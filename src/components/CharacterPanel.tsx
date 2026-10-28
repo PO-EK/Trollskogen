@@ -1,7 +1,7 @@
 import { usePlayer } from "../context/usePlayer";
 import type { OverlayId } from "../pages/overlays";
 import "./CharacterPanel.css";
-import { getMaxHP } from "../game/characterStats";
+import { getMaxHP, getMaxMana } from "../game/characterStats";
 
 type CharacterPanelProps = {
   onOpenOverlay: (overlay: OverlayId) => void;
@@ -14,12 +14,11 @@ function CharacterPanel({
 }: CharacterPanelProps) {
   const { player } = usePlayer();
   const maxHP = getMaxHP(player);
+  const maxMana = getMaxMana(player);
   const expMax = player.ExpMax;
 
   const manaPercent =
-    player.ManaMax > 0
-      ? Math.max(0, Math.min(100, (player.Mana / player.ManaMax) * 100))
-      : 0;
+    maxMana > 0 ? Math.max(0, Math.min(100, (player.Mana / maxMana) * 100)) : 0;
 
   const hpPercent =
     maxHP > 0 ? Math.max(0, Math.min(100, (player.HP / maxHP) * 100)) : 0;
@@ -95,7 +94,7 @@ function CharacterPanel({
         <div className="resource-label">
           <span>💧 Magi: </span>
           <span>
-            {player.Mana} / {player.ManaMax}
+            {player.Mana} / {maxMana}
           </span>
         </div>
 
