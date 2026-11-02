@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
+import { useItemHover } from "../context/useItemHover";
 import "./Location.css";
 import { locations } from "../data/locations";
 import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
-import ItemCard from "../components/inventory/ItemCard";
 import type { ContainerType } from "../data/containerTypes";
 import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
@@ -58,7 +58,7 @@ function Location({
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const { setHoveredItem } = useItemHover();
   const [rewardSummary, setRewardSummary] = useState<{
     exp: number;
     gold: number;
@@ -176,19 +176,25 @@ function Location({
       return true;
     }
 
-    const condition = choice.condition;
+    const conditions = Array.isArray(choice.condition)
+      ? choice.condition
+      : [choice.condition];
 
-    if (condition.type === "storyFlag") {
-      const flagValue = player.StoryFlags[condition.flag] ?? false;
+    return conditions.every((condition) => {
+      if (condition.type === "storyFlag") {
+        const flagValue = player.StoryFlags[condition.flag] ?? false;
 
-      return flagValue === condition.value;
-    }
+        return flagValue === condition.value;
+      }
 
-    if (condition.type === "hasItem") {
-      return player.Inventory.some((item) => item.itemId === condition.itemId);
-    }
+      if (condition.type === "hasItem") {
+        return player.Inventory.some(
+          (item) => item.itemId === condition.itemId,
+        );
+      }
 
-    return false;
+      return false;
+    });
   }
 
   function applyCombatResult(
@@ -205,7 +211,7 @@ function Location({
 
     setContainerItems([]);
     setActiveContainer(null);
-    setHoveredItemId(null);
+    setHoveredItem(null);
 
     if (result.outcome === "win") {
       setRewardSummary({ exp: result.exp, gold: result.gold });
@@ -412,7 +418,7 @@ function Location({
     // Clear the temporary location container before applying new effects.
     setContainerItems([]);
     setActiveContainer(null);
-    setHoveredItemId(null);
+    setHoveredItem(null);
     setRewardSummary(null);
 
     if (choice.effects) {
@@ -566,7 +572,6 @@ function Location({
                     Storage: p.Storage.filter((i) => i.containerItemId !== id),
                   }))
                 }
-                onHoveredItemChange={setHoveredItemId}
                 onCrossContainerDrop={handleCrossContainerDrop}
               />
             ) : (
@@ -578,7 +583,6 @@ function Location({
                 inventory={containerItems}
                 onInventoryChange={handleContainerItemsChanged}
                 onItemRemoved={handleContainerItemRemoved}
-                onHoveredItemChange={setHoveredItemId}
                 onCrossContainerDrop={handleCrossContainerDrop}
                 acceptedItemId={
                   activeContainer.type === "quest"
@@ -588,8 +592,6 @@ function Location({
               />
             )}
           </div>
-
-          <ItemCard itemId={hoveredItemId} />
         </div>
       )}
 

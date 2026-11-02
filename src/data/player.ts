@@ -95,8 +95,8 @@ export const createNewPlayer = (): Player => {
 
     Level: 1,
     Exp: 0,
-    ExpMax: 30,
-    SkillPoints: 5,
+    ExpMax: 50,
+    SkillPoints: 0,
     LearnedNodes: [],
 
     Str: playerStr,
@@ -112,7 +112,7 @@ export const createNewPlayer = (): Player => {
 
     Equipment: {},
     BackpackWidth: 6,
-    BackpackHeight: 8,
+    BackpackHeight: 6,
 
     StorageWidth: 7,
     StorageHeight: 7,
@@ -122,20 +122,10 @@ export const createNewPlayer = (): Player => {
     Inventory: [],
     Quests: [],
     StoryFlags: {},
-    UnlockedLocations: [
-      "intro",
-      "playerHQ",
-      "village",
-      "ruins",
-      "places",
-      "blacksmith",
-    ],
+    UnlockedLocations: ["playerHQ", "village", "ruins"],
     KnownSkills: [],
   };
 
-  player = addItemToInventory(player, "old_axe", "startingWeapon");
-  player = addItemToInventory(player, "health_potion", "testPotion");
-  player = addItemToInventory(player, "mana_potion", "testMana");
   player = addItemToInventory(player, "bandage", "testBandage");
 
   return player;

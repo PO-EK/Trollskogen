@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import Character from "./Character";
+import QuestLog from "./QuestLog";
 import Skills from "./Skills";
 
 export type OverlayProps = {
@@ -15,6 +16,7 @@ export const OVERLAYS = {
   character: Character,
   skills: Skills,
   skillTree: SkillTree,
+  questLog: QuestLog,
 } satisfies Record<string, ComponentType<OverlayProps>>;
 
 export type OverlayId = keyof typeof OVERLAYS;

@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { usePlayer } from "../../context/usePlayer";
 import { useTrader } from "../../context/useTrader";
+import { useItemHover } from "../../context/useItemHover";
 import type { ContainerItem } from "../../data/containerItems";
 import type { ContainerType } from "../../data/containerTypes";
 import ItemGrid from "./ItemGrid";
@@ -20,7 +20,7 @@ function InventoryPanel({ inCombat = false }: InventoryPanelProps) {
   const { player, setPlayer } = usePlayer();
   const { traders, setTraders } = useTrader();
 
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const { hoveredItemId, salePrice } = useItemHover();
   function handleUseItem(
     item: ContainerItem,
     _use: ItemUse,
@@ -129,12 +129,11 @@ function InventoryPanel({ inCombat = false }: InventoryPanelProps) {
               ),
             }));
           }}
-          onHoveredItemChange={setHoveredItemId}
           onCrossContainerDrop={handleCrossContainerDrop}
         />
       </div>
 
-      <ItemCard itemId={hoveredItemId} />
+      <ItemCard itemId={hoveredItemId} salePrice={salePrice ?? undefined} />
     </aside>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { items } from "../../data/items";
 import { useItemDrag } from "../../context/useItemDrag";
+import { useItemHover } from "../../context/useItemHover";
 import type { ContainerItem } from "../../data/containerItems";
 import type { ContainerType } from "../../data/containerTypes";
 import "./ItemGrid.css";
@@ -13,7 +14,6 @@ type ItemGridProps<T extends ContainerItem = ContainerItem> = {
   inventory: T[];
   onInventoryChange: (inventory: T[]) => void;
   onItemRemoved?: (containerItemId: string) => void;
-  onHoveredItemChange?: (itemId: string | null) => void;
 
   /**
    * Called when an item from another container is dropped on this grid.
@@ -39,9 +39,9 @@ function ItemGrid<T extends ContainerItem = ContainerItem>({
   inventory,
   onInventoryChange,
   onItemRemoved,
-  onHoveredItemChange,
   onCrossContainerDrop,
 }: ItemGridProps<T>) {
+  const { setHoveredItem } = useItemHover();
   const {
     draggedItem,
     dragSourceId,
@@ -369,8 +369,17 @@ function ItemGrid<T extends ContainerItem = ContainerItem>({
                 y: containerItem.y,
               });
             }}
-            onMouseEnter={() => onHoveredItemChange?.(containerItem.itemId)}
-            onMouseLeave={() => onHoveredItemChange?.(null)}
+            onMouseEnter={() =>
+              setHoveredItem(
+                containerItem.itemId,
+                containerType === "trader" &&
+                  "buyPrice" in containerItem &&
+                  typeof containerItem.buyPrice === "number"
+                  ? containerItem.buyPrice
+                  : undefined,
+              )
+            }
+            onMouseLeave={() => setHoveredItem(null)}
             style={{
               left: `${containerItem.x * 34 + 4}px`,
               top: `${containerItem.y * 34 + 4}px`,

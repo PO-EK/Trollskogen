@@ -1,12 +1,10 @@
 import { usePlayer } from "../context/usePlayer";
 import { useTrader } from "../context/useTrader";
 import ItemGrid from "../components/inventory/ItemGrid";
-import { useState } from "react";
 import type { ContainerItem } from "../data/containerItems";
 import type { ContainerType } from "../data/containerTypes";
 import type { TraderInventoryItem } from "../data/traders/tradersTypes";
 import { performTransaction } from "../game/performTransaction";
-import ItemCard from "../components/inventory/ItemCard";
 
 type TradingProps = {
   traderId: string | null;
@@ -16,7 +14,6 @@ type TradingProps = {
 function Trading({ traderId, onReturn }: TradingProps) {
   const { player, setPlayer } = usePlayer();
   const { traders, setTraders } = useTrader();
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
   const trader = traders.find((trader) => trader.id === traderId);
 
   if (!trader) {
@@ -42,11 +39,6 @@ function Trading({ traderId, onReturn }: TradingProps) {
     boxShadow: "0 8px 20px rgba(99, 102, 241, 0.28)",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
   } as const;
-
-  // The trader's entry for the hovered item, used for its asking price.
-  const hoveredTraderItem = trader.inventory.find(
-    (item) => item.itemId === hoveredItemId,
-  );
 
   function handleInventoryChange(updatedInventory: TraderInventoryItem[]) {
     setTraders((currentTraders) =>
@@ -121,18 +113,6 @@ function Trading({ traderId, onReturn }: TradingProps) {
           inventory={trader.inventory}
           onInventoryChange={handleInventoryChange}
           onCrossContainerDrop={handleCrossContainerDrop}
-          onHoveredItemChange={setHoveredItemId}
-        />
-      </div>
-
-      <div style={{ marginBottom: "20px" }}>
-        <ItemCard
-          itemId={hoveredItemId}
-          price={
-            hoveredTraderItem
-              ? { label: "Kostnad", amount: hoveredTraderItem.buyPrice }
-              : undefined
-          }
         />
       </div>
 

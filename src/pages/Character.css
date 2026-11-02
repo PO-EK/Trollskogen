@@ -16,15 +16,9 @@
 /* Row 1: item card (left) and equipment (right) */
 .character-page-top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
-}
-
-/* Let the card fill its column instead of using its own 300px width. */
-.character-page-card .item-card {
-  max-width: none;
-  margin: 0;
 }
 
 .character-page-header {

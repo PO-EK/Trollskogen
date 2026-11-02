@@ -5,7 +5,7 @@ export type AdventureChoice = {
   text: string;
   nextNodeId?: string;
   loot?: ContainerItem[];
-  condition?: AdventureCondition;
+  condition?: AdventureCondition | AdventureCondition[];
   effects?: AdventureEffect[];
 };
 

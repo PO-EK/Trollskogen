@@ -1,10 +1,8 @@
 import { usePlayer } from "../context/usePlayer";
 import "./Character.css";
-import { useState } from "react";
 import type { EquipmentSlot } from "../data/itemTypes";
 import charBG from "../assets/charBG.png";
 import EquipSlot from "../components/EquipSlot";
-import ItemCard from "../components/inventory/ItemCard";
 import { getCharacterStats } from "../game/characterStats";
 
 const VISIBLE_SLOTS: EquipmentSlot[] = [
@@ -21,7 +19,6 @@ type CharacterProps = {
 
 function Character({ onClose }: CharacterProps) {
   const { player } = usePlayer();
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
   // Recalculated on every render, so it updates the moment you equip something.
   const stats = getCharacterStats(player);
@@ -37,13 +34,8 @@ function Character({ onClose }: CharacterProps) {
       </div>
 
       <div className="character-page-body">
-        {/* Row 1: item card on the left, equipment on the right */}
+        {/* Equipment */}
         <div className="character-page-top">
-          <section className="character-page-card">
-            <h3>Föremål</h3>
-            <ItemCard itemId={hoveredItemId} />
-          </section>
-
           <section className="character-page-equipment">
             <h3>Utrustning</h3>
 
@@ -55,7 +47,6 @@ function Character({ onClose }: CharacterProps) {
                 <EquipSlot
                   key={slot}
                   slot={slot}
-                  onHoveredItemChange={setHoveredItemId}
                 />
               ))}
             </div>

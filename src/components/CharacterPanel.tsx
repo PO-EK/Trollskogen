@@ -50,33 +50,6 @@ function CharacterPanel({
         </div>
       </div>
 
-      <button
-        className="character-panel-button"
-        disabled={locked}
-        title={locked ? "Inte under strid" : undefined}
-        onClick={() => onOpenOverlay("skillTree")}
-      >
-        Färdighetsträd{player.SkillPoints > 0 ? ` (${player.SkillPoints})` : ""}
-      </button>
-
-      <button
-        className="character-panel-button"
-        disabled={locked}
-        title={locked ? "Inte under strid" : undefined}
-        onClick={() => onOpenOverlay("skills")}
-      >
-        Förmågor
-      </button>
-
-      <button
-        className="character-panel-button"
-        disabled={locked}
-        title={locked ? "Inte under strid" : undefined}
-        onClick={() => onOpenOverlay("character")}
-      >
-        Utrustning
-      </button>
-
       <div className="resource-section">
         <div className="resource-label">
           <span>❤️ Hälsa: </span>
@@ -101,6 +74,58 @@ function CharacterPanel({
         <div className="resource-bar">
           <div className="mana-bar" style={{ width: `${manaPercent}%` }} />
         </div>
+      </div>
+      <div className="theButtons">
+        <button
+          className="character-panel-button"
+          disabled={locked}
+          title={locked ? "Inte under strid" : undefined}
+          onClick={() => onOpenOverlay("skillTree")}
+        >
+          <span className="character-panel-button-icon" aria-hidden="true">
+            🌳
+          </span>
+          <span>
+            Färdighetsträd
+            {player.SkillPoints > 0 ? ` (${player.SkillPoints})` : ""}
+          </span>
+        </button>
+
+        <button
+          className="character-panel-button"
+          disabled={locked}
+          title={locked ? "Inte under strid" : undefined}
+          onClick={() => onOpenOverlay("skills")}
+        >
+          <span className="character-panel-button-icon" aria-hidden="true">
+            ✨
+          </span>
+          <span>Förmågor</span>
+        </button>
+
+        <button
+          className="character-panel-button"
+          disabled={locked}
+          title={locked ? "Inte under strid" : undefined}
+          onClick={() => onOpenOverlay("questLog")}
+        >
+          <span className="character-panel-button-icon" aria-hidden="true">
+            📜
+          </span>
+          <span>Uppdrag</span>
+        </button>
+
+        <button
+          className="character-panel-button"
+          disabled={locked}
+          title={locked ? "Inte under strid" : undefined}
+          onClick={() => onOpenOverlay("character")}
+        >
+          <span className="character-panel-button-icon" aria-hidden="true">
+            🛡️
+          </span>
+          <span>Utrustning</span>
+        </button>
       </div>
     </aside>
   );

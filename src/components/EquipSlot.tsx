@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
 import { useItemDrag } from "../context/useItemDrag";
+import { useItemHover } from "../context/useItemHover";
 import { items } from "../data/items";
 import type { EquipmentSlot } from "../data/itemTypes";
 import { canEquipInSlot, equipSlotId, SLOT_LABELS } from "../game/equipment";
@@ -9,11 +10,11 @@ import { performTransaction } from "../game/performTransaction";
 
 type EquipSlotProps = {
   slot: EquipmentSlot;
-  onHoveredItemChange?: (itemId: string | null) => void;
 };
 
-function EquipSlot({ slot, onHoveredItemChange }: EquipSlotProps) {
+function EquipSlot({ slot }: EquipSlotProps) {
   const { player, setPlayer } = usePlayer();
+  const { setHoveredItem } = useItemHover();
   const {
     draggedItem,
     dragSourceId,
@@ -115,10 +116,10 @@ function EquipSlot({ slot, onHoveredItemChange }: EquipSlotProps) {
       }}
       onMouseEnter={() => {
         if (equipped) {
-          onHoveredItemChange?.(equipped.itemId);
+          setHoveredItem(equipped.itemId);
         }
       }}
-      onMouseLeave={() => onHoveredItemChange?.(null)}
+      onMouseLeave={() => setHoveredItem(null)}
     >
       {equipped && equippedDefinition ? (
         <img

@@ -113,11 +113,10 @@ function ArmourDetails({ armour }: { armour: ArmourItem }) {
 
 type ItemCardProps = {
   itemId: string | null;
-  // Overrides the default "Värt X Kronor" line, e.g. a trader's asking price.
-  price?: { label: string; amount: number };
+  salePrice?: number;
 };
 
-function ItemCard({ itemId, price }: ItemCardProps) {
+function ItemCard({ itemId, salePrice }: ItemCardProps) {
   const item = itemId ? items.find((item) => item.id === itemId) : undefined;
 
   if (!item) {
@@ -129,8 +128,6 @@ function ItemCard({ itemId, price }: ItemCardProps) {
   }
 
   const category = item.category ?? "general";
-  const priceLine = price ?? { label: "Värt", amount: item.baseValue };
-
   return (
     // The key restarts the fade-in animation whenever the item changes.
     <div className="item-card" key={item.id} data-category={category}>
@@ -150,8 +147,16 @@ function ItemCard({ itemId, price }: ItemCardProps) {
       {item.category === "armour" && <ArmourDetails armour={item} />}
 
       <div className="item-card-price">
-        <span className="item-card-label">{priceLine.label}</span>
-        <span className="item-card-value">🪙 {priceLine.amount} Kronor</span>
+        <div className="item-card-price-row">
+          <span className="item-card-label">Värde:</span>
+          <span className="item-card-value">{item.baseValue} 🪙 Kronor</span>
+        </div>
+        {salePrice !== undefined && (
+          <div className="item-card-price-row">
+            <span className="item-card-pricelabel">Pris:</span>
+            <span className="item-card-price"> {salePrice} 🪙 Kronor</span>
+          </div>
+        )}
       </div>
     </div>
   );

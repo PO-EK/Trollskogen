@@ -1,0 +1,129 @@
+.quest-log {
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 16px;
+  color: #e8e0d0;
+  font-family: Georgia, serif;
+}
+
+.quest-log-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #5c4a32;
+}
+
+.quest-log-header h1 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.6rem;
+}
+
+.quest-log-close {
+  margin-left: auto;
+  padding: 8px 16px;
+  background: transparent;
+  color: #e8e0d0;
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.quest-log-close:hover {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.quest-log-section {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quest-log-section h2 {
+  margin: 0;
+  color: #d8b46a;
+  font-size: 1.1rem;
+}
+
+.quest-log-entry {
+  padding: 12px;
+  background: rgba(20, 16, 10, 0.45);
+  border: 1px solid #5c4a32;
+  border-radius: 6px;
+}
+
+.quest-log-entry h3 {
+  margin: 0 0 6px;
+  color: #f3e9d2;
+  font-size: 1rem;
+}
+
+.quest-log-entry p {
+  color: #a99d86;
+  font-size: 0.85rem;
+}
+
+.quest-log-stages {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest-log-stage {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 9px;
+  color: #716958;
+  background: rgba(0, 0, 0, 0.18);
+  border-left: 2px solid #5c4a32;
+  font-size: 0.82rem;
+}
+
+.quest-log-stage[data-state="completed"] {
+  color: #a99d86;
+  border-left-color: #7fc06a;
+}
+
+.quest-log-stage[data-state="current"] {
+  color: #f3e9d2;
+  background: rgba(216, 180, 106, 0.1);
+  border-left-color: #d8b46a;
+}
+
+.quest-log-stage-status {
+  flex-shrink: 0;
+  color: #8a7e69;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.quest-log-stage[data-state="completed"] .quest-log-stage-status {
+  color: #7fc06a;
+}
+
+.quest-log-stage[data-state="current"] .quest-log-stage-status {
+  color: #d8b46a;
+}
+
+.quest-log-entry--completed {
+  opacity: 0.75;
+}
+
+.quest-log-entry .quest-log-status {
+  margin-top: 8px;
+  color: #7fc06a;
+}
+
+.quest-log-empty {
+  color: #a99d86;
+  font-style: italic;
+}
