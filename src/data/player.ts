@@ -120,7 +120,15 @@ export const createNewPlayer = (): Player => {
     Inventory: [],
     Quests: [],
     StoryFlags: {},
-    UnlockedLocations: ["playerHQ", "village", "ruins", "places"],
+    UnlockedLocations: [
+      "playerHQ",
+      "village",
+      "mayors",
+      "vardshuset",
+      "blacksmith",
+      "ruins",
+      "places",
+    ],
     KnownSkills: [],
   };
 

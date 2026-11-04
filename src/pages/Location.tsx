@@ -55,11 +55,29 @@ function Location({
   onStartCombat,
 }: LocationProps) {
   const { player, setPlayer } = usePlayer();
-  const [currentNodeId, setCurrentNodeId] = useState(() =>
-    locationId === "playerHQ" && !player.StoryFlags["playerHQ.IntroSeen"]
-      ? "intro"
-      : "start",
-  );
+  const [currentNodeId, setCurrentNodeId] = useState(() => {
+    const selectedLocation = locations.find(
+      (location) => location.id === locationId,
+    );
+
+    if (
+      selectedLocation?.introNodeId &&
+      selectedLocation.introSeenFlag &&
+      !player.StoryFlags[selectedLocation.introSeenFlag]
+    ) {
+      return selectedLocation.introNodeId;
+    }
+
+    if (
+      selectedLocation?.preQuestNodeId &&
+      selectedLocation.questCompleteFlag &&
+      !player.StoryFlags[selectedLocation.questCompleteFlag]
+    ) {
+      return selectedLocation.preQuestNodeId;
+    }
+
+    return "start";
+  });
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);

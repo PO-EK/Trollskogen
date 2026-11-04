@@ -1,6 +1,167 @@
 import type { AdventureNode } from "../adventureTypes";
 
 export const smeden: Record<string, AdventureNode> = {
+  intro: {
+    id: "intro",
+    text: "Smedjan ligger tyst och verkar förfallen. En skadad man sitter ensam på en stol med benet omlindat. Du känner igen honom som byns smed.",
+    choices: [
+      {
+        text: "Gå fram och hälsa.",
+        nextNodeId: "smedenStart",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "smeden.IntroSeen",
+            value: true,
+          },
+        ],
+      },
+    ],
+  },
+
+  smedenStart: {
+    id: "smedenStart",
+    text: "Smedjan är i dåligt skick. Ingen verksamhet pågår här och på en stol sitter en skadad man med sitt förbundna ben upplagt på en pall. När du hälsar så rycker han till, som från sömnen, och tittar dig upp och ned. 'Är det inte den stora hjälten, jag ser? Vad vill du?' Han låter bitter och varje ord dryper av sarkasm.",
+    choices: [
+      {
+        text: "Jag försöker skydda byn, kan du hjälpa?",
+        nextNodeId: "smedenHelp",
+        condition: {
+          type: "storyFlag",
+          flag: "healTheSmith.Started",
+          value: false,
+        },
+      },
+      {
+        text: "Är du skadad?",
+        nextNodeId: "smedenHurt",
+        condition: {
+          type: "storyFlag",
+          flag: "healTheSmith.Started",
+          value: false,
+        },
+      },
+      {
+        text: "Jag har en läkande dryck till dig.",
+        nextNodeId: "smedenHeal",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "healTheSmith.Started",
+            value: true,
+          },
+          { type: "hasItem", itemId: "health_potion" },
+        ],
+        effects: [
+          { type: "removeItem", itemId: "health_potion" },
+          {
+            type: "setStoryFlag",
+            flag: "healTheSmith.Delivered",
+            value: true,
+          },
+        ],
+      },
+      {
+        text: "Jag ville bara hälsa. Hej då.",
+        effects: [{ type: "endAdventure" }],
+      },
+    ],
+  },
+
+  smedenHurt: {
+    id: "smedenHurt",
+    text: "'Nä, jag har bara på mig dessa bandage för att det var så kallt ute.' säger han sarkastiskt. Han verkar ha dåligt tålamod för dumma frågor.",
+    choices: [{ text: "Okej?", nextNodeId: "smedenStart" }],
+  },
+
+  smedenHelp: {
+    id: "smedenHelp",
+    text: "Smeden skrattar till, men börjar snart hosta och håller sig om sidan. Smeden ser allvarligt på dig och säger 'Du kan inte hjälpa dem som inte vill hjälpa sig själv. När dessa problem började så gjorde varje man och kvinna i denna by ett val, och de valde att endast bry sig om sig själv och det som är deras.' Han verkar ganska bitter mot de andra i byn.",
+    choices: [
+      {
+        text: "De är endast vanligt folk, de vet inte bättre. Vi måste hjälpa dem.",
+        nextNodeId: "smedenHelp2",
+      },
+      {
+        text: "Folkmassor är panikslagna djur, de behöver en stark hand som kan leda dem rätt.",
+        nextNodeId: "smedenHelp2",
+      },
+      {
+        text: "Så du vill lägga dig ned och dö istället för att kämpa?",
+        nextNodeId: "smedenHelp2",
+      },
+    ],
+  },
+
+  smedenHelp2: {
+    id: "smedenHelp2",
+    text: "Smeden öppnar sin mun men inga ord kommer ut. Han stirrar på dig en stund och sedan ser ut över den förstörda byn. Han förblir tyst en stund tills han säger 'Min far brukade säga att de som har styrka nog att slåss för det rätta, borde göra det.''",
+    choices: [
+      {
+        text: "Visar vi byborna att vi vill hjälpa dem, så kommer de hjälpa oss.",
+        nextNodeId: "smedenHelp3",
+      },
+      {
+        text: "Jag ska samla de starka och skapa en plan. Byborna har inget val än att följa.",
+        nextNodeId: "smedenHelp3",
+      },
+      {
+        text: "Denna by kommer inte klara sig länge utan sin smed.",
+        nextNodeId: "smedenHelp3",
+      },
+    ],
+  },
+
+  smedenHelp3: {
+    id: "smedenHelp3",
+    text: "Efter en stund av djupt tänkande så sträcker smeden på sig och utbriser 'Jag börjar bli trött på att bara sitta, det är nog dags att köra igång smedja igen.' Han rycker till av smärta och håller sig om sidan. 'Kanske du kan hjälpa mig först?'",
+    choices: [
+      {
+        text: "Jag återkommer när jag har något.",
+        nextNodeId: "smedenStart",
+        effects: [
+          { type: "setStoryFlag", flag: "healTheSmith.Started", value: true },
+        ],
+      },
+    ],
+  },
+
+  smedenHeal: {
+    id: "smedenHeal",
+    text: "'Jag kan inte göra mitt jobb i smedjan om jag knappt kan lyfta armarna.'",
+    choices: [
+      {
+        text: "Ta denna och krya på dig.",
+        nextNodeId: "start",
+        condition: {
+          type: "storyFlag",
+          flag: "healTheSmith.Delivered",
+          value: true,
+        },
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "healTheSmith.Complete",
+            value: true,
+          },
+          {
+            type: "addExperience",
+            amount: 31,
+          },
+        ],
+      },
+      {
+        text: "Jag återvänder när jag har en Läkande Dryck.",
+        nextNodeId: "smedenStart",
+        condition: {
+          type: "storyFlag",
+          flag: "healTheSmith.Delivered",
+          value: false,
+        },
+      },
+    ],
+  },
+
   start: {
     id: "start",
     text: "Smedjan är i full gång, men rök ut skorsten och ljud av hammare mot metal. Du finns smeden framför sitt städ. 'Jag mår mycket bättre nu, lite stel kanske. Vad behöver du idag?'",
@@ -42,8 +203,13 @@ export const smeden: Record<string, AdventureNode> = {
         nextNodeId: "nattvaktenToolsReturn",
         condition: {
           type: "hasItem",
-          itemId: "SmeltingTools",
+          itemId: "smedenTools",
         },
+        effects: [
+          { type: "removeItem", itemId: "smedenTools" },
+          { type: "addExperience", amount: 25 },
+          { type: "addGold", amount: 50 },
+        ],
       },
       {
         text: "Ursäkta, men jag måste gå vidare.",
@@ -148,7 +314,7 @@ export const smeden: Record<string, AdventureNode> = {
 
   nattvaktenToolsReturn: {
     id: "nattvaktenToolsReturn",
-    text: "Du räcker över verktygen, inlindade i en hoprullad läderfilt. Smeden vecklar upp den och går noggrant igenom varje formar, tång och degel. 'Allt finns med,' mumlar han nöjt. 'Nu har jag allt jag behöver för att smida.'",
+    text: "Du räcker över verktygen, inlindade i en hoprullad läderfilt. Smeden vecklar upp den och går noggrant igenom varje formar, tång och degel. 'Allt finns med,' mumlar han nöjt. 'Nu har jag allt jag behöver för att smida.' Han sträcker dig en påse med mynt som tack.",
     choices: [
       {
         text: "Undrar du inte vem tjuven var?",
@@ -168,25 +334,19 @@ export const smeden: Record<string, AdventureNode> = {
       {
         text: "Jag hjälper till så går det fortare.",
         nextNodeId: "nattvaktenForge",
-        effects: [
-          // { type: "removeItem", itemId: "smith_tools" },
-          { type: "addGold", amount: 50 },
-        ],
+        effects: [],
       },
       {
         text: "Jag vill se hur man gjuter järn.",
         nextNodeId: "nattvaktenForge",
-        effects: [
-          // { type: "removeItem", itemId: "smith_tools" },
-          { type: "addGold", amount: 50 },
-        ],
+        effects: [],
       },
     ],
   },
 
   nattvaktenForge: {
     id: "nattvaktenForge",
-    text: "Ni spenderar flera timmar i smedjan. Smeden smälter ned gamla grytor i degeln medan du hjälper till att hålla elden uppe. Han häller det glödande järnet i formarna, och du ser hur varje spjutspets tar form. När de svalnat nitar ni fast dem på trästavar och slipar dem vassa, en efter en. Till slut ligger tio spjut på rad vid väggen. Smeden torkar svetten ur pannan och nickar belåtet. 'Det här borde duga. Ge dem till Lars.'",
+    text: "Ni spenderar flera timmar i smedjan. Smeden smälter ned gamla grytor i degeln medan du hjälper till att hålla elden uppe. Han häller det glödande järnet i formarna, och du ser hur varje spjutspets tar form. När de svalnat nitar ni fast dem på trästavar och slipar dem vassa, en efter en. Till slut ligger tio spjut på rad vid väggen. Smeden torkar svetten ur pannan och nickar belåtet. 'Det här borde duga. Säg till Lars att de finns här att hämta när de behövs.'",
     choices: [
       {
         text: "Då går jag tillbaka till Lars.",
@@ -196,12 +356,12 @@ export const smeden: Record<string, AdventureNode> = {
             flag: "nattvakten.ToolsReturned",
             value: true,
           },
+          { type: "setStoryFlag", flag: "nattvakten.reportLars", value: true },
           {
             type: "setStoryFlag",
             flag: "nattvakten.returnTools",
             value: false,
           },
-          // { type: "spawnLoot", itemId: "cast_iron_spear" }, // x10 om spjuten ska vara ett föremål
           { type: "endAdventure" },
         ],
       },

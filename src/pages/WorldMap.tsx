@@ -1,28 +1,44 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
 import { locations } from "../data/locations";
+import { maps } from "../data/maps";
+
 type WorldMapProps = {
+  mapId: string;
   onLocationSelect: (locationId: string) => void;
+  onMapSelect: (mapId: string) => void;
 };
 
-function WorldMap({ onLocationSelect }: WorldMapProps) {
+function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(
     null,
   );
   const { player } = usePlayer();
-  const hoveredLocation = locations.find(
-    (location) => location.id === hoveredLocationId,
+  const map = maps[mapId];
+  if (!map) {
+    return <p>Map not found.</p>;
+  }
+
+  const visibleLocations = locations.filter(
+    (location) =>
+      location.mapId === mapId &&
+      player.UnlockedLocations.includes(location.id),
   );
-  const visibleLocations = locations.filter((location) =>
-    player.UnlockedLocations.includes(location.id),
+  const hoveredLocation = visibleLocations.find(
+    (location) => location.id === hoveredLocationId,
   );
 
   return (
-    <div className="world-map">
+    <div
+      className="world-map"
+      style={{ backgroundImage: `url("${map.backgroundImage}")` }}
+      aria-label={map.name}
+    >
       {visibleLocations.map((location) => (
         <button
           key={location.id}
           className="map-location"
+          aria-label={location.name}
           style={{
             left: `${location.x}%`,
             top: `${location.y}%`,
@@ -31,7 +47,12 @@ function WorldMap({ onLocationSelect }: WorldMapProps) {
           onMouseEnter={() => setHoveredLocationId(location.id)}
           onMouseLeave={() => setHoveredLocationId(null)}
         >
-          {location.icon}
+          <img
+            className="map-location-image"
+            src={location.image}
+            alt=""
+            draggable={false}
+          />
         </button>
       ))}
 
@@ -43,10 +64,27 @@ function WorldMap({ onLocationSelect }: WorldMapProps) {
             top: `${hoveredLocation.y}%`,
           }}
         >
-          {" "}
-          {hoveredLocation.name}{" "}
+          {hoveredLocation.name}
         </div>
       )}
+
+      {map.exits.map((exit) => {
+        const targetMap = maps[exit.targetMapId];
+        if (!targetMap) {
+          return null;
+        }
+
+        return (
+          <button
+            key={exit.targetMapId}
+            className="map-exit"
+            style={{ left: `${exit.x}%`, top: `${exit.y}%` }}
+            onClick={() => onMapSelect(exit.targetMapId)}
+          >
+            Gå till {targetMap.name}
+          </button>
+        );
+      })}
     </div>
   );
 }

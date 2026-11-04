@@ -29,6 +29,17 @@ const generalItems: GeneralItem[] = [
     baseValue: 18,
   },
   {
+    id: "smedenTools",
+    name: "Gjutverktyg",
+    description: "Smedens verktyg inlindat i djurskin.",
+    image: leatherImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 0,
+  },
+  {
     id: "leather",
     name: "Läder",
     description: "Råmatrial av djurskin.",

@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700">
+  <defs>
+    <linearGradient id="forestFloor" x2="0" y2="1">
+      <stop stop-color="#64704e"/>
+      <stop offset=".52" stop-color="#4c5c43"/>
+      <stop offset="1" stop-color="#394c3b"/>
+    </linearGradient>
+    <radialGradient id="clearingLight">
+      <stop stop-color="#73805a" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#73805a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="groundTexture" width="48" height="42" patternUnits="userSpaceOnUse">
+      <path d="M7 29l4-8m0 8 6-5m18 7 3-6" fill="none" stroke="#c5b878" stroke-width="1.5" opacity=".2"/>
+      <circle cx="27" cy="12" r="1.5" fill="#d0c28a" opacity=".2"/>
+    </pattern>
+    <radialGradient id="canopy">
+      <stop stop-color="#62744b"/>
+      <stop offset=".68" stop-color="#3d583c"/>
+      <stop offset="1" stop-color="#253d31"/>
+    </radialGradient>
+    <filter id="treeShadow" x="-.5" y="-.5" width="2" height="2">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="2" dy="6" result="blur"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <g id="tree">
+      <ellipse cx="1" cy="11" rx="35" ry="19" fill="#172720" opacity=".65"/>
+      <circle cx="-13" cy="1" r="23" fill="#2d4934" stroke="#20362b" stroke-width="3"/>
+      <circle cx="12" cy="-9" r="27" fill="url(#canopy)" stroke="#20362b" stroke-width="3"/>
+      <circle cx="0" cy="-24" r="18" fill="#4d6641" stroke="#2b4432" stroke-width="2"/>
+      <path d="M-25-3q13-20 27-16m8-8q17 4 22 17" fill="none" stroke="#829060" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+      <circle cx="-20" cy="6" r="3" fill="#9a9867" opacity=".7"/>
+    </g>
+    <g id="smallTree">
+      <ellipse cx="0" cy="9" rx="26" ry="14" fill="#172720" opacity=".58"/>
+      <circle cx="-9" cy="0" r="17" fill="#2b4532" stroke="#20362b" stroke-width="2"/>
+      <circle cx="10" cy="-7" r="20" fill="url(#canopy)" stroke="#20362b" stroke-width="2"/>
+      <circle cx="0" cy="-18" r="13" fill="#4e6440"/>
+      <path d="M-17-2q11-16 21-12" fill="none" stroke="#8a9566" stroke-width="2.5" opacity=".6"/>
+    </g>
+  </defs>
+
+  <rect width="1000" height="700" fill="url(#forestFloor)"/>
+  <rect width="1000" height="700" fill="url(#groundTexture)"/>
+  <ellipse cx="523" cy="350" rx="365" ry="260" fill="url(#clearingLight)"/>
+
+  <!-- The only road enters from the west and ends at the single gap in the trees. -->
+  <path d="M0 611C27 611 53 610 79 611s39 1 57 0" fill="none" stroke="#30372d" stroke-width="54" opacity=".68"/>
+  <path d="M0 611C27 611 53 610 79 611s39 1 57 0" fill="none" stroke="#a68c62" stroke-width="40"/>
+  <path d="M0 611C27 611 53 610 79 611s39 1 57 0" fill="none" stroke="#d0b886" stroke-width="2.5" stroke-dasharray="9 12" opacity=".68"/>
+  <path d="M127 590l18 21-18 21" fill="none" stroke="#66583f" stroke-width="6" opacity=".82"/>
+
+  <!-- Dense, overlapping tree wall on every edge; leave only the road entrance open. -->
+  <g filter="url(#treeShadow)">
+    <!-- Top edge -->
+    <use href="#tree" x="22" y="26" transform="translate(0 0) scale(1.25)"/>
+    <use href="#smallTree" x="74" y="38" transform="scale(1.4)"/>
+    <use href="#tree" x="127" y="22" transform="scale(1.35)"/>
+    <use href="#smallTree" x="180" y="39" transform="scale(1.45)"/>
+    <use href="#tree" x="234" y="23" transform="scale(1.4)"/>
+    <use href="#smallTree" x="289" y="35" transform="scale(1.45)"/>
+    <use href="#tree" x="344" y="20" transform="scale(1.45)"/>
+    <use href="#smallTree" x="399" y="37" transform="scale(1.45)"/>
+    <use href="#tree" x="454" y="19" transform="scale(1.45)"/>
+    <use href="#smallTree" x="509" y="38" transform="scale(1.45)"/>
+    <use href="#tree" x="564" y="21" transform="scale(1.45)"/>
+    <use href="#smallTree" x="619" y="38" transform="scale(1.45)"/>
+    <use href="#tree" x="674" y="20" transform="scale(1.45)"/>
+    <use href="#smallTree" x="729" y="37" transform="scale(1.45)"/>
+    <use href="#tree" x="784" y="22" transform="scale(1.45)"/>
+    <use href="#smallTree" x="839" y="38" transform="scale(1.45)"/>
+    <use href="#tree" x="894" y="19" transform="scale(1.45)"/>
+    <use href="#smallTree" x="950" y="35" transform="scale(1.45)"/>
+    <use href="#tree" x="1001" y="60" transform="scale(1.35)"/>
+    <!-- Right edge -->
+    <use href="#smallTree" x="977" y="111" transform="scale(1.45)"/>
+    <use href="#tree" x="1007" y="166" transform="scale(1.45)"/>
+    <use href="#smallTree" x="978" y="220" transform="scale(1.45)"/>
+    <use href="#tree" x="1007" y="276" transform="scale(1.45)"/>
+    <use href="#smallTree" x="978" y="330" transform="scale(1.45)"/>
+    <use href="#tree" x="1008" y="386" transform="scale(1.45)"/>
+    <use href="#smallTree" x="978" y="440" transform="scale(1.45)"/>
+    <use href="#tree" x="1008" y="496" transform="scale(1.45)"/>
+    <use href="#smallTree" x="978" y="550" transform="scale(1.45)"/>
+    <use href="#tree" x="1008" y="606" transform="scale(1.45)"/>
+    <use href="#smallTree" x="979" y="660" transform="scale(1.45)"/>
+    <!-- Bottom edge -->
+    <use href="#tree" x="932" y="690" transform="scale(1.4)"/>
+    <use href="#smallTree" x="878" y="677" transform="scale(1.45)"/>
+    <use href="#tree" x="824" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="770" y="679" transform="scale(1.45)"/>
+    <use href="#tree" x="716" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="662" y="678" transform="scale(1.45)"/>
+    <use href="#tree" x="608" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="554" y="678" transform="scale(1.45)"/>
+    <use href="#tree" x="500" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="446" y="678" transform="scale(1.45)"/>
+    <use href="#tree" x="392" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="338" y="678" transform="scale(1.45)"/>
+    <use href="#tree" x="284" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="230" y="678" transform="scale(1.45)"/>
+    <use href="#tree" x="176" y="692" transform="scale(1.45)"/>
+    <use href="#smallTree" x="146" y="676" transform="scale(1.2)"/>
+    <use href="#tree" x="25" y="692" transform="scale(1.4)"/>
+    <!-- Left edge above and below the one entrance gap -->
+    <use href="#tree" x="19" y="45" transform="scale(1.45)"/>
+    <use href="#smallTree" x="34" y="99" transform="scale(1.45)"/>
+    <use href="#tree" x="18" y="153" transform="scale(1.45)"/>
+    <use href="#smallTree" x="34" y="207" transform="scale(1.45)"/>
+    <use href="#tree" x="17" y="261" transform="scale(1.45)"/>
+    <use href="#smallTree" x="34" y="315" transform="scale(1.45)"/>
+    <use href="#tree" x="18" y="369" transform="scale(1.45)"/>
+    <use href="#smallTree" x="34" y="423" transform="scale(1.45)"/>
+    <use href="#tree" x="18" y="477" transform="scale(1.45)"/>
+    <use href="#smallTree" x="35" y="531" transform="scale(1.45)"/>
+    <use href="#tree" x="18" y="576" transform="scale(1.35)"/>
+    <use href="#smallTree" x="17" y="675" transform="scale(1.4)"/>
+  </g>
+
+  <!-- Sparse, irregular trees inside the forest, leaving open ground between them. -->
+  <g opacity=".92">
+    <use href="#tree" x="174" y="155" transform="scale(.9)"/>
+    <use href="#smallTree" x="324" y="112" transform="scale(.8)"/>
+    <use href="#tree" x="527" y="114" transform="scale(.82)"/>
+    <use href="#smallTree" x="761" y="147" transform="scale(.9)"/>
+    <use href="#smallTree" x="121" y="310" transform="scale(.85)"/>
+    <use href="#tree" x="280" y="264" transform="scale(.76)"/>
+    <use href="#smallTree" x="440" y="219" transform="scale(.8)"/>
+    <use href="#tree" x="739" y="258" transform="scale(.82)"/>
+    <use href="#smallTree" x="885" y="250" transform="scale(.9)"/>
+    <use href="#tree" x="152" y="438" transform="scale(.84)"/>
+    <use href="#smallTree" x="352" y="527" transform="scale(.8)"/>
+    <use href="#tree" x="583" y="490" transform="scale(.78)"/>
+    <use href="#smallTree" x="831" y="514" transform="scale(.85)"/>
+    <use href="#tree" x="908" y="407" transform="scale(.83)"/>
+  </g>
+
+  <!-- Ground texture only; all named landmarks are separate transparent sprites. -->
+  <g fill="#b5a779" opacity=".45">
+    <circle cx="235" cy="206" r="2"/><circle cx="407" cy="153" r="2"/>
+    <circle cx="671" cy="184" r="2"/><circle cx="847" cy="348" r="2"/>
+    <circle cx="197" cy="386" r="2"/><circle cx="489" cy="550" r="2"/>
+    <circle cx="733" cy="414" r="2"/><circle cx="900" cy="575" r="2"/>
+  </g>
+</svg>

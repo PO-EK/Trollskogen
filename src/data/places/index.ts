@@ -8,6 +8,7 @@ import { playerHQ } from "../places/playerHQ";
 import { places } from "../places/places";
 import { vardshuset } from "../places/Värdshuset";
 import { mayors } from "../places/mayors";
+import { woodcuttersHut } from "../places/woodcuttersHut";
 
 export const adventures: Record<string, Record<string, AdventureNode>> = {
   intro,
@@ -19,4 +20,5 @@ export const adventures: Record<string, Record<string, AdventureNode>> = {
   places,
   vardshuset,
   mayors,
+  woodcuttersHut,
 };

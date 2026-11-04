@@ -1,9 +1,24 @@
 import type { AdventureNode } from "../adventureTypes";
 
 export const mayors: Record<string, AdventureNode> = {
+  intro: {
+    id: "intro",
+    text: "Borgmästarens hus är ett elegant tvåvåningshus. Det är inte jättestort, men betydligt mer välbyggt än de flesta andra husen i byn, med snidade detaljer kring dörren och en liten veranda. Här finns inga barrikader eller kringstaplade möbler, men fönsterluckorna är stängda och ingenting rör sig utanför. Det enda tecknet på liv är röken som stiger ur skorstenen. Någon verkar vara hemma.",
+    choices: [
+      {
+        text: "Ok",
+        nextNodeId: "start",
+        effects: [
+          { type: "setStoryFlag", flag: "mayors.IntroSeen", value: true },
+          { type: "addExperience", amount: 10 },
+        ],
+      },
+    ],
+  },
+
   start: {
     id: "start",
-    text: "Borgmästarens hus är ett elegant tvåvåningshus. Det är inte jättestort, men betydligt mer välbyggt än de flesta andra husen i byn, med snidade detaljer kring dörren och en liten veranda. Här finns inga barrikader eller kringstaplade möbler, men fönsterluckorna är stängda och ingenting rör sig utanför. Det enda tecknet på liv är röken som stiger ur skorstenen. Någon verkar vara hemma.",
+    text: "Du står framför ytterdörren till borgmästarens eleganta hus.",
     choices: [
       {
         text: "Knacka på.",

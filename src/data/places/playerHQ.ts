@@ -9,7 +9,11 @@ export const playerHQ: Record<string, AdventureNode> = {
         text: "Gå in",
         nextNodeId: "start",
         effects: [
-          { type: "setStoryFlag", flag: "playerHQ.IntroSeen", value: true },
+          {
+            type: "setStoryFlag",
+            flag: "playerHQ.IntroSeen",
+            value: true,
+          },
         ],
       },
     ],

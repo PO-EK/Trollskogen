@@ -8,6 +8,7 @@ import WorldMap from "./pages/WorldMap";
 import Location from "./pages/Location";
 import Trading from "./pages/Trading";
 import Combat from "./pages/Combat";
+import { locations } from "./data/locations";
 import { OVERLAYS } from "./pages/overlays";
 import type { OverlayId } from "./pages/overlays";
 import type { CombatEncounter, CombatResult } from "./game/combatTypes";
@@ -21,8 +22,17 @@ type ActiveCombat = {
   onFinish: (result: CombatResult) => void;
 };
 
+function getLocationMapId(locationId: string): string {
+  const location = locations.find((entry) => entry.id === locationId);
+  if (!location) {
+    throw new Error(`Unknown location "${locationId}".`);
+  }
+  return location.mapId;
+}
+
 function App() {
   const [screen, setScreen] = useState<GameScreen>("worldMap");
+  const [activeMapId, setActiveMapId] = useState("village");
 
   // Disable the browser context menu throughout the app.
   useEffect(() => {
@@ -106,10 +116,14 @@ function App() {
             <div style={{ display: overlay ? "none" : "contents" }}>
               {screen === "worldMap" && (
                 <WorldMap
+                  mapId={activeMapId}
                   onLocationSelect={(locationId) => {
+                    const mapId = getLocationMapId(locationId);
                     setSelectedLocationId(locationId);
+                    setActiveMapId(mapId);
                     setScreen("location");
                   }}
+                  onMapSelect={setActiveMapId}
                 />
               )}
 
@@ -131,7 +145,9 @@ function App() {
                       setScreen("trading");
                     }}
                     onTravelTo={(locationId) => {
+                      const mapId = getLocationMapId(locationId);
                       setSelectedLocationId(locationId);
+                      setActiveMapId(mapId);
                       setScreen("location");
                     }}
                     onStartCombat={(encounter, onFinish) => {

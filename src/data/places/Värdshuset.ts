@@ -1,6 +1,99 @@
 import type { AdventureNode } from "../adventureTypes";
 
 export const vardshuset: Record<string, AdventureNode> = {
+  intro: {
+    id: "intro",
+    text: "På det lilla torget i byns centrum står den gamla brunnen, och bredvid den reser sig byns största byggnad: Värdshuset. Fönstren är igenspikade och porten förstärkt, det ser mer ut som ett fort än ett värdshus. Framför de stora dubbeldörrarna står en vakt med spjut. Du känner igen honom. Det är Lars, Ulfs son, några år yngre än du. Du minns honom från gruppen av barn som lekte tillsammans, även om ni aldrig var nära vänner.",
+    choices: [
+      {
+        text: "Gå fram till Lars.",
+        nextNodeId: "villageLars",
+        effects: [
+          { type: "setStoryFlag", flag: "vardshuset.IntroSeen", value: true },
+        ],
+      },
+    ],
+  },
+
+  villageLars: {
+    id: "villageLars",
+    text: "Lars rätar på sig när du närmar dig, och hans ansikte lyser upp. 'Det är du! Jag såg dig i går natt, hur du fick trollet att vända innan det nådde boskapen. Jag stod bara där med mitt spjut och skakade.' Han skrattar nervöst. 'Du är en hjälte, vet du det? Det är gott att ha dig hemma igen.'",
+    choices: [
+      {
+        text: "Vad är det som händer i byn?",
+        nextNodeId: "villageLarsVillage",
+      },
+      { text: "Vad är det här för ställe nu?", nextNodeId: "villageLarsInn" },
+      { text: "Jag vill hjälpa byn.", nextNodeId: "villageLarsFather" },
+      {
+        text: "Jag vill ha hämnd för mina föräldrar.",
+        nextNodeId: "villageLarsFather",
+      },
+    ],
+  },
+  villageLarsVillage: {
+    id: "villageLarsVillage",
+    text: "Lars blir allvarlig. 'Det har blivit värre för varje natt sedan borgmästaren dödades förra veckan. Ingen leder oss nu. Hans fru Britt har stängt in sig i deras hus och släpper inte in någon. Alla tänker bara på sitt eget, och folk ser på varandra som om grannen vore nästa hot.' Han ser ned på sitt spjut. 'Jag vet inte hur länge vi håller så här.'",
+    choices: [{ text: "Tillbaka.", nextNodeId: "villageLars" }],
+  },
+  villageLarsInn: {
+    id: "villageLarsInn",
+    text: "'Värdshuset är sjukhus och skyddsrum nu,' säger Lars och nickar mot dörren bakom sig. 'De som blivit utan hus bor här, och de skadade ligger inne i matsalen. Vi har barrikerat så gott vi kan. Det är det enda stället i byn som känns någorlunda tryggt.'",
+    choices: [{ text: "Tillbaka.", nextNodeId: "villageLars" }],
+  },
+  villageLarsFather: {
+    id: "villageLarsFather",
+    text: "Lars tänker en stund och rynkar pannan. 'Om du menar allvar, så borde du prata med min far. Han känner alla här och vet mer än han låter på.' Han tvekar. 'Pappa har alltid varit för snäll och givmild för sitt eget bästa. Folk ber honom om saker, och han säger aldrig nej. Jag är rädd att de tar för sig av honom tills inget är kvar.' Han vänder sig om, lyfter tillbaka slåen och öppnar dörren. 'Gå in. Och tack för att du är här.'",
+    choices: [{ text: "Gå in i Värdshuset.", nextNodeId: "villageInside" }],
+  },
+  villageInside: {
+    id: "villageInside",
+    text: "Inne är det varmt och luktar av örtsalvor och rök. Borden och stolarna har flyttats undan eller byggts om till sjuksängar. Längs väggarna ligger skadade bybor med bandage, och deras nära och kära sitter vid deras sida med fuktiga trasor. Någon stönar, någon viskar. En äldre kvinna med grått hår uppsatt i en knut får syn på dig och kommer fram. 'Behöver du hjälp, käraste? Är du skadad?'",
+    choices: [{ text: "Jag letar efter Ulf.", nextNodeId: "villageMarie" }],
+  },
+  villageMarie: {
+    id: "villageMarie",
+    text: "'Ulf? Min man står bakom baren och räknar tunnor som om det skulle få dem att räcka längre.' Hon ler trött. 'Jag är Marie, förresten. Säg till om du behöver något.'",
+    choices: [{ text: "Gå fram till baren.", nextNodeId: "villageUlf" }],
+  },
+  villageUlf: {
+    id: "villageUlf",
+    text: "Bakom baren står en gammal man med vitt skägg och går igenom rader av tunnor och säckar, en penna bakom örat. Han ser upp när du närmar dig och lägger ned pennan. Du presenterar dig, och Ulf ler brett. 'Jag vet vem du är. Du är från gården vid skogsbrynet. Jag hörde att det första du gjorde när du kom hem från kriget var att skrämma bort ett stort troll som var på väg att äta upp byns boskap.' Han skakar din hand med båda sina. 'Gudarna vare tack att du är här. Vi behöver hjälp, och det är ingen skam att erkänna det.'",
+    choices: [{ text: "Hur ser läget ut?", nextNodeId: "villageUlfSituation" }],
+  },
+  villageUlfSituation: {
+    id: "villageUlfSituation",
+    text: "'Värre än du kan se.' Ulf lutar sig mot baren och sänker rösten. 'Monstren kommer från Trollskogen nästan varje natt nu. De tar boskap, bränner ladugårdar och dödar den som står i vägen. Borgmästaren försökte organisera en vakt och blev dödad för en vecka sedan. Sedan dess har ingen vågat ta ledningen.' Han suckar. 'Vi har fyllt värdshuset med skadade och hemlösa, men maten tar slut, och medicinerna med.' Han tvekar. 'En sak till. Utanför byn bor en häxa. Trollen och monstren vågar sig aldrig nära hennes lilla stuga, så hon klarar sig nog.'",
+    choices: [{ text: "En häxa?", nextNodeId: "villageUlfWitch" }],
+  },
+  villageUlfWitch: {
+    id: "villageUlfWitch",
+    text: "'Många här tror att hon ligger bakom allt det här,' säger Ulf och skakar på huvudet. 'Men jag vet bättre. När Marie blev sjuk för många år sedan, så sjuk att ingen trodde hon skulle klara sig, var det häxan som kom med örter och botade henne. Hon tog knappt betalt.' Hans blick mjuknar. 'Folk är rädda och behöver någon att skylla på. Jag säger inte att du ska lita på henne. Bara att jag har skäl att inte döma henne.'",
+    choices: [
+      {
+        text: "Jag ska hålla det i minnet.",
+        nextNodeId: "villageIntroEnd",
+        effects: [
+          { type: "setStoryFlag", flag: "village.heardOfWitch", value: true },
+        ],
+      },
+    ],
+  },
+  villageIntroEnd: {
+    id: "villageIntroEnd",
+    text: "Ulf klappar dig på axeln. 'Värdshuset står öppet för dig, när du än behöver det. Vi har inte mycket, men det du behöver ska du få så långt det räcker.'",
+    choices: [
+      {
+        text: "Tack, Ulf.",
+        effects: [
+          { type: "setStoryFlag", flag: "village.introDone", value: true },
+          { type: "endAdventure" },
+          { type: "addExperience", amount: 42 },
+        ],
+      },
+    ],
+  },
+
   start: {
     id: "start",
     text: "Värdshuset är fyllt av värme och doften av örtsalvor och rök. Sjuksängar står där borden brukade vara, men bakom baren och bland sängarna hittar du ansikten du känner.",
@@ -9,6 +102,7 @@ export const vardshuset: Record<string, AdventureNode> = {
         text: "Prata med Ulf.",
         nextNodeId: "ulfStart",
       },
+
       {
         text: "Prata med Marie.",
         nextNodeId: "marieStart",
@@ -118,7 +212,6 @@ export const vardshuset: Record<string, AdventureNode> = {
         nextNodeId: "start",
         effects: [
           { type: "setStoryFlag", flag: "newleader.started", value: true },
-          { type: "unlockLocation", locationId: "mayors" },
         ],
       },
     ],
@@ -138,8 +231,63 @@ export const vardshuset: Record<string, AdventureNode> = {
         },
       },
       {
+        text: "Nattvakten: Spjuten är klara. Smeden har dem.",
+        nextNodeId: "larsSpears",
+        condition: {
+          type: "storyFlag",
+          flag: "nattvakten.reportLars",
+          value: true,
+        },
+      },
+      {
         text: "Tillbaka.",
         nextNodeId: "start",
+      },
+    ],
+  },
+  larsSpears: {
+    id: "larsSpears",
+    text: "Lars stirrar på dig, och sedan sprider sig ett brett leende över hans ansikte. 'Redan? Tio spjut? Av gjutjärn?' Han skrattar förtjust och slår ihop händerna. 'Du anar inte vad det här betyder. Jag kan äntligen lova folk riktiga vapen! Det blir mycket lättare att få byborna att ställa upp när de vet att de inte går ut med tomma händer.' Han skakar på huvudet. 'Jag visste inte att det skulle gå så fort. Du är otrolig.'",
+    choices: [
+      {
+        text: "Och du blir kapten över nattvakten.",
+        nextNodeId: "larsCaptain",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "nattvakten.spearsDelivered",
+            value: true,
+          },
+          { type: "addGold", amount: 100 },
+          { type: "addExperience", amount: 100 },
+          { type: "spawnLoot", itemId: "lars_steel_spear" },
+        ],
+      },
+    ],
+  },
+
+  larsCaptain: {
+    id: "larsCaptain",
+    text: "Lars stannar mitt i en rörelse. 'Kapten?' Han blinkar och kan inte hålla tillbaka ett leende. 'Kapten Lars.' Han kliar sig i nacken och försöker se oberörd ut, men ögonen glittrar, och han måste rätta till sin hållning två gånger. 'Jag har aldrig... tack. Verkligen. Det betyder mer än du tror.' Han rotar i fickan och trycker en tung påse i din hand. 'Här, 100 Kroner. Det är allt jag har sparat. Och ta det här.' Han räcker dig sitt gamla spjut. 'Jag behöver det inte längre. Jag ska ha ett nytt, ett av de riktiga.'",
+    choices: [
+      {
+        text: "Tack, Kapten Lars.",
+        nextNodeId: "larsLeaves",
+      },
+    ],
+  },
+
+  larsLeaves: {
+    id: "larsLeaves",
+    text: "Lars rätar på sig och nickar allvarligt, som en riktig kapten. Sedan börjar han gå mot dörren, med rak rygg och huvudet högt, på väg mot smedjan för att ta en titt på sina nya spjut. Mitt på vägen tappar han fattningen och ler åt sig själv, och för ett ögonblick ser han ut som den pojke du minns från leken på torget.",
+    choices: [
+      {
+        text: "Uppdrag klart.",
+        nextNodeId: "start",
+        effects: [
+          { type: "setStoryFlag", flag: "nattvakten.complete", value: true },
+          { type: "setStoryFlag", flag: "nattvakten.reportLars", value: false },
+        ],
       },
     ],
   },

@@ -69,7 +69,7 @@ export const enemies = {
     skills: ["bandit_slash", "bandit_stab"],
     resistances: { ...neutralResistances },
     isBoss: false,
-    exp: 64,
+    exp: 44,
     gold: 14,
     loot: [],
   },
@@ -85,9 +85,9 @@ export const enemies = {
     skills: ["stab_quick"],
     resistances: { ...neutralResistances, slashing: 1.2 },
     isBoss: false,
-    exp: 35,
+    exp: 65,
     gold: 80,
-    loot: [drop("wood_torch", 0.3)],
+    loot: [drop("health_potion", 0.5)],
   },
 
   mercenary: {
@@ -145,7 +145,7 @@ export const enemies = {
     isBoss: false,
     exp: 42,
     gold: 6,
-    loot: [drop("leather", 0.4)],
+    loot: [],
   },
 
   wolverine: {

@@ -99,6 +99,23 @@ export const skills: Skill[] = [
     ],
   },
   {
+    id: "lars_stab",
+    name: "Genomborrande Hugg",
+    description: "En snabb stöt med vapnet.",
+    target: "enemy",
+    damageType: "piercing",
+    damage: { kind: "weapon", multiplier: 1.6 },
+    effects: [
+      {
+        type: "bleed",
+        damage: 2,
+        percentOfDamage: 20,
+        chance: 60,
+        maxStacks: 10,
+      },
+    ],
+  },
+  {
     id: "stab_hard",
     name: "Hårt stick",
     description: "En kraftig stöt som tränger djupt.",

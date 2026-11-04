@@ -100,6 +100,26 @@ export const weapons: WeaponItem[] = [
     skills: ["stab_quick", "stab_hard", "staff_block"],
   },
   {
+    id: "lars_steel_spear",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Kapten Lars Spjut",
+    description:
+      "Lars trogna spjut, gjort av stål och mycket väl omhändertaget.",
+    image: ironSpearImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+      { x: 0, y: 3 },
+    ],
+    baseValue: 55,
+    minDamage: 14,
+    maxDamage: 24,
+    stat: "Dex",
+    skills: ["lars_stab", "stab_hard", "staff_block"],
+  },
+  {
     id: "wood_torch",
     category: "weapon",
     slot: "offHand",
