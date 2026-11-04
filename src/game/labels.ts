@@ -5,6 +5,7 @@ import type { StatusKind } from "../data/skillTypes";
 export const CURE_LABELS: Record<StatusKind, string> = {
   burn: "branden",
   bleed: "blödningen",
+  healOverTime: "läkningen över tid",
   stun: "bedövningen",
   guard: "skyddet",
   evade: "undvikandet",
@@ -26,6 +27,7 @@ export const DAMAGE_TYPE_LABELS: Record<DamageType, string> = {
   piercing: "Stickande",
   crushing: "Krossande",
   fire: "Eld",
+  electric: "Blixt",
   dark: "Mörk",
   light: "Helig",
 };

@@ -1,24 +1,38 @@
 import type { AdventureNode } from "../adventureTypes";
 
 export const playerHQ: Record<string, AdventureNode> = {
+  intro: {
+    id: "intro",
+    text: "Det här är din lilla stuga: ett enda rum, men mysigt och utrustat med allt du behöver. Här finns en spis, en säng och en låst kista.",
+    choices: [
+      {
+        text: "Gå in",
+        nextNodeId: "start",
+        effects: [
+          { type: "setStoryFlag", flag: "playerHQ.IntroSeen", value: true },
+        ],
+      },
+    ],
+  },
+
   start: {
     id: "start",
-
-    text: "Din lilla stuga. Det är inte lyxigt men det duger för dem som är van att sova i skogen.",
+    text: "Du står i din stuga.",
 
     choices: [
       {
-        text: "Öppna din kista",
-        nextNodeId: "storageChest",
-        effects: [{ type: "openStorage" }],
-      },
-      {
-        text: "Använd arbetsbänken.",
-        nextNodeId: "workbench",
-      },
-      {
         text: "Gå till sängs.",
         nextNodeId: "inBed",
+      },
+      {
+        text: "Undersök den låsta kistan",
+        nextNodeId: "storageChest",
+        condition: { type: "storyFlag", flag: "unlockedStorage", value: false },
+      },
+      {
+        text: "Öppna kistan",
+        condition: { type: "storyFlag", flag: "unlockedStorage", value: true },
+        effects: [{ type: "openStorage" }],
       },
       {
         text: "Lämna stugan",
@@ -33,19 +47,41 @@ export const playerHQ: Record<string, AdventureNode> = {
 
   storageChest: {
     id: "storageChest",
-    text: "Kistan är gjord av trä men bunden med tjock metal, den ser väldigt tung och säker ut. Här kan du förvara saker du till spara, utan rädsla att det ska försvinna.",
+    text: "Kistan är av trä, förstärkt med tjocka metallband. Den ser tung och säker ut, men låset håller den stängd. Du behöver hitta en nyckel.",
     choices: [
       {
-        text: "Tillbaka",
+        text: "Börja leta efter nyckeln",
+        condition: {
+          type: "storyFlag",
+          flag: "openStorageQuest.Started",
+          value: false,
+        },
         nextNodeId: "start",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "openStorageQuest.Started",
+            value: true,
+          },
+        ],
       },
-    ],
-  },
-
-  workbench: {
-    id: "workbench",
-    text: "Du sätter dig vid snickarbänken. Den som bodde här för måste ha tagit väl hand om den. Här kan du skapa föremål eller bearbeta matrial.",
-    choices: [
+      {
+        text: "Använd nyckeln",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "openStorageQuest.Started",
+            value: true,
+          },
+          { type: "hasItem", itemId: "storageKey" },
+        ],
+        nextNodeId: "start",
+        effects: [
+          { type: "removeItem", itemId: "storageKey" },
+          { type: "setStoryFlag", flag: "unlockedStorage", value: true },
+          { type: "openStorage" },
+        ],
+      },
       {
         text: "Tillbaka",
         nextNodeId: "start",

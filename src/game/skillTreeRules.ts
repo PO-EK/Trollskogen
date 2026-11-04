@@ -24,7 +24,7 @@ export function getNodeState(player: Player, node: TreeNode): NodeState {
 export function canLearn(player: Player, node: TreeNode): boolean {
   return (
     getNodeState(player, node) === "available" &&
-    player.SkillPoints >= node.cost
+    player.SkillPoints >= (node.cost ?? 1)
   );
 }
 
@@ -46,7 +46,7 @@ export function learnNode(player: Player, node: TreeNode): Player {
 
   const next: Player = {
     ...player,
-    SkillPoints: player.SkillPoints - node.cost,
+    SkillPoints: player.SkillPoints - (node.cost ?? 1),
     LearnedNodes: [...player.LearnedNodes, node.id],
   };
 

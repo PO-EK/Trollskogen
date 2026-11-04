@@ -1,6 +1,72 @@
 import type { ContainerItem } from "../data/containerItems";
 import type { Player } from "../data/player";
+import type { Trader, TraderInventoryItem } from "../data/traders/tradersTypes";
 import { items } from "../data/items";
+
+type AddItemToContainerOptions<Metadata extends object> = {
+  idPrefix: string;
+  metadata: Metadata;
+  containerItemId?: string;
+  occupiedIds?: string[];
+};
+
+export function addItemToContainer<Metadata extends object>(
+  inventory: Array<ContainerItem & Metadata>,
+  itemId: string,
+  width: number,
+  height: number,
+  {
+    idPrefix,
+    metadata,
+    containerItemId,
+    occupiedIds = [],
+  }: AddItemToContainerOptions<Metadata>,
+): Array<ContainerItem & Metadata> {
+  if (!items.some((item) => item.id === itemId)) {
+    throw new Error(`Cannot add unknown item "${itemId}" to a container.`);
+  }
+
+  const existingIds = new Set([
+    ...inventory.map((item) => item.containerItemId),
+    ...occupiedIds,
+  ]);
+  let newContainerItemId = containerItemId;
+
+  if (newContainerItemId) {
+    if (existingIds.has(newContainerItemId)) {
+      throw new Error(`Duplicate container item id "${newContainerItemId}".`);
+    }
+  } else {
+    let suffix = 1;
+    newContainerItemId = `${idPrefix}-${suffix}`;
+
+    while (existingIds.has(newContainerItemId)) {
+      suffix += 1;
+      newContainerItemId = `${idPrefix}-${suffix}`;
+    }
+  }
+
+  const position = findFirstAvailableItemPosition(
+    itemId,
+    inventory,
+    width,
+    height,
+  );
+
+  if (!position) {
+    throw new Error(`No space available for item "${itemId}".`);
+  }
+
+  return [
+    ...inventory,
+    {
+      ...metadata,
+      containerItemId: newContainerItemId,
+      itemId,
+      ...position,
+    },
+  ];
+}
 
 export function findFirstAvailableItemPosition(
   itemId: string,
@@ -50,24 +116,14 @@ export function findFirstAvailableItemPosition(
   return null;
 }
 
-function createContainerItemId(player: Player, itemId: string): string {
-  const occupiedIds = new Set([
+function getPlayerContainerItemIds(player: Player): string[] {
+  return [
     ...player.Inventory.map((item) => item.containerItemId),
     ...player.Storage.map((item) => item.containerItemId),
     ...Object.values(player.Equipment).flatMap((item) =>
       item ? [item.containerItemId] : [],
     ),
-  ]);
-
-  let suffix = 1;
-  let containerItemId = `${itemId}-${suffix}`;
-
-  while (occupiedIds.has(containerItemId)) {
-    suffix += 1;
-    containerItemId = `${itemId}-${suffix}`;
-  }
-
-  return containerItemId;
+  ];
 }
 
 export function addItemToInventory(
@@ -79,19 +135,9 @@ export function addItemToInventory(
     throw new Error(`Cannot add unknown item "${itemId}" to the player.`);
   }
 
-  const newContainerItemId =
-    containerItemId ?? createContainerItemId(player, itemId);
-
-  const existingIds = [
-    ...player.Inventory,
-    ...player.Storage,
-    ...Object.values(player.Equipment).filter(
-      (item): item is ContainerItem => item !== undefined,
-    ),
-  ].map((item) => item.containerItemId);
-
-  if (existingIds.includes(newContainerItemId)) {
-    throw new Error(`Duplicate container item id "${newContainerItemId}".`);
+  const occupiedIds = getPlayerContainerItemIds(player);
+  if (containerItemId && occupiedIds.includes(containerItemId)) {
+    throw new Error(`Duplicate container item id "${containerItemId}".`);
   }
 
   const backpackPosition = findFirstAvailableItemPosition(
@@ -104,14 +150,23 @@ export function addItemToInventory(
   if (backpackPosition) {
     return {
       ...player,
-      Inventory: [
-        ...player.Inventory,
+      Inventory: addItemToContainer(
+        player.Inventory,
+        itemId,
+        player.BackpackWidth,
+        player.BackpackHeight,
         {
-          containerItemId: newContainerItemId,
-          itemId,
-          ...backpackPosition,
+          idPrefix: itemId,
+          metadata: {},
+          containerItemId,
+          occupiedIds: [
+            ...player.Storage.map((item) => item.containerItemId),
+            ...Object.values(player.Equipment).flatMap((item) =>
+              item ? [item.containerItemId] : [],
+            ),
+          ],
         },
-      ],
+      ),
     };
   }
 
@@ -123,18 +178,64 @@ export function addItemToInventory(
   );
 
   if (storagePosition) {
-    return {
-      ...player,
-      Storage: [
-        ...player.Storage,
-        {
-          containerItemId: newContainerItemId,
-          itemId,
-          ...storagePosition,
-        },
-      ],
-    };
+    return addItemToStorage(player, itemId, containerItemId);
   }
 
   throw new Error(`No space available for item "${itemId}".`);
+}
+
+export function addItemToStorage(
+  player: Player,
+  itemId: string,
+  containerItemId?: string,
+): Player {
+  return {
+    ...player,
+    Storage: addItemToContainer(
+      player.Storage,
+      itemId,
+      player.StorageWidth,
+      player.StorageHeight,
+      {
+        idPrefix: itemId,
+        metadata: {},
+        containerItemId,
+        occupiedIds: [
+          ...player.Inventory.map((item) => item.containerItemId),
+          ...Object.values(player.Equipment).flatMap((item) =>
+            item ? [item.containerItemId] : [],
+          ),
+        ],
+      },
+    ),
+  };
+}
+
+export function addItemToTraderInventory(
+  trader: Trader,
+  itemId: string,
+): Trader {
+  const definition = items.find((item) => item.id === itemId);
+
+  if (!definition) {
+    throw new Error(
+      `Cannot add unknown item "${itemId}" to trader "${trader.id}".`,
+    );
+  }
+  if (!Number.isFinite(trader.markup) || trader.markup < 0) {
+    throw new Error(`Invalid markup for trader "${trader.id}".`);
+  }
+
+  const inventory: TraderInventoryItem[] = addItemToContainer(
+    trader.inventory,
+    itemId,
+    trader.inventoryWidth,
+    trader.inventoryHeight,
+    {
+      idPrefix: `${trader.id}-${itemId}`,
+      metadata: { buyPrice: Math.round(definition.baseValue * trader.markup) },
+    },
+  );
+
+  return { ...trader, inventory };
 }

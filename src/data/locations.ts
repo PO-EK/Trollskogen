@@ -36,7 +36,7 @@ export const locations: MapLocation[] = [
     id: "mayors",
     name: "Borgmästaren",
     x: 30,
-    y: 25,
+    y: 15,
     icon: "🏘️",
     adventureId: "mayors",
   },

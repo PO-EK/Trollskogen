@@ -5,6 +5,7 @@ export type DamageType =
   | "piercing"
   | "crushing"
   | "fire"
+  | "electric"
   | "dark"
   | "light";
 // Derived from a skill's damage, never stored: weapon skills scale off the
@@ -12,7 +13,7 @@ export type DamageType =
 export type SkillGroup = "weapon" | "spell" | "support";
 export type SkillDamage =
   // Rolls the equipped weapon's damage and multiplies it.
-  | { kind: "weapon"; multiplier: number }
+  | { kind: "weapon"; multiplier: number; stat?: WeaponStat }
   // Own damage range, scaled by a player stat (spells).
   | { kind: "spell"; min: number; max: number; stat: WeaponStat };
 
@@ -24,11 +25,12 @@ export type StatusKind =
   | "evade"
   | "burn"
   | "bleed"
+  | "healOverTime"
   | "stun"
   | "weak"
   | "offguard";
 
-// Every chance is a percentage from 0 to 100. Omit it for guaranteed effects.
+// Proc chances are percentages from 0 to 100; omit for guaranteed effects.
 type EffectChance = { chance?: number };
 
 export type SkillEffect = EffectChance &
@@ -40,21 +42,31 @@ export type SkillEffect = EffectChance &
         turns: number;
       }
     | { type: "heal"; amount?: number; percentOfMax?: number }
+    | { type: "lifesteal"; percentOfDamage: number }
     | { type: "restoreMana"; amount?: number; percentOfMax?: number }
     | { type: "cure"; statuses: StatusKind[] }
     | { type: "damageMod"; percent: number; turns: number }
     | { type: "guard"; percent: number; turns: number }
+    // Evade's chance is the probability of avoiding an incoming attack.
     | { type: "evade"; chance: number; turns: number }
     // damage is per layer; maxStacks > 1 lets repeated hits stack
     | {
         type: "burn";
         damage: number;
+        percentOfDamage?: number;
         turns?: number | null;
         maxStacks?: number;
       }
     | {
         type: "bleed";
         damage: number;
+        percentOfDamage?: number;
+        turns?: number | null;
+        maxStacks?: number;
+      }
+    | {
+        type: "healOverTime";
+        amount: number;
         turns?: number | null;
         maxStacks?: number;
       }

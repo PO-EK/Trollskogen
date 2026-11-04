@@ -103,7 +103,7 @@ export const ruins: Record<string, AdventureNode> = {
         effects: [
           {
             type: "spawnLoot",
-            itemId: "old_axe",
+            itemId: "dads_axe",
           },
           {
             type: "setStoryFlag",

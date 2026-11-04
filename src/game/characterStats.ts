@@ -10,12 +10,14 @@ import {
   MANA_BONUS_PER_INT_POINT,
   MANA_PER_INT_POINT,
   MANA_PER_LEVEL,
+  getDodgeChance,
 } from "./balance";
 import { getStatMultiplier } from "./weaponDamage";
 
 export type CharacterStats = {
   attack: number;
   defense: number;
+  dodgeChance: number;
   maxHP: number;
   maxMana: number;
   weaponName: string | null;
@@ -90,26 +92,22 @@ export function getAttack(player: Player): number {
 
 export function getMaxHP(player: Player): number {
   const flat = HP_PER_CON_POINT * player.Con;
-
-  const multiplier = Math.max(
-    0,
-    1 + HP_BONUS_PER_CON_POINT * (player.Con - BASELINE_STAT),
+  const excess = Math.max(0, player.Con - BASELINE_STAT);
+  const attributeHP = Math.max(
+    1,
+    Math.ceil(flat + HP_BONUS_PER_CON_POINT * excess ** 2),
   );
-
-  const attributeHP = Math.max(1, Math.ceil(flat * multiplier));
 
   return attributeHP + (player.Level - 1) * HP_PER_LEVEL;
 }
 
 export function getMaxMana(player: Player): number {
   const flat = MANA_PER_INT_POINT * player.Int;
-
-  const multiplier = Math.max(
-    0,
-    1 + MANA_BONUS_PER_INT_POINT * (player.Int - BASELINE_STAT),
+  const excess = Math.max(0, player.Int - BASELINE_STAT);
+  const attributeMana = Math.max(
+    1,
+    Math.ceil(flat + MANA_BONUS_PER_INT_POINT * excess ** 2),
   );
-
-  const attributeMana = Math.max(1, Math.ceil(flat * multiplier));
 
   return attributeMana + (player.Level - 1) * MANA_PER_LEVEL;
 }
@@ -118,6 +116,7 @@ export function getCharacterStats(player: Player): CharacterStats {
   return {
     attack: getAttack(player),
     defense: getDefense(player),
+    dodgeChance: player.DodgeChance,
     maxHP: getMaxHP(player),
     maxMana: getMaxMana(player),
     weaponName: getEquippedWeapon(player)?.name ?? null,
@@ -130,6 +129,7 @@ export function recalculatePlayerStats(player: Player): Player {
 
   return {
     ...player,
+    DodgeChance: getDodgeChance(player.Dex),
     HPMax: maxHP,
     ManaMax: maxMana,
     HP: Math.min(player.HP, maxHP),

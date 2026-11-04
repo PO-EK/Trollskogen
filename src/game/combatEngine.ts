@@ -5,11 +5,8 @@ import type { Skill } from "../data/skillTypes";
 import { getSkill } from "../data/skills";
 import { rollSkillDamage } from "./battleSkills";
 import {
-  BASE_DODGE,
-  BASELINE_STAT,
   DEFENSE_HALF_POINT,
-  DODGE_HALF_POINT,
-  MAX_DODGE,
+  getDodgeChance,
 } from "./balance";
 import { getDefense, getEquippedWeapon, getMaxHP } from "./characterStats";
 import type {
@@ -28,6 +25,7 @@ import {
 import type { Status, Vitals } from "./effects";
 
 export type { Status } from "./effects";
+export { getDodgeChance };
 
 // ---------------------------------------------------------------------
 // Types
@@ -66,15 +64,6 @@ type Action =
 // ---------------------------------------------------------------------
 // Math
 // ---------------------------------------------------------------------
-
-export function getDodgeChance(dex: number): number {
-  const points = Math.max(0, dex - BASELINE_STAT);
-
-  return (
-    BASE_DODGE +
-    (MAX_DODGE - BASE_DODGE) * (points / (points + DODGE_HALF_POINT))
-  );
-}
 
 export function getDefenseReduction(defense: number): number {
   return defense / (defense + DEFENSE_HALF_POINT);
@@ -141,6 +130,8 @@ function getEffectivePlayer(player: Player, statuses: Status[]): Player {
     }
   }
 
+  effective.DodgeChance = getDodgeChance(effective.Dex);
+
   return effective;
 }
 
@@ -149,9 +140,15 @@ function tickFighter(
   fighter: Fighter,
   side: Side,
   ctx: CombatContext,
-): { fighter: Fighter; burnDamage: number; bleedDamage: number } {
+): {
+  fighter: Fighter;
+  burnDamage: number;
+  bleedDamage: number;
+  healing: number;
+} {
   let burnDamage = 0;
   let bleedDamage = 0;
+  let healing = 0;
   const statuses: Status[] = [];
 
   for (const status of fighter.statuses) {
@@ -173,6 +170,10 @@ function tickFighter(
       bleedDamage += status.damage * status.stacks;
     }
 
+    if (status.kind === "healOverTime") {
+      healing += status.amount * status.stacks;
+    }
+
     if (status.turnsLeft == null) {
       statuses.push(status);
     } else if (status.turnsLeft > 1) {
@@ -183,11 +184,16 @@ function tickFighter(
   return {
     fighter: {
       ...fighter,
-      hp: fighter.hp - burnDamage - bleedDamage,
+      hp:
+        fighter.hp -
+        burnDamage -
+        bleedDamage +
+        Math.min(healing, Math.max(0, fighter.maxHp - fighter.hp)),
       statuses,
     },
     burnDamage,
     bleedDamage,
+    healing: Math.min(healing, Math.max(0, fighter.maxHp - fighter.hp)),
   };
 }
 
@@ -281,7 +287,10 @@ function rollEnemyHit(
 // One action: hit -> tick the other side -> own countdown -> new
 // statuses -> ONE death check
 // ---------------------------------------------------------------------
-function getStacks(fighter: Fighter, kind: "burn" | "bleed"): number {
+function getStacks(
+  fighter: Fighter,
+  kind: "burn" | "bleed" | "healOverTime",
+): number {
   const status = fighter.statuses.find((candidate) => candidate.kind === kind);
 
   return status && isStackable(status) ? status.stacks : 0;
@@ -322,6 +331,7 @@ function performAction(
 
   // 1. The action itself
   let missed = false;
+  let damageDealt = 0;
 
   if (action.kind === "skip") {
     say(
@@ -345,7 +355,7 @@ function performAction(
     if (targetsOpponent) {
       const dodge =
         defender === "player"
-          ? getDodgeChance(getEffectivePlayer(ctx.player, target.statuses).Dex)
+          ? getEffectivePlayer(ctx.player, target.statuses).DodgeChance
           : 0;
 
       missed = random() < getAvoidChance(dodge, target.statuses);
@@ -362,6 +372,7 @@ function performAction(
             ? rollPlayerHit(skill, attacker, target, ctx, random)
             : rollEnemyHit(skill, attacker, target, ctx, random);
 
+        damageDealt = damage;
         target = { ...target, hp: target.hp - damage };
         say(
           actor === "player"
@@ -394,6 +405,13 @@ function performAction(
     );
   }
 
+  if (tick.healing > 0) {
+    say(
+      `${subject(defender)} återfår ${tick.healing} hälsa från läkningen över tid.`,
+      "info",
+    );
+  }
+
   // 3. The actor's own damage buffs count down, but only after attacking
   if (action.kind === "skill" || action.kind === "basic") {
     attacker = tickOwnClock(attacker);
@@ -401,56 +419,90 @@ function performAction(
 
   // 4. New statuses and healing from the skill, applied after the tick.
   // Each effect rolls its own chance.
-  if (skill?.effects && !missed && target.hp > 0) {
+  if (skill?.effects && !missed) {
     const recipientSide: Side = skill.target === "self" ? actor : defender;
     const who = subject(recipientSide);
-
-    const applied = applyEffects(
-      recipientSide === actor ? attacker : target,
-      skill.effects,
-      random,
+    const lifestealEffects = skill.effects.filter(
+      (effect) => effect.type === "lifesteal",
+    );
+    const targetEffects = skill.effects.filter(
+      (effect) => effect.type !== "lifesteal",
     );
 
-    if (recipientSide === actor) {
-      attacker = applied.fighter;
-    } else {
-      target = applied.fighter;
-    }
+    if (lifestealEffects.length > 0) {
+      const leech = applyEffects(
+        attacker,
+        lifestealEffects,
+        random,
+        damageDealt,
+      );
+      attacker = leech.fighter;
 
-    for (const effect of applied.applied) {
-      if (effect.type === "burn") {
-        const stacks = getStacks(applied.fighter, "burn");
-
-        say(
-          stacks > 1
-            ? `${who} brinner värre! (${stacks} lager)`
-            : `${who} fattar eld!`,
-          "info",
-        );
-      }
-
-      if (effect.type === "bleed") {
-        const stacks = getStacks(applied.fighter, "bleed");
-
-        say(
-          stacks > 1
-            ? `${who} blöder värre! (${stacks} lager)`
-            : `${who} börjar blöda!`,
-          "info",
-        );
-      }
-
-      if (effect.type === "stun") {
-        say(`${who} bedövas!`, "info");
+      if (leech.healed > 0) {
+        say(`${subject(actor)} dränerar ${leech.healed} hälsa.`, "info");
       }
     }
 
-    if (applied.healed > 0) {
-      say(`${who} återfår ${applied.healed} hälsa.`, "info");
-    }
+    if (targetEffects.length > 0 && target.hp > 0) {
+      const applied = applyEffects(
+        recipientSide === actor ? attacker : target,
+        targetEffects,
+        random,
+        damageDealt,
+      );
 
-    if (applied.manaRestored > 0) {
-      say(`${who} återfår ${applied.manaRestored} magi.`, "info");
+      if (recipientSide === actor) {
+        attacker = applied.fighter;
+      } else {
+        target = applied.fighter;
+      }
+
+      for (const effect of applied.applied) {
+        if (effect.type === "burn") {
+          const stacks = getStacks(applied.fighter, "burn");
+
+          say(
+            stacks > 1
+              ? `${who} brinner värre! (${stacks} lager)`
+              : `${who} fattar eld!`,
+            "info",
+          );
+        }
+
+        if (effect.type === "bleed") {
+          const stacks = getStacks(applied.fighter, "bleed");
+
+          say(
+            stacks > 1
+              ? `${who} blöder värre! (${stacks} lager)`
+              : `${who} börjar blöda!`,
+            "info",
+          );
+        }
+
+        if (effect.type === "healOverTime") {
+          const stacks = getStacks(applied.fighter, "healOverTime");
+
+          say(
+            stacks > 1
+              ? `${who} får starkare läkning! (${stacks} lager)`
+              : `${who} börjar läka över tid.`,
+            "info",
+          );
+        }
+
+        if (effect.type === "stun") {
+          say(`${who} bedövas!`, "info");
+        }
+      }
+
+      if (applied.healed > 0) {
+        say(`${who} återfår ${applied.healed} hälsa.`, "info");
+      }
+
+      if (applied.manaRestored > 0) {
+        say(`${who} återfår ${applied.manaRestored} magi.`, "info");
+      }
     }
   }
 

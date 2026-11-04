@@ -390,10 +390,9 @@ function performSell({
    * When the trader receives the item, it becomes a
    * TraderInventoryItem.
    *
-   * The trader's future asking price is 25% above
-   * the item's base value.
+   * Its asking price uses this trader's markup.
    */
-  const buyPrice = Math.round(itemDefinition.baseValue * 1.25);
+  const buyPrice = Math.round(itemDefinition.baseValue * trader.markup);
 
   const traderItem: TraderInventoryItem = {
     containerItemId: playerItem.containerItemId,

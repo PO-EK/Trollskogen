@@ -42,7 +42,7 @@ export const places: Record<string, AdventureNode> = {
           {
             type: "startCombat",
             enemyId: "bandit",
-            extraLoot: [drop("health_potion")],
+            extraLoot: [],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
           },
@@ -70,7 +70,7 @@ export const places: Record<string, AdventureNode> = {
           {
             type: "startCombat",
             enemyId: "mercenary",
-            extraLoot: [drop("battle_axe")],
+            extraLoot: [drop("health_potion")],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
           },
@@ -129,7 +129,7 @@ export const places: Record<string, AdventureNode> = {
           {
             type: "startCombat",
             enemyId: "wolf",
-            extraLoot: [drop("cloth")],
+            extraLoot: [],
             winNodeId: "fightWon",
             loseNodeId: "fightLost",
           },

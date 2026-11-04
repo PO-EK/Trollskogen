@@ -23,7 +23,7 @@ export type TreeNode = {
   bonuses?: AttributeBonus[]; // everything the node gives
   skillId?: string;
   requires: TreeNode[]; // needs ANY ONE of these first. None = a starting node
-  cost: number; // skill points
+  cost: number | null; // skill points
 };
 
 export const SKILL_TREE_TREES: SkillTreeDefinition[] = [];
@@ -37,7 +37,7 @@ type NodeDef<Id extends string> = {
   requires?: NoInfer<Id>[]; // needs ANY ONE of these first. Leave out = a starting node
   skill?: string; // teaches this skill
   attributes?: Partial<Record<AttributeName, number>>; // e.g. { Str: 1, Con: 1 }
-  cost?: number; // skill points, default 1
+  cost?: number | null; // skill points, default 1
 };
 
 function tree<Id extends string>(
@@ -139,21 +139,43 @@ function tree<Id extends string>(
 // =====================================================================
 
 tree("warrior", { name: "Krigare", icon: "🛡️", lockedAttribute: "Str" }, [
+  {
+    id: "str-root",
+    skill: "Starkare",
+    attributes: { Str: 3 },
+  },
   { id: "root", attributes: { Str: 1, Con: 1 } },
-
   // Styrka
-  { id: "warcry", requires: ["root"], skill: "warcry", attributes: { Str: 2 } },
+  { id: "warcry", requires: ["root"], skill: "warcry" },
   { id: "str-3", requires: ["warcry"], attributes: { Str: 2 } },
   { id: "str-4", requires: ["warcry"], attributes: { Str: 2 } },
-  { id: "berserk", requires: ["str-3"], skill: "berserk" },
-  { id: "takedown", requires: ["str-4"], skill: "takedown" },
-  { id: "str-5", requires: ["berserk"], attributes: { Str: 1 }, cost: 1 },
-  { id: "str-6", requires: ["takedown"], attributes: { Str: 1 }, cost: 1 },
-  { id: "power_strike", requires: ["str-5", "str-6"], skill: "power_strike" },
+  {
+    id: "berserk",
+    requires: ["str-3"],
+    skill: "berserk",
+  },
+  {
+    id: "takedown",
+    requires: ["str-4"],
+    skill: "takedown",
+  },
+  { id: "str-5", requires: ["berserk"], attributes: { Str: 2 }, cost: 1 },
+  { id: "str-6", requires: ["takedown"], attributes: { Str: 2 }, cost: 1 },
+  {
+    id: "str-7",
+    requires: ["str-5", "str-6"],
+    attributes: { Str: 3 },
+    cost: 1,
+  },
+  {
+    id: "power_strike",
+    requires: ["str-7"],
+    skill: "power_strike",
+  },
   {
     id: "str-end",
     requires: ["power_strike"],
-    attributes: { Str: 3, Con: 1 },
+    attributes: { Str: 5 },
     cost: 1,
   },
   // Fysik
@@ -161,85 +183,174 @@ tree("warrior", { name: "Krigare", icon: "🛡️", lockedAttribute: "Str" }, [
     id: "iron-skin",
     requires: ["root"],
     skill: "iron_skin",
-    attributes: { Con: 2 },
   },
   { id: "con-2", requires: ["iron-skin"], attributes: { Con: 2 } },
   { id: "con-3", requires: ["iron-skin"], attributes: { Con: 2 } },
-  { id: "steel_skin", requires: ["con-2"], skill: "steel_skin" },
-  { id: "first-aid", requires: ["con-3"], skill: "first_aid" },
+  {
+    id: "steel_skin",
+    requires: ["con-2"],
+    skill: "steel_skin",
+  },
+  {
+    id: "first-aid",
+    requires: ["con-3"],
+    skill: "first_aid",
+  },
   {
     id: "con-5",
     requires: ["steel_skin"],
-    attributes: { Con: 1 },
+    attributes: { Con: 2 },
     cost: 1,
   },
   {
     id: "con-6",
     requires: ["first-aid"],
-    attributes: { Con: 1 },
+    attributes: { Con: 2 },
     cost: 1,
   },
-  { id: "last_chance", requires: ["con-5", "con-6"], skill: "last_chance" },
+  {
+    id: "con-7",
+    requires: ["con-5", "con-6"],
+    attributes: { Con: 3 },
+    cost: 1,
+  },
+  {
+    id: "last_chance",
+    requires: ["con-7"],
+    skill: "last_chance",
+  },
   {
     id: "con-end",
     requires: ["last_chance"],
-    attributes: { Con: 3, Str: 1 },
+    attributes: { Con: 5 },
     cost: 1,
+  },
+  {
+    id: "con-root",
+    skill: "Hälsosam Kropp",
+    attributes: { Con: 3 },
   },
 ]);
 
 tree("hunter", { name: "Jägare", icon: "🏹", lockedAttribute: "Dex" }, [
-  { id: "root", attributes: { Dex: 1 } },
+  { id: "root", attributes: { Dex: 2, Con: 3 } },
 
-  { id: "speed", requires: ["root"], skill: "speed" },
+  // Smidighet och undvikande
+  //damage
+  { id: "speed", requires: ["root"], skill: "mark_target" },
+  { id: "dmg-1", requires: ["speed"], attributes: { Dex: 2 } },
+  { id: "dmg-2", requires: ["speed"], attributes: { Dex: 2 } },
+  { id: "deep-cut", requires: ["dmg-1"], skill: "deep_cut" },
+  { id: "molotov", requires: ["dmg-2"], skill: "molotov" },
+  { id: "dmg-3", requires: ["deep-cut"], attributes: { Dex: 2 } },
+  { id: "dmg-4", requires: ["molotov"], attributes: { Dex: 2 } },
+  {
+    id: "dmg-5",
+    requires: ["dmg-3", "dmg-4"],
+    skill: "Öva Smidighet",
+    attributes: { Dex: 3 },
+  },
+
+  { id: "precise-cut", requires: ["dmg-5"], skill: "precise_cut" },
+  { id: "dex-spell", requires: ["dmg-5"], skill: "wind_arrow" },
+  {
+    id: "dmg-end",
+    requires: ["dex-spell", "precise-cut"],
+    attributes: { Dex: 5 },
+    cost: 1,
+  },
+
+  //defense
   { id: "quick-step", requires: ["root"], skill: "quick_step" },
+  { id: "def-1", requires: ["quick-step"], attributes: { Dex: 1, Con: 2 } },
+  { id: "def-2", requires: ["quick-step"], attributes: { Dex: 1, Con: 2 } },
+  { id: "field-aid", requires: ["def-1"], skill: "field_aid" },
+  { id: "clear-mind", requires: ["def-2"], skill: "clear_mind" },
 
-  { id: "dex-2", requires: ["speed"], attributes: { Dex: 1 } },
-  { id: "dex-3", requires: ["dex-2"], attributes: { Dex: 1 } },
-  { id: "rend", requires: ["dex-3"], skill: "rend" },
-  { id: "deep-cut", requires: ["dex-3"], skill: "deep_cut" },
-  { id: "hybrid", requires: ["dex-3"], attributes: { Dex: 1, Con: 1 } },
+  { id: "def-3", requires: ["field-aid"], attributes: { Con: 3 } },
+  { id: "def-4", requires: ["clear-mind"], attributes: { Con: 3 } },
 
-  { id: "dex-4", requires: ["quick-step"], attributes: { Dex: 3 }, cost: 1 },
+  {
+    id: "def-5",
+    requires: ["def-3", "def-4"],
+    skill: "Uthållighet",
+    attributes: { Con: 4 },
+  },
+
+  { id: "hunter-net", requires: ["def-5"], skill: "hunter_net" },
+  { id: "second-wind", requires: ["def-5"], skill: "second_wind" },
+  {
+    id: "def-end",
+    requires: ["hunter-net", "second-wind"],
+    attributes: { Con: 5 },
+    cost: 1,
+  },
 ]);
 
 tree("mage", { name: "Trollkarl", icon: "🔮", lockedAttribute: "Int" }, [
-  { id: "mana-shield", skill: "mana_shield", attributes: { Int: 1 } },
-  { id: "int-boost", requires: ["mana-shield"], attributes: { Int: 3 } },
+  {
+    id: "magic-arrow",
+    skill: "magicArrow",
+    attributes: { Int: 1 },
+  },
+  { id: "int-boost", requires: ["magic-arrow"], attributes: { Int: 3 } },
+  {
+    id: "mana-shield",
+    requires: ["int-boost"],
+    skill: "mana_shield",
+    attributes: { Int: 1 },
+  },
   {
     id: "meditate",
     requires: ["int-boost"],
     skill: "meditate",
     attributes: { Int: 1 },
   },
+  {
+    id: "int_boost2",
+    requires: ["meditate", "mana-shield"],
+    attributes: { Int: 3 },
+  },
+
+  {
+    id: "electric-shock",
+    requires: ["int_boost2"],
+    skill: "electric_shock",
+    attributes: { Int: 1 },
+  },
+  { id: "cure", requires: ["int_boost2"], skill: "cure" },
+  {
+    id: "blood-sigil",
+    requires: ["int_boost2"],
+    skill: "blood_sigil",
+  },
 
   // Eld
-  { id: "fire", requires: ["meditate"], attributes: { Int: 1 } },
+  { id: "fire", requires: ["electric-shock"], attributes: { Int: 2 } },
   {
     id: "fire-bolt",
     requires: ["fire"],
     skill: "fire_bolt",
-    attributes: { Int: 1 },
   },
-  { id: "fire-int", requires: ["fire-bolt"], attributes: { Int: 1 } },
+
+  { id: "fire-int", requires: ["fire-bolt"], attributes: { Int: 2 } },
   {
     id: "inferno",
     requires: ["fire-int"],
     skill: "inferno",
-    attributes: { Int: 1 },
   },
-  { id: "fire-3", requires: ["inferno"], attributes: { Int: 3 }, cost: 1 },
+  { id: "fire-3", requires: ["inferno"], attributes: { Int: 5 }, cost: 1 },
 
   // Ljus: skill and attribute in the same node
-  { id: "light", requires: ["meditate"], attributes: { Int: 1 } },
+  { id: "light", requires: ["cure"], attributes: { Int: 2 } },
   {
     id: "heal-quick",
     requires: ["light"],
     skill: "heal_quick",
-    attributes: { Int: 1 },
     cost: 1,
   },
-  { id: "light-int", requires: ["heal-quick"], attributes: { Int: 1 } },
+
+  { id: "light-int", requires: ["heal-quick"], attributes: { Int: 2 } },
   {
     id: "holy-spear",
     requires: ["light-int"],
@@ -247,17 +358,18 @@ tree("mage", { name: "Trollkarl", icon: "🔮", lockedAttribute: "Int" }, [
     attributes: { Int: 1 },
     cost: 1,
   },
-  { id: "light-3", requires: ["holy-spear"], attributes: { Int: 3 }, cost: 3 },
+  { id: "light-3", requires: ["holy-spear"], attributes: { Int: 5 }, cost: 1 },
 
   // Mörker
-  { id: "dark", requires: ["meditate"], attributes: { Int: 1 } },
+  { id: "dark", requires: ["blood-sigil"], attributes: { Int: 2 } },
   {
     id: "shadow_clone",
     requires: ["dark"],
     skill: "shadow_clone",
     attributes: { Int: 1 },
   },
-  { id: "dark-int", requires: ["shadow_clone"], attributes: { Int: 1 } },
+  { id: "dark-int", requires: ["shadow_clone"], attributes: { Int: 2 } },
+
   {
     id: "curse-strong",
     requires: ["dark-int"],
@@ -267,8 +379,8 @@ tree("mage", { name: "Trollkarl", icon: "🔮", lockedAttribute: "Int" }, [
   {
     id: "dark-end",
     requires: ["curse-strong"],
-    attributes: { Int: 3 },
-    cost: 3,
+    attributes: { Int: 5 },
+    cost: 1,
   },
 ]);
 

@@ -1,10 +1,11 @@
-import type { Trader } from "./tradersTypes";
+import type { TraderDefinition } from "./tradersTypes";
 
-export const innkeeper: Trader = {
+export const innkeeper: TraderDefinition = {
   id: "innkeeper",
   name: "Värdshusvärden",
   description: "En vänlig man som säljer drycker och andra förnödenheter.",
   inventoryWidth: 5,
   inventoryHeight: 3,
-  inventory: [],
+  markup: 1.25,
+  stock: [],
 };

@@ -102,6 +102,10 @@ function Character({ onClose }: CharacterProps) {
               </span>
             </div>
             <div className="stat-row">
+              <span>💨 Undvikande: </span>
+              <span>{Math.round(stats.dodgeChance * 100)}%</span>
+            </div>
+            <div className="stat-row">
               <span>❤️ Max hälsa: </span>
               <span>{stats.maxHP}</span>
             </div>

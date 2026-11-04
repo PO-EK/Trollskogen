@@ -54,7 +54,12 @@ function Location({
   onTravelTo,
   onStartCombat,
 }: LocationProps) {
-  const [currentNodeId, setCurrentNodeId] = useState("start");
+  const { player, setPlayer } = usePlayer();
+  const [currentNodeId, setCurrentNodeId] = useState(() =>
+    locationId === "playerHQ" && !player.StoryFlags["playerHQ.IntroSeen"]
+      ? "intro"
+      : "start",
+  );
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);
@@ -65,8 +70,6 @@ function Location({
   } | null>(null);
 
   const location = locations.find((location) => location.id === locationId);
-
-  const { player, setPlayer } = usePlayer();
 
   if (!location) {
     return <p>Location not found.</p>;

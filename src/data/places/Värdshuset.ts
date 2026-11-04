@@ -175,6 +175,7 @@ export const vardshuset: Record<string, AdventureNode> = {
         nextNodeId: "start",
         effects: [
           { type: "setStoryFlag", flag: "nattvakten.started", value: true },
+          { type: "setStoryFlag", flag: "nattvakten.askSmith", value: true },
         ],
       },
     ],

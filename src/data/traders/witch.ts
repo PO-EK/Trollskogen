@@ -1,10 +1,11 @@
-import type { Trader } from "./tradersTypes";
+import type { TraderDefinition } from "./tradersTypes";
 
-export const witch: Trader = {
+export const witch: TraderDefinition = {
   id: "witch",
   name: "Häxan",
   description: "En mystisk kvinna som säljer märkliga drycker och föremål.",
   inventoryWidth: 5,
   inventoryHeight: 3,
-  inventory: [],
+  markup: 1.25,
+  stock: [],
 };

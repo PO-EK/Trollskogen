@@ -193,6 +193,11 @@
   font-size: 0.8rem;
 }
 
+.tree-node[data-kind="attribute"] .tree-attr-icon[data-hybrid="true"] {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
 .tree-node[data-attribute="Str"] {
   --accent: #d2603f;
 }
@@ -225,7 +230,7 @@
   font-weight: 600;
 }
 
-.tree-node-cost {
+.tree-node-status {
   font-size: 0.7rem;
   color: #d8b46a;
 }
@@ -247,11 +252,6 @@
 .tree-node[data-selected="true"] {
   outline: 2px solid #d8b46a;
   outline-offset: 2px;
-}
-
-/* Can't afford it yet */
-.tree-node[data-state="available"][data-affordable="false"] .tree-node-cost {
-  color: #e8663a;
 }
 
 @media (max-width: 800px) {

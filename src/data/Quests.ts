@@ -15,6 +15,20 @@ export type QuestDefinition = {
 
 export const quests: QuestDefinition[] = [
   {
+    id: "openStorageQuest",
+    title: "Nyckeln till kistan",
+    description: "Hitta nyckeln till kistan i din stuga och lås upp den.",
+    stages: [
+      {
+        text: "Använd nyckeln för att låsa upp kistan i din stuga.",
+        completedFlag: "unlockedStorage",
+      },
+    ],
+    startedFlag: "openStorageQuest.Started",
+    completedFlag: "unlockedStorage",
+    completedText: "Kistan i din stuga är upplåst.",
+  },
+  {
     id: "healTheSmith",
     title: "Smedens läkande dryck",
     description:
@@ -33,45 +47,7 @@ export const quests: QuestDefinition[] = [
     completedFlag: "healTheSmith.Complete",
     completedText: "Smeden är återställd och smedjan kan öppna igen.",
   },
-  {
-    id: "stolenTools",
-    title: "Stulna verktyg",
-    description:
-      "Smeden hörde oljud från smedjan och jagade bort en man som tog med sig ett antal verktyg han behöver. Tjuven sprang mot torget.",
-    stages: [
-      {
-        text: "Fråga runt",
-        completedFlag: "stolenTools.AskedAround",
-      },
-      {
-        text: "Någon såg tjuven springa mot skogen",
-        completedFlag: "stolenTools.SawThiefHeadingToForest",
-      },
-      {
-        text: "Du letar och hittar honom, han flyr.",
-        completedFlag: "stolenTools.FoundThief",
-      },
-      {
-        text: "Du kommer ikapp men han blev dödad av ett troll",
-        completedFlag: "stolenTools.FoundThiefKilledByTroll",
-      },
-      {
-        text: "Besegra trollet för att ta tillbaka verktygen",
-        completedFlag: "stolenTools.TrollDefeated",
-      },
-      {
-        text: "Lämna tillbaka verktygen till smeden",
-        completedFlag: "stolenTools.ToolsReturned",
-      },
-      {
-        text: "Quest Complete.",
-        completedFlag: "stolenTools.Complete",
-      },
-    ],
-    startedFlag: "stolenTools.Started",
-    completedFlag: "stolenTools.Complete",
-    completedText: "Quest Complete.",
-  },
+
   {
     id: "nightWatch",
     title: "Byns nattvakt",
@@ -79,12 +55,32 @@ export const quests: QuestDefinition[] = [
       "Lars vill bilda en ny nattvakt av bybor, men byn har ont om material. Spjut är billigt och enkelt, och han kan lära folk att använda dem. Be smeden smida spjutspetsar.",
     stages: [
       {
-        text: "Fråga smeden om han kan smida omkring tio spjutspetsar.",
+        text: "Fråga smeden om han kan smida omkring tio spjutspetsar",
         completedFlag: "nattvakten.smithAsked",
       },
       {
-        text: "Skaffa trästavar till spjuten.",
-        completedFlag: "nattvakten.shaftsFound",
+        text: "Smeden behöver sina stulna verktyg tillbaka. Fråga runt byn om någon såg tjuven.",
+        completedFlag: "nattvakten.findTools",
+      },
+      {
+        text: "Ett vittne såg tjuven springa mot skogen, leta efter spår",
+        completedFlag: "nattvakten.SawThiefHeadingToForest",
+      },
+      {
+        text: "Du hittade tjuven men han flydde in i skogen",
+        completedFlag: "nattvakten.FoundThief",
+      },
+      {
+        text: "Du kommer ikapp men han blev dödad av rövare",
+        completedFlag: "nattvakten.FoundThiefKilled",
+      },
+      {
+        text: "Besegra dem för att ta tillbaka verktygen",
+        completedFlag: "nattvakten.BanditDefeated",
+      },
+      {
+        text: "Återvänd till smeden med verktygen.",
+        completedFlag: "nattvakten.ToolsReturned",
       },
       {
         text: "Lämna spjuten till Lars så att han kan börja träna nattvakten.",

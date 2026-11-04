@@ -2,7 +2,7 @@ import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
 import SkillCard from "../components/skills/SkillCard";
 import { SKILL_TREE_NODES, SKILL_TREE_TREES } from "../data/skillTree";
-import type { TreeNode } from "../data/skillTree";
+import type { AttributeName, TreeNode } from "../data/skillTree";
 import { getSkill } from "../data/skills";
 import { ATTRIBUTE_LABELS } from "../game/labels";
 import { getSkillGroup } from "../game/skillLoadout";
@@ -19,6 +19,22 @@ function getIcon(treeId: string): string {
   return SKILL_TREE_TREES.find((tree) => tree.id === treeId)?.icon ?? "";
 }
 
+function getAttributeIcon(node: TreeNode): string {
+  const bonuses = node.bonuses ?? [];
+  const icons: Record<AttributeName, string> = {
+    Str: "⚔️",
+    Dex: "🏹",
+    Con: "🛡️",
+    Int: getIcon(node.treeId),
+  };
+
+  if (bonuses.length > 1) {
+    return bonuses.map((bonus) => icons[bonus.attribute]).join("");
+  }
+
+  return bonuses[0] ? icons[bonuses[0].attribute] : getIcon(node.treeId);
+}
+
 function getNodeLabel(node: TreeNode): string {
   if (node.skillId) {
     return getSkill(node.skillId)?.name ?? node.skillId;
@@ -27,7 +43,7 @@ function getNodeLabel(node: TreeNode): string {
   if (node.bonuses && node.bonuses.length > 1) {
     return node.bonuses
       .map((bonus) => `+${bonus.amount} ${ATTRIBUTE_LABELS[bonus.attribute]}`)
-      .join(" + ");
+      .join(" & ");
   }
 
   return node.attribute
@@ -65,7 +81,7 @@ function SkillTree({ onClose }: SkillTreeProps) {
 
   function renderDetails(node: TreeNode) {
     const state = getNodeState(player, node);
-    const affordable = player.SkillPoints >= node.cost;
+    const affordable = player.SkillPoints >= (node.cost ?? 1);
     const skill = node.skillId ? getSkill(node.skillId) : undefined;
 
     const action =
@@ -75,7 +91,7 @@ function SkillTree({ onClose }: SkillTreeProps) {
           disabled={!affordable}
           onClick={() => handleLearn(node)}
         >
-          Lär dig ({node.cost} p)
+          Lär dig
         </button>
       ) : undefined;
 
@@ -86,9 +102,9 @@ function SkillTree({ onClose }: SkillTreeProps) {
         ? "Du kan utrusta den under Färdigheter."
         : "Redan tagen.";
     } else if (state === "locked") {
-      note = `Kräver någon av: ${node.requires.map(getNodeLabel).join(", ")}`;
+      note = ``;
     } else if (!affordable) {
-      note = `Du behöver ${node.cost} färdighetspoäng (du har ${player.SkillPoints}).`;
+      note = "Du saknar färdighetspoäng.";
     }
 
     const displayBonuses =
@@ -124,10 +140,6 @@ function SkillTree({ onClose }: SkillTreeProps) {
                 </span>
               </div>
             ))}
-            <div className="item-card-row">
-              <span className="item-card-label">Kostnad</span>
-              <span className="item-card-value">{node.cost} p</span>
-            </div>
           </div>
         ) : null}
 
@@ -221,20 +233,23 @@ function SkillTree({ onClose }: SkillTreeProps) {
                   data-attribute={node.attribute}
                   data-attribute-amount={node.attributeAmount ?? 1}
                   data-selected={selected?.id === node.id}
-                  data-affordable={player.SkillPoints >= node.cost}
                   style={{
                     left: cx - width / 2,
                     top: cy - height / 2,
                     width,
                     height,
                   }}
-                  title={`${getNodeLabel(node)} (${node.cost} p)`}
+                  title={getNodeLabel(node)}
                   onClick={() => setSelected(node)}
                 >
                   {node.kind === "attribute" ? (
                     <>
-                      <span className="tree-attr-icon">
-                        {getIcon(node.treeId)}
+                      <span
+                        className="tree-attr-icon"
+                        data-hybrid={(node.bonuses?.length ?? 0) > 1}
+                        aria-hidden="true"
+                      >
+                        {getAttributeIcon(node)}
                       </span>
                       <span className="tree-attr-plus">
                         {node.bonuses && node.bonuses.length > 1
@@ -247,9 +262,9 @@ function SkillTree({ onClose }: SkillTreeProps) {
                       <span className="tree-node-name">
                         {getNodeLabel(node)}
                       </span>
-                      <span className="tree-node-cost">
-                        {state === "learned" ? "✓ Känd" : `${node.cost} p`}
-                      </span>
+                      {state === "learned" && (
+                        <span className="tree-node-status">✓ Känd</span>
+                      )}
                     </>
                   )}
                 </button>

@@ -40,33 +40,35 @@ function QuestLog({ onClose }: OverlayProps) {
                   <h3>{quest.title}</h3>
                   <p>{quest.description}</p>
                   <ol className="quest-log-stages">
-                    {quest.stages.map((stage, index) => {
-                      const completed = Boolean(
-                        player.StoryFlags[stage.completedFlag],
-                      );
-                      const current =
-                        !completed &&
-                        quest.stages
-                          .slice(0, index)
-                          .every((previousStage) =>
-                            player.StoryFlags[previousStage.completedFlag],
-                          );
+                    {quest.stages
+                      .map((stage, index) => {
+                        const completed = Boolean(
+                          player.StoryFlags[stage.completedFlag],
+                        );
+                        const current =
+                          !completed &&
+                          quest.stages
+                            .slice(0, index)
+                            .every(
+                              (previousStage) =>
+                                player.StoryFlags[previousStage.completedFlag],
+                            );
 
-                      return (
+                        return { stage, completed, current };
+                      })
+                      .filter(({ completed, current }) => completed || current)
+                      .map(({ stage, completed, current }) => (
                         <li
                           className="quest-log-stage"
-                          data-state={
-                            completed ? "completed" : current ? "current" : "upcoming"
-                          }
+                          data-state={current ? "current" : "completed"}
                           key={stage.completedFlag}
                         >
                           <span>{stage.text}</span>
                           <span className="quest-log-stage-status">
-                            {completed ? "Klar" : current ? "Aktuellt" : "Kommande"}
+                            {completed ? "Klar" : "Aktuellt"}
                           </span>
                         </li>
-                      );
-                    })}
+                      ))}
                   </ol>
                 </article>
               ))}

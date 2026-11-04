@@ -1,9 +1,23 @@
-import type { Trader } from "./tradersTypes";
+import type { Trader, TraderDefinition } from "./tradersTypes";
+import { addItemToTraderInventory } from "../../game/inventory";
 import { innkeeper } from "./innkeeper";
 import { witch } from "./witch";
 import { blacksmith } from "./blacksmith";
 
-export const traders: Trader[] = [innkeeper, witch, blacksmith];
+const traderDefinitions: TraderDefinition[] = [innkeeper, witch, blacksmith];
+
+function createTrader(definition: TraderDefinition): Trader {
+  const { stock, ...trader } = definition;
+  let initializedTrader: Trader = { ...trader, inventory: [] };
+
+  for (const itemId of stock) {
+    initializedTrader = addItemToTraderInventory(initializedTrader, itemId);
+  }
+
+  return initializedTrader;
+}
+
+export const traders: Trader[] = traderDefinitions.map(createTrader);
 
 export function getTrader(traderId: string): Trader | undefined {
   return traders.find((trader) => trader.id === traderId);

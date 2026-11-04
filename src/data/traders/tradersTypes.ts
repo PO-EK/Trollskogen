@@ -10,5 +10,10 @@ export type Trader = {
   description: string;
   inventoryWidth: number;
   inventoryHeight: number;
+  markup: number;
   inventory: TraderInventoryItem[];
+};
+
+export type TraderDefinition = Omit<Trader, "inventory"> & {
+  stock: string[];
 };

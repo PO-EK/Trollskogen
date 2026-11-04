@@ -18,9 +18,10 @@ export function getSkillDamageRange(
   }
 
   if (damage.kind === "weapon") {
+    const weaponStats = weapon ?? FISTS;
     const range = getDamageRange(
       player,
-      weapon ?? FISTS,
+      { ...weaponStats, stat: damage.stat ?? weaponStats.stat },
       getFlatAttackBonus(player),
     );
 
@@ -57,8 +58,14 @@ export function rollSkillDamage(
   let base: number;
 
   if (damage.kind === "weapon") {
+    const weaponStats = weapon ?? FISTS;
     base =
-      rollDamage(player, weapon ?? FISTS, random, getFlatAttackBonus(player)) *
+      rollDamage(
+        player,
+        { ...weaponStats, stat: damage.stat ?? weaponStats.stat },
+        random,
+        getFlatAttackBonus(player),
+      ) *
       damage.multiplier;
   } else {
     base = rollDamage(

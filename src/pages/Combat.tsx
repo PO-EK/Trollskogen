@@ -27,6 +27,7 @@ const STATUS_VISUALS: Record<Status["kind"], { icon: string; label: string }> =
   {
     burn: { icon: "🔥", label: "Brand" },
     bleed: { icon: "🩸", label: "Blödning" },
+    healOverTime: { icon: "💚", label: "Läkning över tid" },
     stun: { icon: "💫", label: "Bedövad" },
     guard: { icon: "🛡️", label: "Skydd" },
     evade: { icon: "💨", label: "Undvikande" },
@@ -45,6 +46,13 @@ function describeStatus(status: Status): string {
       return status.stacks > 1
         ? `${total} skada per runda (${status.stacks} lager)`
         : `${total} skada per runda`;
+    }
+    case "healOverTime": {
+      const total = status.amount * status.stacks;
+
+      return status.stacks > 1
+        ? `${total} hälsa per runda (${status.stacks} lager)`
+        : `${total} hälsa per runda`;
     }
     case "stun":
       return "förlorar sin tur";
@@ -69,6 +77,8 @@ function isHarmful(status: Status): boolean {
     case "bleed":
     case "stun":
       return true;
+    case "healOverTime":
+      return false;
     case "damageMod":
       return status.percent < 0;
     case "weak":

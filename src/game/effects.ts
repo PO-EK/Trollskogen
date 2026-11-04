@@ -29,6 +29,13 @@ export type Status =
       stacks: number;
       maxStacks: number;
     }
+  | {
+      kind: "healOverTime";
+      amount: number; // per layer
+      turnsLeft?: number | null;
+      stacks: number;
+      maxStacks: number;
+    }
   | { kind: "stun"; turnsLeft?: number | null }
   | { kind: "weak"; percent: number; turnsLeft?: number | null }
   | { kind: "offguard"; percent: number; turnsLeft?: number | null };
@@ -42,10 +49,17 @@ export type Vitals = {
   statuses: Status[];
 };
 
-export type StackableStatus = Extract<Status, { kind: "burn" | "bleed" }>;
+export type StackableStatus = Extract<
+  Status,
+  { kind: "burn" | "bleed" | "healOverTime" }
+>;
 
 export function isStackable(status: Status): status is StackableStatus {
-  return status.kind === "burn" || status.kind === "bleed";
+  return (
+    status.kind === "burn" ||
+    status.kind === "bleed" ||
+    status.kind === "healOverTime"
+  );
 }
 
 // Casting the same status again refreshes it instead of stacking.
@@ -81,7 +95,10 @@ function addStatus(statuses: Status[], status: Status): Status[] {
   return [...others, status];
 }
 
-function effectToStatus(effect: SkillEffect): Status | null {
+function effectToStatus(
+  effect: SkillEffect,
+  damageDealt: number,
+): Status | null {
   switch (effect.type) {
     case "buff":
       return {
@@ -119,7 +136,9 @@ function effectToStatus(effect: SkillEffect): Status | null {
     case "burn":
       return {
         kind: "burn",
-        damage: effect.damage,
+        damage:
+          effect.damage +
+          Math.round(((effect.percentOfDamage ?? 0) / 100) * damageDealt),
         turnsLeft: effect.turns,
         stacks: 1,
         maxStacks: effect.maxStacks ?? 1,
@@ -127,7 +146,17 @@ function effectToStatus(effect: SkillEffect): Status | null {
     case "bleed":
       return {
         kind: "bleed",
-        damage: effect.damage,
+        damage:
+          effect.damage +
+          Math.round(((effect.percentOfDamage ?? 0) / 100) * damageDealt),
+        turnsLeft: effect.turns,
+        stacks: 1,
+        maxStacks: effect.maxStacks ?? 1,
+      };
+    case "healOverTime":
+      return {
+        kind: "healOverTime",
+        amount: effect.amount,
         turnsLeft: effect.turns,
         stacks: 1,
         maxStacks: effect.maxStacks ?? 1,
@@ -135,6 +164,7 @@ function effectToStatus(effect: SkillEffect): Status | null {
     case "stun":
       return { kind: "stun", turnsLeft: effect.turns };
     case "heal":
+    case "lifesteal":
     case "restoreMana":
     case "cure":
       return null;
@@ -163,6 +193,7 @@ export function applyEffects<T extends Vitals>(
   fighter: T,
   effects: SkillEffect[],
   random: () => number = Math.random,
+  damageDealt = 0,
 ): ApplyResult<T> {
   let next = fighter;
   let healed = 0;
@@ -171,7 +202,11 @@ export function applyEffects<T extends Vitals>(
   const applied: SkillEffect[] = [];
 
   for (const effect of effects) {
-    if (effect.chance !== undefined && random() * 100 >= effect.chance) {
+    if (
+      effect.type !== "evade" &&
+      effect.chance !== undefined &&
+      random() * 100 >= effect.chance
+    ) {
       continue;
     }
 
@@ -181,6 +216,18 @@ export function applyEffects<T extends Vitals>(
       const hp = Math.min(
         next.maxHp,
         next.hp + scaledAmount(effect.amount, effect.percentOfMax, next.maxHp),
+      );
+
+      healed += hp - next.hp;
+      next = { ...next, hp };
+      continue;
+    }
+
+    if (effect.type === "lifesteal") {
+      const hp = Math.min(
+        next.maxHp,
+        next.hp +
+          Math.round((effect.percentOfDamage / 100) * damageDealt),
       );
 
       healed += hp - next.hp;
@@ -219,7 +266,7 @@ export function applyEffects<T extends Vitals>(
       continue;
     }
 
-    const status = effectToStatus(effect);
+    const status = effectToStatus(effect, damageDealt);
 
     if (status) {
       next = { ...next, statuses: addStatus(next.statuses, status) };

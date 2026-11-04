@@ -18,7 +18,7 @@ function describeWithChance(effect: SkillEffect): string {
   const text = describeEffect(effect);
   const chance = effect.chance;
 
-  return chance !== undefined && chance < 100
+  return effect.type !== "evade" && chance !== undefined && chance < 100
     ? `${Math.round(chance)}% chans: ${text}`
     : text;
 }
@@ -30,6 +30,8 @@ function describeEffect(effect: SkillEffect): string {
       return effect.percentOfMax
         ? `Läker ${effect.percentOfMax}% av max hälsa`
         : `Läker ${effect.amount ?? 0} hälsa`;
+    case "lifesteal":
+      return `Läker ${effect.percentOfDamage}% av skadan som hälsa`;
     case "damageMod":
       return `${effect.percent > 0 ? "+" : ""}${effect.percent}% skada i ${effect.turns} rundor`;
     case "weak":
@@ -39,11 +41,17 @@ function describeEffect(effect: SkillEffect): string {
     case "offguard":
       return `Tar ${effect.percent}% mer skada i ${effect.turns} rundor`;
     case "evade":
-      return `${effect.chance}% att undvika attacker i ${effect.turns} rundor`;
+      return `${Math.round(effect.chance)}% chans att undvika attacker i ${effect.turns} rundor`;
     case "burn":
-      return `Brand: ${effect.damage} skada per runda${stackText(effect.maxStacks)}`;
+      return `Brand: ${effect.damage}${
+        effect.percentOfDamage ? ` + ${effect.percentOfDamage}% av skadan` : ""
+      } skada per runda${stackText(effect.maxStacks)}`;
     case "bleed":
-      return `Blödning: ${effect.damage} skada per runda, ${stackText(effect.maxStacks)}`;
+      return `Blödning: ${effect.damage}${
+        effect.percentOfDamage ? ` + ${effect.percentOfDamage}% av skadan` : ""
+      } skada per runda${stackText(effect.maxStacks)}`;
+    case "healOverTime":
+      return `Läker ${effect.amount} hälsa per runda${stackText(effect.maxStacks)}`;
     case "stun":
       return `Bedövar i ${effect.turns} rundor`;
     case "restoreMana":

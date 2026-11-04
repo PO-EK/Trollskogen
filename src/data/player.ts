@@ -7,26 +7,22 @@ import {
   HP_PER_CON_POINT,
   MANA_PER_INT_POINT,
   MANA_BONUS_PER_INT_POINT,
+  getDodgeChance,
 } from "../game/balance";
 import { addItemToInventory } from "../game/inventory";
+import { equippedItem } from "../game/equipment";
 
 export function getMaxHP(con: number): number {
   const flat = HP_PER_CON_POINT * con;
-  const multiplier = Math.max(
-    0,
-    1 + HP_BONUS_PER_CON_POINT * (con - BASELINE_STAT),
-  );
+  const excess = Math.max(0, con - BASELINE_STAT);
 
-  return Math.max(1, Math.ceil(flat * multiplier));
+  return Math.max(1, Math.ceil(flat + HP_BONUS_PER_CON_POINT * excess ** 2));
 }
 export function getMaxMana(int: number): number {
   const flat = MANA_PER_INT_POINT * int;
-  const multiplier = Math.max(
-    0,
-    1 + MANA_BONUS_PER_INT_POINT * (int - BASELINE_STAT),
-  );
+  const excess = Math.max(0, int - BASELINE_STAT);
 
-  return Math.max(1, Math.ceil(flat * multiplier));
+  return Math.max(1, Math.ceil(flat + MANA_BONUS_PER_INT_POINT * excess ** 2));
 }
 
 const playerStr = 10;
@@ -53,6 +49,7 @@ export type Player = {
   // stats
   Str: number;
   Dex: number;
+  DodgeChance: number;
   Con: number;
   Int: number;
 
@@ -94,13 +91,14 @@ export const createNewPlayer = (): Player => {
     Gold: 360,
 
     Level: 1,
-    Exp: 0,
+    Exp: 4,
     ExpMax: 50,
-    SkillPoints: 0,
+    SkillPoints: 1,
     LearnedNodes: [],
 
     Str: playerStr,
     Dex: playerDex,
+    DodgeChance: getDodgeChance(playerDex),
     Con: playerCon,
     Int: playerInt,
 
@@ -122,11 +120,13 @@ export const createNewPlayer = (): Player => {
     Inventory: [],
     Quests: [],
     StoryFlags: {},
-    UnlockedLocations: ["playerHQ", "village", "ruins"],
+    UnlockedLocations: ["playerHQ", "village", "ruins", "places"],
     KnownSkills: [],
   };
 
-  player = addItemToInventory(player, "bandage", "testBandage");
+  player = addItemToInventory(player, "bandage", "startBandage");
+  player = addItemToInventory(player, "storageKey", "playerKey");
+  player = equippedItem(player, "iron_sword", "starterSword");
 
   return player;
 };
