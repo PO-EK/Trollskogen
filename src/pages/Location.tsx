@@ -3,6 +3,7 @@ import { usePlayer } from "../context/usePlayer";
 import { useItemHover } from "../context/useItemHover";
 import "./Location.css";
 import { locations } from "../data/locations";
+import { getChestDefinition } from "../data/Chests";
 import { adventures } from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
@@ -23,6 +24,23 @@ import {
 const LOOT_WIDTH = 4;
 const LOOT_HEIGHT = 4;
 
+function renderLocationText(text: string) {
+  return text.split(/\n{2,}/).map((paragraph, paragraphIndex) => (
+    <p className="location-paragraph" key={paragraphIndex}>
+      {paragraph.split(/('[^']+'|“[^”]+”)/g).map((part, partIndex) =>
+        (part.startsWith("'") && part.endsWith("'")) ||
+        (part.startsWith("“") && part.endsWith("”")) ? (
+          <span className="location-dialogue" key={partIndex}>
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      )}
+    </p>
+  ));
+}
+
 type ActiveLocationContainer =
   | {
       type: "loot";
@@ -34,7 +52,7 @@ type ActiveLocationContainer =
       questId: string;
       acceptedItemId: string;
     }
-  | { type: "storage"; id: "storage" };
+  | { type: "chest"; id: string };
 
 type LocationProps = {
   locationId: string | null;
@@ -107,6 +125,11 @@ function Location({
     return <p>Adventure node not found.</p>;
   }
 
+  const activeChest =
+    activeContainer?.type === "chest"
+      ? getChestDefinition(activeContainer.id)
+      : null;
+
   /*
    * Returns true if ItemGrid should remove the item from its source container.
    * Returns false if the handler already updated the source,
@@ -122,15 +145,22 @@ function Location({
       return false;
     }
 
-    // Storage: the transaction moves the item between the player's lists,
-    // so the source has already been updated.
-    if (activeContainer.type === "storage") {
+    if (activeContainer.type === "chest") {
+      const isPlayerToChest =
+        sourceType === "player" && sourceId === "player";
+      const isChestToPlayer =
+        sourceType === "chest" && sourceId === activeContainer.id;
+
+      if (!isPlayerToChest && !isChestToPlayer) {
+        return false;
+      }
+
       const result = performTransaction({
         item,
         sourceId,
         sourceType,
-        destinationId: "storage",
-        destinationType: "storage",
+        destinationId: isPlayerToChest ? activeContainer.id : "player",
+        destinationType: isPlayerToChest ? "chest" : "player",
         position,
         player,
       });
@@ -282,6 +312,9 @@ function Location({
           UnlockedLocations: p.UnlockedLocations.includes(effect.locationId)
             ? p.UnlockedLocations
             : [...p.UnlockedLocations, effect.locationId],
+          LockedLocations: p.LockedLocations.filter(
+            (id) => id !== effect.locationId,
+          ),
         }));
         break;
 
@@ -309,6 +342,21 @@ function Location({
         setPlayer((p) => ({
           ...p,
           UnlockedLocations: p.UnlockedLocations.filter(
+            (id) => id !== effect.locationId,
+          ),
+          LockedLocations: p.LockedLocations.includes(effect.locationId)
+            ? p.LockedLocations
+            : [...p.LockedLocations, effect.locationId],
+        }));
+        break;
+
+      case "hideLocation":
+        setPlayer((p) => ({
+          ...p,
+          UnlockedLocations: p.UnlockedLocations.filter(
+            (id) => id !== effect.locationId,
+          ),
+          LockedLocations: p.LockedLocations.filter(
             (id) => id !== effect.locationId,
           ),
         }));
@@ -363,8 +411,17 @@ function Location({
         break;
 
       case "openStorage":
-        setContainerItems([]);
-        setActiveContainer({ type: "storage", id: "storage" });
+        setActiveContainer({ type: "chest", id: "playerStorage" });
+        break;
+
+      case "openChest":
+        getChestDefinition(effect.chestId);
+        if (!player.Chests[effect.chestId]) {
+          throw new Error(
+            `Missing player inventory for chest "${effect.chestId}".`,
+          );
+        }
+        setActiveContainer({ type: "chest", id: effect.chestId });
         break;
 
       case "removeItem":
@@ -502,9 +559,9 @@ function Location({
       const fitsInStorage =
         findFirstAvailableItemPosition(
           lootItem.itemId,
-          updatedPlayer.Storage,
-          updatedPlayer.StorageWidth,
-          updatedPlayer.StorageHeight,
+          updatedPlayer.Chests.playerStorage,
+          getChestDefinition("playerStorage").width,
+          getChestDefinition("playerStorage").height,
         ) !== null;
 
       if (!fitsInBackpack && !fitsInStorage) {
@@ -537,9 +594,9 @@ function Location({
         ) !== null ||
         findFirstAvailableItemPosition(
           lootItem.itemId,
-          player.Storage,
-          player.StorageWidth,
-          player.StorageHeight,
+          player.Chests.playerStorage,
+          getChestDefinition("playerStorage").width,
+          getChestDefinition("playerStorage").height,
         ) !== null,
     );
 
@@ -547,7 +604,9 @@ function Location({
     <div className="location">
       <h1 className="location-header">{location.name}</h1>
 
-      <p className="location-text">{currentNode.text}</p>
+      <div className="location-text">
+        {renderLocationText(currentNode.text)}
+      </div>
 
       {rewardSummary && (
         <div className="location-reward-summary">
@@ -558,7 +617,7 @@ function Location({
         </div>
       )}
 
-      {activeContainer && (
+      {activeContainer && activeContainer.type !== "chest" && (
         <div>
           {activeContainer.type === "loot" && (
             <div className="location-loot-actions">
@@ -577,42 +636,103 @@ function Location({
             </div>
           )}
           <div style={{ display: "flex", justifyContent: "center" }}>
-            {activeContainer.type === "storage" ? (
-              <ItemGrid
-                containerId="storage"
-                containerType="storage"
-                width={player.StorageWidth}
-                height={player.StorageHeight}
-                inventory={player.Storage}
-                onInventoryChange={(updated) =>
-                  setPlayer((p) => ({ ...p, Storage: updated }))
-                }
-                onItemRemoved={(id) =>
-                  setPlayer((p) => ({
-                    ...p,
-                    Storage: p.Storage.filter((i) => i.containerItemId !== id),
-                  }))
-                }
-                onCrossContainerDrop={handleCrossContainerDrop}
-              />
-            ) : (
-              <ItemGrid
-                containerId={activeContainer.id}
-                containerType={activeContainer.type}
-                width={activeContainer.type === "loot" ? LOOT_WIDTH : 4}
-                height={activeContainer.type === "loot" ? LOOT_HEIGHT : 4}
-                inventory={containerItems}
-                onInventoryChange={handleContainerItemsChanged}
-                onItemRemoved={handleContainerItemRemoved}
-                onCrossContainerDrop={handleCrossContainerDrop}
-                acceptedItemId={
-                  activeContainer.type === "quest"
-                    ? activeContainer.acceptedItemId
-                    : undefined
-                }
-              />
-            )}
+            <ItemGrid
+              containerId={activeContainer.id}
+              containerType={activeContainer.type}
+              width={activeContainer.type === "loot" ? LOOT_WIDTH : 4}
+              height={activeContainer.type === "loot" ? LOOT_HEIGHT : 4}
+              inventory={containerItems}
+              onInventoryChange={handleContainerItemsChanged}
+              onItemRemoved={handleContainerItemRemoved}
+              onCrossContainerDrop={handleCrossContainerDrop}
+              acceptedItemId={
+                activeContainer.type === "quest"
+                  ? activeContainer.acceptedItemId
+                  : undefined
+              }
+            />
           </div>
+        </div>
+      )}
+
+      {activeContainer?.type === "chest" && activeChest && (
+        <div
+          className="location-chest-backdrop"
+          onClick={() => setActiveContainer(null)}
+        >
+          <section
+            className="location-chest-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="location-chest-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="location-chest-header">
+              <h2 id="location-chest-title">{activeChest.name}</h2>
+              <button
+                className="location-chest-close"
+                onClick={() => setActiveContainer(null)}
+                aria-label="Stäng kistan"
+              >
+                ×
+              </button>
+            </header>
+            <div className="location-chest-grids">
+              <section className="location-chest-section">
+                <h3>Ryggsäck</h3>
+                <ItemGrid
+                  containerId="player"
+                  containerType="player"
+                  width={player.BackpackWidth}
+                  height={player.BackpackHeight}
+                  inventory={player.Inventory}
+                  onInventoryChange={(updated) =>
+                    setPlayer((p) => ({ ...p, Inventory: updated }))
+                  }
+                  onItemRemoved={(id) =>
+                    setPlayer((p) => ({
+                      ...p,
+                      Inventory: p.Inventory.filter(
+                        (item) => item.containerItemId !== id,
+                      ),
+                    }))
+                  }
+                  onCrossContainerDrop={handleCrossContainerDrop}
+                />
+              </section>
+              <section className="location-chest-section">
+                <h3>{activeChest.name}</h3>
+                <ItemGrid
+                  containerId={activeContainer.id}
+                  containerType="chest"
+                  width={activeChest.width}
+                  height={activeChest.height}
+                  inventory={player.Chests[activeContainer.id]}
+                  onInventoryChange={(updated) =>
+                    setPlayer((p) => ({
+                      ...p,
+                      Chests: {
+                        ...p.Chests,
+                        [activeContainer.id]: updated,
+                      },
+                    }))
+                  }
+                  onItemRemoved={(id) =>
+                    setPlayer((p) => ({
+                      ...p,
+                      Chests: {
+                        ...p.Chests,
+                        [activeContainer.id]: p.Chests[
+                          activeContainer.id
+                        ].filter((item) => item.containerItemId !== id),
+                      },
+                    }))
+                  }
+                  onCrossContainerDrop={handleCrossContainerDrop}
+                />
+              </section>
+            </div>
+          </section>
         </div>
       )}
 

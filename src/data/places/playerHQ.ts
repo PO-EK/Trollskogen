@@ -35,6 +35,7 @@ export const playerHQ: Record<string, AdventureNode> = {
       },
       {
         text: "Öppna kistan",
+        nextNodeId: "storageChest",
         condition: { type: "storyFlag", flag: "unlockedStorage", value: true },
         effects: [{ type: "openStorage" }],
       },
@@ -60,7 +61,7 @@ export const playerHQ: Record<string, AdventureNode> = {
           flag: "openStorageQuest.Started",
           value: false,
         },
-        nextNodeId: "start",
+        nextNodeId: "storageChest",
         effects: [
           {
             type: "setStoryFlag",
@@ -79,7 +80,7 @@ export const playerHQ: Record<string, AdventureNode> = {
           },
           { type: "hasItem", itemId: "storageKey" },
         ],
-        nextNodeId: "start",
+        nextNodeId: "storageChest",
         effects: [
           { type: "removeItem", itemId: "storageKey" },
           { type: "setStoryFlag", flag: "unlockedStorage", value: true },

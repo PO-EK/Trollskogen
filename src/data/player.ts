@@ -1,5 +1,6 @@
 export type StoryFlags = Record<string, boolean>;
 import type { ContainerItem } from "./containerItems";
+import { chests } from "./Chests";
 import type { EquipmentSlot } from "./itemTypes";
 import {
   BASELINE_STAT,
@@ -9,8 +10,9 @@ import {
   MANA_BONUS_PER_INT_POINT,
   getDodgeChance,
 } from "../game/balance";
-import { addItemToInventory } from "../game/inventory";
+import { addItemToChest, addItemToInventory } from "../game/inventory";
 import { equippedItem } from "../game/equipment";
+import { locations } from "./locations";
 
 export function getMaxHP(con: number): number {
   const flat = HP_PER_CON_POINT * con;
@@ -67,14 +69,13 @@ export type Player = {
   BackpackHeight: number;
   Inventory: ContainerItem[];
 
-  StorageWidth: number;
-  StorageHeight: number;
-  Storage: ContainerItem[];
+  Chests: Record<string, ContainerItem[]>;
 
   // Quest progression
   Quests: QuestState[];
   StoryFlags: Record<string, boolean>;
   UnlockedLocations: string[];
+  LockedLocations: string[];
   // In the Player type:
   KnownSkills: string[]; // spells/skills the player has learned
 };
@@ -88,7 +89,7 @@ export const createNewPlayer = (): Player => {
   let player: Player = {
     Name: "Admin",
 
-    Gold: 360,
+    Gold: 20,
 
     Level: 1,
     Exp: 4,
@@ -112,29 +113,32 @@ export const createNewPlayer = (): Player => {
     BackpackWidth: 6,
     BackpackHeight: 6,
 
-    StorageWidth: 7,
-    StorageHeight: 7,
-    Storage: [],
+    Chests: Object.fromEntries(
+      Object.entries(chests).map(([chestId]) => [chestId, []]),
+    ),
 
     EquippedSkills: [],
     Inventory: [],
     Quests: [],
     StoryFlags: {},
-    UnlockedLocations: [
-      "playerHQ",
-      "village",
-      "mayors",
-      "vardshuset",
-      "blacksmith",
-      "ruins",
-      "places",
-    ],
+    UnlockedLocations: locations
+      .filter((location) => location.initialState === "unlocked")
+      .map((location) => location.id),
+    LockedLocations: locations
+      .filter((location) => location.initialState === "locked")
+      .map((location) => location.id),
     KnownSkills: [],
   };
 
   player = addItemToInventory(player, "bandage", "startBandage");
   player = addItemToInventory(player, "storageKey", "playerKey");
   player = equippedItem(player, "iron_sword", "starterSword");
+
+  for (const [chestId, definition] of Object.entries(chests)) {
+    for (const itemId of definition.contents) {
+      player = addItemToChest(player, chestId, itemId);
+    }
+  }
 
   return player;
 };

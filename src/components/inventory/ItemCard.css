@@ -132,6 +132,30 @@
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
+.item-card-use {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border: 1px solid rgba(143, 194, 122, 0.35);
+  border-radius: 6px;
+  background: rgba(143, 194, 122, 0.08);
+}
+
+.item-card-use-status {
+  margin-bottom: 3px;
+  color: #a9d795;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.item-card-use-effects {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-left: 16px;
+  color: #e8dcc4;
+  font-size: 0.78rem;
+}
+
 /* Stat rows */
 .item-card-row {
   display: flex;

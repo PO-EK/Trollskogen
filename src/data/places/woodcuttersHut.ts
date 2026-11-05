@@ -115,7 +115,7 @@ export const woodcuttersHut: Record<string, AdventureNode> = {
             value: true,
           },
           { type: "setStoryFlag", flag: "nattvakten.returnTools", value: true },
-          { type: "lockLocation", locationId: "woodcuttersHut" },
+          { type: "hideLocation", locationId: "woodcuttersHut" },
           { type: "endAdventure" },
         ],
       },

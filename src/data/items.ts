@@ -12,6 +12,11 @@ import clothBandage from "../assets/items/bandage.png";
 import leatherImage from "../assets/items/leather.png";
 import woodlogImage from "../assets/items/woodlog.png";
 
+import sandwichImage from "../assets/items/macka.png";
+import soupVegImage from "../assets/items/gryta.png";
+import teaImage from "../assets/items/tea.png";
+import beerImage from "../assets/items/beer.png";
+
 // Keeps existing imports of these types from "data/items" working.
 export type { ItemShape } from "./itemTypes";
 export type Item = GameItem;
@@ -27,6 +32,63 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 1 },
     ],
     baseValue: 18,
+  },
+  {
+    id: "beerMug",
+    name: "Värdshusets Öl",
+    description: "Bryggt lokalt.",
+    image: beerImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 12,
+    use: {
+      verb: "drack en öl",
+      effects: [{ type: "restoreMana", amount: 40 }],
+    },
+  },
+  {
+    id: "sandwich",
+    name: "Smörgås",
+    description: "Bröd med kött och grönsaker",
+    image: sandwichImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 8,
+    use: {
+      verb: "åt en smörgås",
+      effects: [{ type: "heal", amount: 40 }],
+    },
+  },
+  {
+    id: "soupVeg",
+    name: "Grönsaksgryta",
+    description: "Krämig gryta full med olika grönsaker.",
+    image: soupVegImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 28,
+    use: {
+      verb: "åt en grönsaksgryta",
+      effects: [
+        { type: "heal", amount: 50 },
+        { type: "restoreMana", amount: 50 },
+      ],
+    },
+  },
+  {
+    id: "teaStar",
+    name: "Stjärn Te",
+    description: "En stark dryck som piggar upp sinnet.",
+    image: teaImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 25,
+    use: {
+      verb: "drack stjärnte",
+      effects: [{ type: "restoreMana", amount: 80 }],
+    },
   },
   {
     id: "smedenTools",

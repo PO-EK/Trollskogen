@@ -1,9 +1,3 @@
-import enemyPH from "../assets/enemyPH.png";
-import banditImage from "../assets/enemies/bandit.png";
-import ambusherImage from "../assets/enemies/scout.png";
-import mercenaryImage from "../assets/enemies/mercenery.png";
-import wolfImage from "../assets/enemies/wolf.png";
-
 import { items } from "./items";
 import type { DamageType } from "./skillTypes";
 import { getSkill } from "./skills";
@@ -23,7 +17,7 @@ export type Enemy = {
   id: string;
   type: EnemyType;
   name: string;
-  image: string;
+  description: string;
   exp: number;
   gold: number;
   loot: LootDrop[];
@@ -62,7 +56,8 @@ export const enemies = {
     id: "bandit",
     type: "human",
     name: "Rövare",
-    image: banditImage,
+    description:
+      "En härjad rövare med slitet läder och ett vasst vapen i handen.",
     hp: 120,
     minDamage: 12,
     maxDamage: 15,
@@ -78,7 +73,8 @@ export const enemies = {
     id: "ambusher",
     type: "human",
     name: "Spejare",
-    image: ambusherImage,
+    description:
+      "En vaksam spejare som rör sig lätt och väntar på rätt tillfälle att anfalla.",
     hp: 40,
     minDamage: 20,
     maxDamage: 38,
@@ -94,7 +90,8 @@ export const enemies = {
     id: "mercenary",
     type: "human",
     name: "Legoknekt",
-    image: mercenaryImage,
+    description:
+      "En välutrustad legoknekt med stadig hållning och vana av strid.",
     hp: 220,
     minDamage: 22,
     maxDamage: 25,
@@ -110,7 +107,8 @@ export const enemies = {
     id: "banditChief",
     type: "human",
     name: "Rövarhövding",
-    image: enemyPH,
+    description:
+      "Rövarnas hårdföra ledare, märkt av många strider och redo att försvara sitt byte.",
     hp: 140,
     minDamage: 50,
     maxDamage: 66,
@@ -134,7 +132,8 @@ export const enemies = {
     id: "wolf",
     type: "animal",
     name: "Gråvarg",
-    image: wolfImage,
+    description:
+      "En mager gråvarg blottar tänderna och cirklar rastlöst omkring dig.",
     hp: 58,
     minDamage: 5,
     maxDamage: 8,
@@ -152,7 +151,7 @@ export const enemies = {
     id: "wolverine",
     type: "animal",
     name: "Järv",
-    image: enemyPH,
+    description: "En kompakt järv fräser ilsket och visar sina kraftiga klor.",
     hp: 40,
     minDamage: 13,
     maxDamage: 23,
@@ -172,7 +171,8 @@ export const enemies = {
     id: "boar",
     type: "animal",
     name: "Vildgalt",
-    image: enemyPH,
+    description:
+      "En stor vildgalt stampar i marken med sänkt huvud och blottade betar.",
     hp: 90,
     minDamage: 6,
     maxDamage: 11,
@@ -192,7 +192,7 @@ export const enemies = {
     id: "bear",
     type: "animal",
     name: "Trollbjörn",
-    image: enemyPH,
+    description: "En väldig trollbjörn reser sig på bakbenen och ryter djupt.",
     hp: 100,
     minDamage: 12,
     maxDamage: 20,
@@ -219,7 +219,7 @@ export const enemies = {
     id: "madcap",
     type: "fey",
     name: "Vättar",
-    image: enemyPH,
+    description: "Små vättar med illvilliga leenden flockas omkring dig.",
     hp: 44,
     minDamage: 4,
     maxDamage: 8,
@@ -239,7 +239,8 @@ export const enemies = {
     id: "drownling",
     type: "fey",
     name: "Myling",
-    image: enemyPH,
+    description:
+      "En blek myling tycks drypa av mörkt vatten och viskar olycksbådande.",
     hp: 70,
     minDamage: 5,
     maxDamage: 9,
@@ -260,7 +261,8 @@ export const enemies = {
     id: "dryad",
     type: "fey",
     name: "Skogsrå",
-    image: enemyPH,
+    description:
+      "Skogsrået står stilla mellan träden, vackert och hotfullt på samma gång.",
     hp: 80,
     minDamage: 5,
     maxDamage: 10,
@@ -283,7 +285,8 @@ export const enemies = {
     id: "troll",
     type: "fey",
     name: "Skogstroll",
-    image: enemyPH,
+    description:
+      "Ett massivt skogstroll höjer sina knotiga nävar och spärrar vägen.",
     hp: 200,
     minDamage: 14,
     maxDamage: 24,

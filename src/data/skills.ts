@@ -186,6 +186,16 @@ export const skills: Skill[] = [
         maxStacks: 5,
       },
     ],
+  },
+  {
+    id: "wand_drain",
+    name: "Magiuttag",
+    description:
+      "Träffar fienden med magisk kraft och återställer magi motsvarande en del av skadan.",
+    target: "enemy",
+    damageType: "piercing",
+    damage: { kind: "weapon", multiplier: 1.2 },
+    effects: [{ type: "manaLeech", percentOfDamage: 40 }],
     cooldown: 1,
   },
   {
@@ -194,7 +204,7 @@ export const skills: Skill[] = [
     description: "Skada fienden med ren magisk kraft.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.2 },
+    damage: { kind: "weapon", multiplier: 1.4 },
   },
   {
     id: "wand_push",
@@ -203,8 +213,8 @@ export const skills: Skill[] = [
     target: "enemy",
     damageType: "crushing",
     damage: { kind: "weapon", multiplier: 1 },
-    effects: [{ type: "stun", chance: 100, turns: 1 }],
-    cooldown: 4,
+    effects: [{ type: "stun", chance: 100, turns: 2 }],
+    cooldown: 5,
   },
 
   // ---- Enemy skills ----
@@ -434,15 +444,16 @@ export const skills: Skill[] = [
     manaCost: 16,
     cooldown: 4,
   },
+
   //Trollkarl:
   {
     id: "mana_shield",
     name: "Magisk Sköld",
     description: "Använd magi för att blockera skada.",
     target: "self",
-    effects: [{ type: "guard", percent: 70, turns: 6 }],
-    manaCost: 30,
-    cooldown: 6,
+    effects: [{ type: "guard", percent: 70, turns: 3 }],
+    manaCost: 40,
+    cooldown: 3,
   },
   {
     id: "shadow_clone",

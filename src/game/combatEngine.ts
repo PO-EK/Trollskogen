@@ -422,17 +422,19 @@ function performAction(
   if (skill?.effects && !missed) {
     const recipientSide: Side = skill.target === "self" ? actor : defender;
     const who = subject(recipientSide);
-    const lifestealEffects = skill.effects.filter(
-      (effect) => effect.type === "lifesteal",
+    const leechEffects = skill.effects.filter(
+      (effect) =>
+        effect.type === "lifesteal" || effect.type === "manaLeech",
     );
     const targetEffects = skill.effects.filter(
-      (effect) => effect.type !== "lifesteal",
+      (effect) =>
+        effect.type !== "lifesteal" && effect.type !== "manaLeech",
     );
 
-    if (lifestealEffects.length > 0) {
+    if (leechEffects.length > 0) {
       const leech = applyEffects(
         attacker,
-        lifestealEffects,
+        leechEffects,
         random,
         damageDealt,
       );
@@ -440,6 +442,10 @@ function performAction(
 
       if (leech.healed > 0) {
         say(`${subject(actor)} dränerar ${leech.healed} hälsa.`, "info");
+      }
+
+      if (leech.manaRestored > 0) {
+        say(`${subject(actor)} dränerar ${leech.manaRestored} magi.`, "info");
       }
     }
 

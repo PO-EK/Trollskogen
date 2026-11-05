@@ -7,8 +7,9 @@ import type {
   WeaponItem,
   WeaponStat,
 } from "../../data/itemTypes";
-import type { Skill } from "../../data/skillTypes";
+import type { Skill, SkillEffect } from "../../data/skillTypes";
 import { getDamageRange } from "../../game/weaponDamage";
+import { ATTRIBUTE_LABELS, CURE_LABELS } from "../../game/labels";
 import "./ItemCard.css";
 
 // Record<...> makes TypeScript complain if you add a new slot, stat or
@@ -41,6 +42,45 @@ const CATEGORY_LABELS = {
   weapon: "Vapen",
   armour: "Rustning",
 } as const;
+
+function describeUseEffect(effect: SkillEffect): string {
+  switch (effect.type) {
+    case "heal":
+      return effect.percentOfMax
+        ? `Läker ${effect.percentOfMax}% av max hälsa`
+        : `Läker ${effect.amount ?? 0} hälsa`;
+    case "restoreMana":
+      return effect.percentOfMax
+        ? `Återställer ${effect.percentOfMax}% av max magi`
+        : `Återställer ${effect.amount ?? 0} magi`;
+    case "cure":
+      return `Botar ${effect.statuses.map((status) => CURE_LABELS[status]).join(", ")}`;
+    case "buff":
+      return `${effect.amount > 0 ? "+" : ""}${effect.amount} ${ATTRIBUTE_LABELS[effect.stat]} i ${effect.turns} rundor`;
+    case "lifesteal":
+      return `Läker ${effect.percentOfDamage}% av skadan som hälsa`;
+    case "manaLeech":
+      return `Återställer ${effect.percentOfDamage}% av skadan som magi`;
+    case "damageMod":
+      return `${effect.percent > 0 ? "+" : ""}${effect.percent}% skada i ${effect.turns} rundor`;
+    case "weak":
+      return `${effect.percent}% mindre skada i ${effect.turns} rundor`;
+    case "guard":
+      return `Tar ${effect.percent}% mindre skada i ${effect.turns} rundor`;
+    case "offguard":
+      return `Tar ${effect.percent}% mer skada i ${effect.turns} rundor`;
+    case "evade":
+      return `${Math.round(effect.chance)}% chans att undvika attacker i ${effect.turns} rundor`;
+    case "burn":
+      return `Brand: ${effect.damage} skada per runda`;
+    case "bleed":
+      return `Blödning: ${effect.damage} skada per runda`;
+    case "healOverTime":
+      return `Läker ${effect.amount} hälsa per runda`;
+    case "stun":
+      return `Bedövar i ${effect.turns} rundor`;
+  }
+}
 
 /* function getSkillMeta(skill: Skill): string {
   const parts: string[] = [];
@@ -128,6 +168,10 @@ function ItemCard({ itemId, salePrice }: ItemCardProps) {
   }
 
   const category = item.category ?? "general";
+  const itemUse =
+    item.category === "weapon" || item.category === "armour"
+      ? undefined
+      : item.use;
   return (
     // The key restarts the fade-in animation whenever the item changes.
     <div className="item-card" key={item.id} data-category={category}>
@@ -142,6 +186,19 @@ function ItemCard({ itemId, salePrice }: ItemCardProps) {
 
       <p className="item-card-description">{item.description}</p>
       <div className="item-card-divider" />
+
+      {itemUse && (
+        <section className="item-card-use" aria-label="Användning">
+          <div className="item-card-use-status">Kan användas</div>
+          <ul className="item-card-use-effects">
+            {itemUse.effects.map((effect, index) => (
+              <li key={`${effect.type}-${index}`}>
+                {describeUseEffect(effect)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {item.category === "weapon" && <WeaponDetails weapon={item} />}
       {item.category === "armour" && <ArmourDetails armour={item} />}

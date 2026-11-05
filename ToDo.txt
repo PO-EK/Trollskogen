@@ -17,16 +17,14 @@ Disable Right-Click + Select - Klart
 Level up - Klart
 Skill Tree - Klart
 
-Quest tracking
+Quest tracking - Klart
 
 Quests/Story Locations:
 
 Intro - Klart
 Ruins - Klart
 Smeden - Klart
-Snickare
-Värdhuset
-Jägaren
+Värdhuset - Klart
 Häxan
 
 Enemies Stats + Art:

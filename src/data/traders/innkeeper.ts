@@ -7,5 +7,5 @@ export const innkeeper: TraderDefinition = {
   inventoryWidth: 5,
   inventoryHeight: 3,
   markup: 1.25,
-  stock: [],
+  stock: ["beerMug", "soupVeg", "teaStar", "sandwich"],
 };

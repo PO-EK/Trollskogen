@@ -32,6 +32,8 @@ function describeEffect(effect: SkillEffect): string {
         : `Läker ${effect.amount ?? 0} hälsa`;
     case "lifesteal":
       return `Läker ${effect.percentOfDamage}% av skadan som hälsa`;
+    case "manaLeech":
+      return `Återställer ${effect.percentOfDamage}% av skadan som magi`;
     case "damageMod":
       return `${effect.percent > 0 ? "+" : ""}${effect.percent}% skada i ${effect.turns} rundor`;
     case "weak":

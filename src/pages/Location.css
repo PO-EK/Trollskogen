@@ -56,13 +56,32 @@
 }
 
 .location-text {
+  box-sizing: border-box;
+  height: 260px;
+  overflow-y: auto;
   border: 2px solid #c09a5b;
-  padding: 10px;
+  padding: 20px;
+  color: wheat;
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
   font-size: 20px;
-  padding-top: 20px;
-  padding-bottom: 30px;
-  text-wrap-mode: wrap;
+  line-height: 1.6;
   text-align: start;
+  text-wrap: pretty;
+  scrollbar-gutter: stable;
+}
+
+.location-paragraph {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.location-paragraph + .location-paragraph {
+  margin-top: 1em;
+}
+
+.location-dialogue {
+  display: block;
+  color: #b8d7f0;
 }
 
 .location-header {
@@ -110,4 +129,85 @@
   color: #e8d7b0;
   font-family: Georgia, serif;
   text-align: center;
+}
+
+.location-chest-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.location-chest-overlay {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  padding: 20px;
+  border: 2px solid #8c6b3e;
+  border-radius: 8px;
+  background: #17130e;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+.location-chest-grids {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 24px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.location-chest-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-chest-section h3 {
+  margin: 0;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  text-align: center;
+}
+
+.location-chest-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.location-chest-header h2 {
+  margin: 0;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.location-chest-close {
+  border: 1px solid #8c6b3e;
+  border-radius: 4px;
+  padding: 2px 10px;
+  background: transparent;
+  color: #e8d7b0;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.location-chest-close:hover {
+  background: #30261b;
+}
+
+@media (max-width: 620px) {
+  .location-chest-grids {
+    grid-template-columns: max-content;
+  }
 }

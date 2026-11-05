@@ -56,7 +56,9 @@ export function equippedItem(
 
   const existingIds = [
     ...player.Inventory.map((item) => item.containerItemId),
-    ...player.Storage.map((item) => item.containerItemId),
+    ...Object.values(player.Chests).flatMap((items) =>
+      items.map((item) => item.containerItemId),
+    ),
     ...Object.values(player.Equipment).flatMap((item) =>
       item ? [item.containerItemId] : [],
     ),

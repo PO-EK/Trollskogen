@@ -60,7 +60,7 @@ export const weapons: WeaponItem[] = [
     minDamage: 8,
     maxDamage: 9,
     stat: "Int",
-    skills: ["wand_stab", "wand_slash", "wand_push"],
+    skills: ["wand_slash", "wand_drain", "wand_push"],
   },
   {
     id: "steel_sword",

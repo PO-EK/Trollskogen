@@ -1,7 +1,7 @@
 export type ContainerType =
   | "player"
   | "trader"
-  | "storage"
+  | "chest"
   | "quest"
   | "loot"
   | "equipment"

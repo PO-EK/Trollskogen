@@ -43,6 +43,7 @@ export type SkillEffect = EffectChance &
       }
     | { type: "heal"; amount?: number; percentOfMax?: number }
     | { type: "lifesteal"; percentOfDamage: number }
+    | { type: "manaLeech"; percentOfDamage: number }
     | { type: "restoreMana"; amount?: number; percentOfMax?: number }
     | { type: "cure"; statuses: StatusKind[] }
     | { type: "damageMod"; percent: number; turns: number }

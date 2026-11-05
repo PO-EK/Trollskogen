@@ -22,7 +22,8 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
   const visibleLocations = locations.filter(
     (location) =>
       location.mapId === mapId &&
-      player.UnlockedLocations.includes(location.id),
+      (player.UnlockedLocations.includes(location.id) ||
+        player.LockedLocations.includes(location.id)),
   );
   const hoveredLocation = visibleLocations.find(
     (location) => location.id === hoveredLocationId,
@@ -34,27 +35,38 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
       style={{ backgroundImage: `url("${map.backgroundImage}")` }}
       aria-label={map.name}
     >
-      {visibleLocations.map((location) => (
-        <button
-          key={location.id}
-          className="map-location"
-          aria-label={location.name}
-          style={{
-            left: `${location.x}%`,
-            top: `${location.y}%`,
-          }}
-          onClick={() => onLocationSelect(location.id)}
-          onMouseEnter={() => setHoveredLocationId(location.id)}
-          onMouseLeave={() => setHoveredLocationId(null)}
-        >
-          <img
-            className="map-location-image"
-            src={location.image}
-            alt=""
-            draggable={false}
-          />
-        </button>
-      ))}
+      {visibleLocations.map((location) => {
+        const isLocked = player.LockedLocations.includes(location.id);
+
+        return (
+          <button
+            key={location.id}
+            className={`map-location${isLocked ? " map-location-locked" : ""}`}
+            aria-label={location.name}
+            aria-disabled={isLocked}
+            tabIndex={isLocked ? -1 : undefined}
+            style={{
+              left: `${location.x}%`,
+              top: `${location.y}%`,
+              transform: `translate(-50%, -50%) scale(${location.scale})`,
+            }}
+            onClick={() => {
+              if (!isLocked) {
+                onLocationSelect(location.id);
+              }
+            }}
+            onMouseEnter={() => setHoveredLocationId(location.id)}
+            onMouseLeave={() => setHoveredLocationId(null)}
+          >
+            <img
+              className="map-location-image"
+              src={location.image}
+              alt=""
+              draggable={false}
+            />
+          </button>
+        );
+      })}
 
       {hoveredLocation && (
         <div

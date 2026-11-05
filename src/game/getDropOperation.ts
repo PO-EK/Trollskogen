@@ -21,11 +21,11 @@ export function getDropOperation(
     return "pickup";
   }
 
-  if (sourceType === "player" && destinationType === "storage") {
+  if (sourceType === "player" && destinationType === "chest") {
     return "store";
   }
 
-  if (sourceType === "storage" && destinationType === "player") {
+  if (sourceType === "chest" && destinationType === "player") {
     return "retrieve";
   }
 
@@ -39,9 +39,6 @@ export function getDropOperation(
 
   if (destinationType === "quest") {
     return "quest";
-  }
-  if (sourceType === "storage" && destinationType === "storage") {
-    return "move";
   }
   if (sourceType === "player" && destinationType === "useSlot") {
     return "use";

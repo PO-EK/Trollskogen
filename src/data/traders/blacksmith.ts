@@ -5,7 +5,7 @@ export const blacksmith: TraderDefinition = {
   name: "Smeden",
   description: "En kraftig smed som säljer vapen och rustningar.",
   inventoryWidth: 8,
-  inventoryHeight: 5,
+  inventoryHeight: 6,
   markup: 1.25,
   stock: [
     "iron_body",

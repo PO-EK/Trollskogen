@@ -257,8 +257,7 @@ function Combat({ encounter, onFinish }: CombatProps) {
 
   return (
     <div className="combat">
-      {/* Enemy: name, hp, statuses */}
-      <section className="combat-enemy">
+      <section className="combat-enemy-card">
         <div className="combat-enemy-title">
           <h2>{enemy.name}</h2>
           <span className="combat-turn">
@@ -266,31 +265,26 @@ function Combat({ encounter, onFinish }: CombatProps) {
           </span>
           <span className="combat-round">Runda {state.round}</span>
         </div>
-      </section>
-      <StatusRow statuses={state.enemy.statuses} />
-      {/* Middle: enemy image and the log */}
-      <div className="combat-middle">
-        <img
-          className="combat-enemy-image"
-          src={enemy.image}
-          alt={enemy.name}
-        />
-
-        <div className="combat-log" ref={logRef}>
-          {state.log.map((entry, index) => (
-            <p key={index} className="combat-log-line" data-tone={entry.tone}>
-              {entry.text}
-            </p>
-          ))}
-        </div>
+        <p className="combat-enemy-description">{enemy.description}</p>
         <div className="resource-label">
-          <span>❤️ Hälsa </span>
+          <span>❤️ Hälsa</span>
           <span>
             {state.enemy.hp} / {state.enemy.maxHp}
           </span>
         </div>
         <div className="resource-bar">
           <div className="health-bar" style={{ width: `${enemyPercent}%` }} />
+        </div>
+        <StatusRow statuses={state.enemy.statuses} />
+      </section>
+
+      <div className="combat-middle">
+        <div className="combat-log" ref={logRef}>
+          {state.log.map((entry, index) => (
+            <p key={index} className="combat-log-line" data-tone={entry.tone}>
+              {entry.text}
+            </p>
+          ))}
         </div>
       </div>
 

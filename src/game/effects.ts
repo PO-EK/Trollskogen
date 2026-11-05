@@ -166,6 +166,7 @@ function effectToStatus(
     case "heal":
     case "lifesteal":
     case "restoreMana":
+    case "manaLeech":
     case "cure":
       return null;
     default:
@@ -232,6 +233,18 @@ export function applyEffects<T extends Vitals>(
 
       healed += hp - next.hp;
       next = { ...next, hp };
+      continue;
+    }
+
+    if (effect.type === "manaLeech") {
+      const mana = Math.min(
+        next.maxMana,
+        next.mana +
+          Math.round((effect.percentOfDamage / 100) * damageDealt),
+      );
+
+      manaRestored += mana - next.mana;
+      next = { ...next, mana };
       continue;
     }
 

@@ -48,17 +48,17 @@ export const vardshuset: Record<string, AdventureNode> = {
   },
   villageInside: {
     id: "villageInside",
-    text: "Inne är det varmt och luktar av örtsalvor och rök. Borden och stolarna har flyttats undan eller byggts om till sjuksängar. Längs väggarna ligger skadade bybor med bandage, och deras nära och kära sitter vid deras sida med fuktiga trasor. Någon stönar, någon viskar. En äldre kvinna med grått hår uppsatt i en knut får syn på dig och kommer fram. 'Behöver du hjälp, käraste? Är du skadad?'",
+    text: "Inne är det varmt och luktar av örtsalvor och rök. Borden och stolarna har flyttats undan eller byggts om till sjuksängar. Längs väggarna ligger skadade bybor med bandage, och deras nära och kära sitter vid deras sida med fuktiga trasor. Någon stönar, någon viskar. En äldre kvinna med grått hår uppsatt i en knut får syn på dig och kommer fram. 'Behöver du hjälp? Är du skadad?'",
     choices: [{ text: "Jag letar efter Ulf.", nextNodeId: "villageMarie" }],
   },
   villageMarie: {
     id: "villageMarie",
-    text: "'Ulf? Min man står bakom baren och räknar tunnor som om det skulle få dem att räcka längre.' Hon ler trött. 'Jag är Marie, förresten. Säg till om du behöver något.'",
+    text: "'Ulf? Min man står bakom baren och räknar tunnor som om det skulle få dem att räcka längre.' Hon ler trött. 'Jag är Marie, förresten. Säg till om du behöver något.' Hon återvänder snabbt till de skadade och hungriga.",
     choices: [{ text: "Gå fram till baren.", nextNodeId: "villageUlf" }],
   },
   villageUlf: {
     id: "villageUlf",
-    text: "Bakom baren står en gammal man med vitt skägg och går igenom rader av tunnor och säckar, en penna bakom örat. Han ser upp när du närmar dig och lägger ned pennan. Du presenterar dig, och Ulf ler brett. 'Jag vet vem du är. Du är från gården vid skogsbrynet. Jag hörde att det första du gjorde när du kom hem från kriget var att skrämma bort ett stort troll som var på väg att äta upp byns boskap.' Han skakar din hand med båda sina. 'Gudarna vare tack att du är här. Vi behöver hjälp, och det är ingen skam att erkänna det.'",
+    text: "Bakom baren står en gammal man med vitt skägg och går igenom rader av tunnor och säckar, en penna bakom örat. Han ser upp när du närmar dig och lägger ned pennan. \n\nDu presenterar dig, och Ulf ler brett. 'Jag vet vem du är. Du är från gården vid skogsbrynet. Jag hörde att det första du gjorde när du kom hem från kriget var att skrämma bort ett stort troll som var på väg att äta upp byns boskap.' Han skakar din hand med båda sina. 'Gudarna vare tack att du är här. Vi behöver hjälp, och det är ingen skam att erkänna det.'",
     choices: [{ text: "Hur ser läget ut?", nextNodeId: "villageUlfSituation" }],
   },
   villageUlfSituation: {
@@ -126,6 +126,16 @@ export const vardshuset: Record<string, AdventureNode> = {
     id: "ulfStart",
     text: "Ulf ser upp från sina listor och lägger ifrån sig pennan. 'Där är du ju. Vad kan jag göra för dig?'",
     choices: [
+      {
+        text: "Jag behöver köpa provianter",
+        nextNodeId: "ulfStart",
+        effects: [
+          {
+            type: "openTrader",
+            traderId: "innkeeper",
+          },
+        ],
+      },
       {
         text: "Byn behöver en ledare.",
         nextNodeId: "ulfLeader",

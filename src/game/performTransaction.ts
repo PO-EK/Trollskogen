@@ -2,6 +2,7 @@ import { items } from "../data/items";
 import type { ContainerItem } from "../data/containerItems";
 import type { ContainerType } from "../data/containerTypes";
 import type { Player } from "../data/player";
+import { getChestDefinition } from "../data/Chests";
 import type { Trader, TraderInventoryItem } from "../data/traders/tradersTypes";
 import { canEquipInSlot, parseEquipSlotId } from "./equipment";
 import { getDropOperation } from "./getDropOperation";
@@ -424,9 +425,7 @@ function performSell({
 }
 
 /*
- * Moves an item between the player's backpack and the player's storage.
- * Both lists live in the Player object, so the item is removed from one
- * and added to the other in a single update. It can't be lost or duplicated.
+ * Moves an item between the player's backpack and a chest in one update.
  */
 function performMoveBetweenPlayerLists({
   item,
@@ -439,22 +438,24 @@ function performMoveBetweenPlayerLists({
 }: TransactionHandlerArgs & {
   direction: "store" | "retrieve";
 }): PerformTransactionOutput {
-  const expectedSourceId = direction === "store" ? "player" : "storage";
-  const expectedDestinationId = direction === "store" ? "storage" : "player";
+  const chestId = direction === "store" ? destinationId : sourceId;
 
   if (
-    sourceId !== expectedSourceId ||
-    destinationId !== expectedDestinationId
+    (direction === "store" && sourceId !== "player") ||
+    (direction === "retrieve" && destinationId !== "player")
   ) {
-    return {
-      success: false,
-      reason: "invalid_transaction",
-      player,
-      trader,
-    };
+    return invalid(player, trader);
   }
 
-  const sourceList = direction === "store" ? player.Inventory : player.Storage;
+  getChestDefinition(chestId);
+  const chestItems = player.Chests[chestId];
+
+  if (!chestItems) {
+    return invalid(player, trader);
+  }
+
+  const sourceList =
+    direction === "store" ? player.Inventory : chestItems;
 
   // Trust our own state, not the dragged copy (same approach as performSell).
   const ownedItem = sourceList.find(
@@ -494,18 +495,20 @@ function performMoveBetweenPlayerLists({
     (listItem) => listItem.containerItemId !== ownedItem.containerItemId,
   );
 
-  const updatedPlayer: Player =
-    direction === "store"
-      ? {
-          ...player,
-          Inventory: remaining,
-          Storage: [...player.Storage, movedItem],
-        }
-      : {
-          ...player,
-          Storage: remaining,
-          Inventory: [...player.Inventory, movedItem],
-        };
+  const updatedPlayer: Player = {
+    ...player,
+    Inventory:
+      direction === "store"
+        ? remaining
+        : [...player.Inventory, movedItem],
+    Chests: {
+      ...player.Chests,
+      [chestId]:
+        direction === "store"
+          ? [...chestItems, movedItem]
+          : remaining,
+    },
+  };
 
   return {
     success: true,

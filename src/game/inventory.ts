@@ -1,4 +1,5 @@
 import type { ContainerItem } from "../data/containerItems";
+import { getChestDefinition } from "../data/Chests";
 import type { Player } from "../data/player";
 import type { Trader, TraderInventoryItem } from "../data/traders/tradersTypes";
 import { items } from "../data/items";
@@ -119,7 +120,9 @@ export function findFirstAvailableItemPosition(
 function getPlayerContainerItemIds(player: Player): string[] {
   return [
     ...player.Inventory.map((item) => item.containerItemId),
-    ...player.Storage.map((item) => item.containerItemId),
+    ...Object.values(player.Chests).flatMap((items) =>
+      items.map((item) => item.containerItemId),
+    ),
     ...Object.values(player.Equipment).flatMap((item) =>
       item ? [item.containerItemId] : [],
     ),
@@ -160,7 +163,9 @@ export function addItemToInventory(
           metadata: {},
           containerItemId,
           occupiedIds: [
-            ...player.Storage.map((item) => item.containerItemId),
+            ...Object.values(player.Chests).flatMap((items) =>
+              items.map((item) => item.containerItemId),
+            ),
             ...Object.values(player.Equipment).flatMap((item) =>
               item ? [item.containerItemId] : [],
             ),
@@ -170,44 +175,59 @@ export function addItemToInventory(
     };
   }
 
+  const storageDefinition = getChestDefinition("playerStorage");
   const storagePosition = findFirstAvailableItemPosition(
     itemId,
-    player.Storage,
-    player.StorageWidth,
-    player.StorageHeight,
+    player.Chests.playerStorage,
+    storageDefinition.width,
+    storageDefinition.height,
   );
 
   if (storagePosition) {
-    return addItemToStorage(player, itemId, containerItemId);
+    return addItemToChest(player, "playerStorage", itemId, containerItemId);
   }
 
   throw new Error(`No space available for item "${itemId}".`);
 }
 
-export function addItemToStorage(
+export function addItemToChest(
   player: Player,
+  chestId: string,
   itemId: string,
   containerItemId?: string,
 ): Player {
+  const definition = getChestDefinition(chestId);
+  const chestInventory = player.Chests[chestId];
+
+  if (!chestInventory) {
+    throw new Error(`Missing player inventory for chest "${chestId}".`);
+  }
+
   return {
     ...player,
-    Storage: addItemToContainer(
-      player.Storage,
-      itemId,
-      player.StorageWidth,
-      player.StorageHeight,
-      {
-        idPrefix: itemId,
-        metadata: {},
-        containerItemId,
-        occupiedIds: [
-          ...player.Inventory.map((item) => item.containerItemId),
-          ...Object.values(player.Equipment).flatMap((item) =>
-            item ? [item.containerItemId] : [],
-          ),
-        ],
-      },
-    ),
+    Chests: {
+      ...player.Chests,
+      [chestId]: addItemToContainer(
+        chestInventory,
+        itemId,
+        definition.width,
+        definition.height,
+        {
+          idPrefix: `${chestId}-${itemId}`,
+          metadata: {},
+          containerItemId,
+          occupiedIds: [
+            ...player.Inventory.map((item) => item.containerItemId),
+            ...Object.values(player.Chests).flatMap((items) =>
+              items.map((item) => item.containerItemId),
+            ),
+            ...Object.values(player.Equipment).flatMap((item) =>
+              item ? [item.containerItemId] : [],
+            ),
+          ],
+        },
+      ),
+    },
   };
 }
 

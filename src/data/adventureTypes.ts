@@ -1,4 +1,5 @@
 import type { ContainerItem } from "../data/containerItems";
+import type { ChestId } from "./Chests";
 import type { CombatEncounter } from "../game/combatTypes";
 
 export type AdventureChoice = {
@@ -39,6 +40,7 @@ export type AdventureEffect =
   | { type: "learnSkill"; skillId: string }
   | { type: "addGold"; amount: number }
   | { type: "openStorage" }
+  | { type: "openChest"; chestId: ChestId }
   | { type: "removeGold"; amount: number }
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
@@ -50,4 +52,5 @@ export type AdventureEffect =
   | { type: "travelTo"; locationId: string }
   | { type: "unlockLocation"; locationId: string }
   | { type: "lockLocation"; locationId: string }
+  | { type: "hideLocation"; locationId: string }
   | { type: "endAdventure" };

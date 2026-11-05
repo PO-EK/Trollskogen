@@ -12,9 +12,21 @@
   font-family: Georgia, serif;
 }
 
-/* Enemy header */
+.combat-enemy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+
+  background: rgba(20, 16, 10, 0.6);
+  border: 2px solid #5c4a32;
+  border-radius: 8px;
+}
+
 .combat-enemy-title {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
   justify-content: space-between;
   align-items: baseline;
 }
@@ -28,6 +40,13 @@
 .combat-round {
   font-size: 0.8rem;
   color: #8a7e69;
+}
+
+.combat-enemy-description {
+  margin: 0;
+  color: #e8d7b0;
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 /* Status icons, with the turns left as a small number */
@@ -74,22 +93,20 @@
   text-align: center;
 }
 
-/* Middle: image left, log right. It takes the leftover height. */
+/* The log takes the remaining height beneath the enemy card. */
 .combat-middle {
   flex: 1;
   min-height: 160px;
-
-  display: grid;
-  grid-template-columns: minmax(150px, 230px) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-  gap: 12px;
+  display: flex;
 }
 
-.combat-enemy-image {
-  width: 100%;
-  height: 100%;
+.combat-enemy-card .combat-statuses {
+  margin-top: 0;
+}
+
+.combat-middle .combat-log {
+  flex: 1;
   min-height: 0;
-  object-fit: contain;
 }
 
 .combat-log {
@@ -354,10 +371,4 @@
   line-height: 14px;
   text-align: center;
   color: #e8a09a;
-}
-@media (max-width: 700px) {
-  .combat-middle {
-    grid-template-columns: 1fr;
-    grid-template-rows: 120px minmax(0, 1fr);
-  }
 }
