@@ -66,7 +66,7 @@ export const enemies = {
     isBoss: false,
     exp: 44,
     gold: 14,
-    loot: [],
+    loot: [drop("ruby", 0.5), drop("sapphire", 0.3), drop("diamond", 0.1)],
   },
 
   ambusher: {
@@ -144,7 +144,7 @@ export const enemies = {
     isBoss: false,
     exp: 42,
     gold: 6,
-    loot: [],
+    loot: [drop("wolfMeat", 0.8), drop("wolfPelt", 0.5)],
   },
 
   wolverine: {
@@ -176,7 +176,7 @@ export const enemies = {
     hp: 90,
     minDamage: 6,
     maxDamage: 11,
-    skills: ["bite", "tackle", "stab_hard"],
+    skills: ["bite", "stab_hard"],
     resistances: {
       ...neutralResistances,
       slashing: 0.75,
@@ -185,7 +185,7 @@ export const enemies = {
     isBoss: false,
     exp: 90,
     gold: 0,
-    loot: [drop("leather", 0.6)],
+    loot: [],
   },
 
   bear: {
@@ -290,7 +290,7 @@ export const enemies = {
     hp: 200,
     minDamage: 14,
     maxDamage: 24,
-    skills: ["punch", "harden", "crush_swing"],
+    skills: ["punch", "harden", "crush_hard"],
     resistances: {
       ...neutralResistances,
       slashing: 1.25,

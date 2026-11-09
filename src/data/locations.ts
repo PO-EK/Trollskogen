@@ -9,6 +9,7 @@ import witchHutImage from "../assets/map-locations/witchHut.png";
 import woodcuttersHutImage from "../assets/map-locations/woodcuttersHut.png";
 import ancientTreeImage from "../assets/map-locations/ancientTree.png";
 import banditCampImage from "../assets/map-locations/banditCamp.png";
+import witchIntroQuestImage from "../assets/map-locations/witchIntroQuest.png";
 
 export type LocationInitialState = "unlocked" | "hidden" | "locked";
 
@@ -178,12 +179,14 @@ export const locations: MapLocation[] = [
     id: "witchHut",
     mapId: "wilderness",
     name: "Häxans stuga",
-    initialState: "hidden",
+    initialState: "unlocked",
     x: 15,
     y: 70,
     image: witchHutImage,
     scale: 1,
-    adventureId: "witchHut",
+    adventureId: "witchCottage",
+    introNodeId: "intro",
+    introSeenFlag: "mainstory.witch.introComplete",
   },
   {
     id: "banditCamp",
@@ -201,10 +204,21 @@ export const locations: MapLocation[] = [
     mapId: "wilderness",
     name: "Trollskogen",
     initialState: "unlocked",
-    x: 53,
+    x: 43,
     y: 24,
     image: ancientTreeImage,
     scale: 2,
     adventureId: "places",
+  },
+  {
+    id: "witchIntroQuest",
+    mapId: "wilderness",
+    name: "Svampgrotta",
+    initialState: "hidden",
+    x: 20,
+    y: 40,
+    image: witchIntroQuestImage,
+    scale: 1.2,
+    adventureId: "witchIntroQuest",
   },
 ];

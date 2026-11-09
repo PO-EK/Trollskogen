@@ -16,6 +16,16 @@ import sandwichImage from "../assets/items/macka.png";
 import soupVegImage from "../assets/items/gryta.png";
 import teaImage from "../assets/items/tea.png";
 import beerImage from "../assets/items/beer.png";
+import blueMushroomImage from "../assets/items/blueMushroom.png";
+import wolfMeatImage from "../assets/items/wolfMeat.png";
+import wolfPeltImage from "../assets/items/wolfPelt.png";
+import orangeMushroomsImage from "../assets/items/orangeMushrooms.png";
+import rubyImage from "../assets/items/ruby.png";
+import sapphireImage from "../assets/items/sapphire.png";
+import diamondImage from "../assets/items/diamond.png";
+import silverRingImage from "../assets/items/silverRing.png";
+import goldRingImage from "../assets/items/goldRing.png";
+import diamondRingImage from "../assets/items/diamondRing.png";
 
 // Keeps existing imports of these types from "data/items" working.
 export type { ItemShape } from "./itemTypes";
@@ -113,6 +123,73 @@ const generalItems: GeneralItem[] = [
     baseValue: 20,
   },
   {
+    id: "wolfMeat",
+    name: "Vargkött",
+    description: "Rått kött från en varg.",
+    image: wolfMeatImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 12,
+  },
+  {
+    id: "wolfPelt",
+    name: "Vargskinn",
+    description: "En varm, gråbrun vargpäls.",
+    image: wolfPeltImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 48,
+  },
+  {
+    id: "ruby",
+    name: "Rubin",
+    description: "En klar, röd ädelsten.",
+    image: rubyImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 90,
+  },
+  {
+    id: "sapphire",
+    name: "Safir",
+    description: "En djupblå ädelsten med slipade fasetter.",
+    image: sapphireImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 100,
+  },
+  {
+    id: "diamond",
+    name: "Diamant",
+    description: "En gnistrande, klar ädelsten.",
+    image: diamondImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 180,
+  },
+  {
+    id: "silverRing",
+    name: "Silverring",
+    description: "En enkel ring av polerat silver.",
+    image: silverRingImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 70,
+  },
+  {
+    id: "goldRing",
+    name: "Guldring",
+    description: "En vacker ring av rent guld.",
+    image: goldRingImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 125,
+  },
+  {
+    id: "diamondRing",
+    name: "Diamantring",
+    description: "En guldring prydd med en gnistrande diamant.",
+    image: diamondRingImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 300,
+  },
+  {
     id: "woodlog",
     name: "Stock",
     description: "Råmatrial av trä.",
@@ -176,6 +253,30 @@ const generalItems: GeneralItem[] = [
     use: {
       verb: "drack en magisk dryck",
       effects: [{ type: "restoreMana", percentOfMax: 100 }],
+    },
+  },
+  {
+    id: "magicMushroom",
+    name: "Magisk Svamp",
+    description: "En blå svamp med magiska egenskaper.",
+    image: blueMushroomImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 24,
+    use: {
+      verb: "åt en magisk svamp",
+      effects: [{ type: "restoreMana", amount: 12 }],
+    },
+  },
+  {
+    id: "healingMushroom",
+    name: "Läkande Svamp",
+    description: "En liten klase orange svampar som läker 12 hälsa.",
+    image: orangeMushroomsImage,
+    shape: [{ x: 0, y: 0 }],
+    baseValue: 12,
+    use: {
+      verb: "åt en läkande svamp",
+      effects: [{ type: "heal", amount: 12 }],
     },
   },
   {
