@@ -135,6 +135,18 @@
   min-width: 0;
 }
 
+.location-container--loot {
+  grid-row: 1;
+}
+
+.location-content--loot .location-choices {
+  grid-row: 2;
+}
+
+.location-content--loot .location-reward-summary {
+  grid-row: 3;
+}
+
 .location-inventory-grid {
   display: flex;
   justify-content: center;
@@ -215,6 +227,10 @@
 
   .location-choices {
     align-items: center;
+  }
+
+  .location-content--loot .location-container--loot {
+    grid-row: 1;
   }
 
   .location-chest-container {

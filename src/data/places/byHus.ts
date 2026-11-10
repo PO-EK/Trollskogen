@@ -6,7 +6,7 @@ export const byHus: Record<string, AdventureNode> = {
     text: "Det finns inget att göra här ännu.",
     choices: [
       {
-        text: "Lämna stugan.",
+        text: "Tillbaka.",
         effects: [{ type: "endAdventure" }],
       },
     ],

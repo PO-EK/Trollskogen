@@ -13,6 +13,9 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(
     null,
   );
+  const [actionPointsMessage, setActionPointsMessage] = useState<string | null>(
+    null,
+  );
   const { player } = usePlayer();
   const map = maps[mapId];
   if (!map) {
@@ -52,6 +55,17 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
             }}
             onClick={() => {
               if (!isLocked) {
+                if (
+                  location.id !== "playerHQ" &&
+                  player.ActionPoints < 1
+                ) {
+                  setActionPointsMessage(
+                    "Du är för trött för att ge dig ut på äventyr. Vila i ditt hus för att återfå dina krafter.",
+                  );
+                  return;
+                }
+
+                setActionPointsMessage(null);
                 onLocationSelect(location.id);
               }
             }}
@@ -80,6 +94,12 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
         </div>
       )}
 
+      {actionPointsMessage && (
+        <p className="map-action-message" role="alert">
+          {actionPointsMessage}
+        </p>
+      )}
+
       {map.exits.map((exit) => {
         const targetMap = maps[exit.targetMapId];
         if (!targetMap) {
@@ -91,7 +111,10 @@ function WorldMap({ mapId, onLocationSelect, onMapSelect }: WorldMapProps) {
             key={exit.targetMapId}
             className="map-exit"
             style={{ left: `${exit.x}%`, top: `${exit.y}%` }}
-            onClick={() => onMapSelect(exit.targetMapId)}
+            onClick={() => {
+              setActionPointsMessage(null);
+              onMapSelect(exit.targetMapId);
+            }}
           >
             Gå till {targetMap.name}
           </button>

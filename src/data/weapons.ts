@@ -2,7 +2,9 @@ import oldAxeImage from "../assets/items/oldaxe.png";
 import ironSwordImage from "../assets/items/shortsword.png";
 import type { WeaponItem, WeaponStats } from "./itemTypes";
 import woodtorchImage from "../assets/items/fakla.png";
-import wandImage from "../assets/items/wand.png";
+import woodWandImage from "../assets/items/woodWand.png";
+import emberWandImage from "../assets/items/emberWand.png";
+import blackWandImage from "../assets/items/blackWand.png";
 import dolkImage from "../assets/items/dolk.png";
 import battleAxeImage from "../assets/items/battleaxe.png";
 import ironSpearImage from "../assets/items/spear1.png";
@@ -68,12 +70,12 @@ export const weapons: WeaponItem[] = [
     skills: ["slash_deep", "stab_hard", "stab_weaken"],
   },
   {
-    id: "wand",
+    id: "wood_wand",
     category: "weapon",
     slot: "mainHand",
-    name: "Magisk Stav",
-    description: "En liten gren fylld med magi.",
-    image: wandImage,
+    name: "Naturstav",
+    description: "En böjd gren med gröna skott och jordnära färger.",
+    image: woodWandImage,
     shape: [
       { x: 0, y: 0 },
       { x: 0, y: 1 },
@@ -82,7 +84,43 @@ export const weapons: WeaponItem[] = [
     minDamage: 8,
     maxDamage: 9,
     stat: "Int",
-    skills: ["wand_slash", "wand_drain", "wand_push"],
+    skills: ["wand_windCut", "wand_push"],
+  },
+  {
+    id: "ember_wand",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Glödande stav",
+    description:
+      "En rakt snidad stav med ett tjockt grepp och en glödande spets.",
+    image: emberWandImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 55,
+    minDamage: 8,
+    maxDamage: 9,
+    stat: "Int",
+    skills: ["ember_burst", "ember_wall"],
+  },
+  {
+    id: "black_wand",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Svart järnstav",
+    description:
+      "En kantig, mörk stav med ett grepp och parerskydd som på en dolk.",
+    image: blackWandImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 55,
+    minDamage: 8,
+    maxDamage: 9,
+    stat: "Int",
+    skills: ["black_siphon", "black_leech"],
   },
   {
     id: "wooden_club",
@@ -119,7 +157,7 @@ export const weapons: WeaponItem[] = [
     skills: ["crush_quick", "crush_hard"],
   },
   {
-    id: "war_hammer",
+    id: "war_club",
     category: "weapon",
     slot: "mainHand",
     name: "Stridshammare",
@@ -135,7 +173,7 @@ export const weapons: WeaponItem[] = [
     minDamage: 15,
     maxDamage: 21,
     stat: "Str",
-    skills: ["crush_stun", "crush_hard"],
+    skills: ["crush_quick", "crush_hard", "crush_stun"],
   },
   {
     id: "steel_sword",

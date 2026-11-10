@@ -10,13 +10,13 @@ export const chests = {
     name: "Din Kista",
     width: 7,
     height: 7,
-    contents: ["wooden_club", "iron_mace", "war_hammer"],
+    contents: [],
   },
   ruinsChest: {
     name: "Moders kista",
     width: 4,
     height: 3,
-    contents: ["wand", "diamond", "health_potion", "goldRing"],
+    contents: ["diamond", "health_potion", "goldRing"],
   },
   banditChest1: {
     name: "Rövarnas kista",

@@ -212,6 +212,31 @@ export const smeden: Record<string, AdventureNode> = {
         ],
       },
       {
+        text: "Nattvakten: Är spjutspetsarna klara?",
+        nextNodeId: "nattvaktenSpearsReady",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "nattvakten.SpearsReady",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "nattvakten.SpearsCollected",
+            value: false,
+          },
+        ],
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "nattvakten.SpearsCollected",
+            value: true,
+          },
+          { type: "setStoryFlag", flag: "nattvakten.reportLars", value: true },
+          { type: "endAdventure" },
+        ],
+      },
+      {
         text: "Ursäkta, men jag måste gå vidare.",
         effects: [
           {
@@ -222,6 +247,16 @@ export const smeden: Record<string, AdventureNode> = {
     ],
   },
 
+  nattvaktenSpearsReady: {
+    id: "nattvaktenSpearsReady",
+    text: "Han torkar svätten ifrån pannan med ena handen och pekar med den andra emot en tunna i hörnet. Den är fylld med spjut av god kvalitet. 'Gå till den där Lars berätta att de är klara och finns här att hämtas. Jag skulle även vilja tala med honom.' Du inser att smeden vill fortsätta hjälpa nattvakten, även om det är med kunskap och erfarenhet.",
+    choices: [
+      {
+        text: "Jag skickar över honom. Tack så mycket för hjälpen.",
+        nextNodeId: "start",
+      },
+    ],
+  },
   nattvaktenStart: {
     id: "nattvaktenStart",
     text: "Smeden lyfter ett ögonbryn och lägger ifrån sig hammaren. 'Tio spjut? Vad tänker du göra med dem, kasta dem ett i taget?'",
@@ -319,48 +354,39 @@ export const smeden: Record<string, AdventureNode> = {
       {
         text: "Undrar du inte vem tjuven var?",
         nextNodeId: "nattvaktenTold",
-      },
-      {
-        text: "Vill du veta var jag hittade dem?",
-        nextNodeId: "nattvaktenTold",
-      },
-    ],
-  },
-
-  nattvaktenTold: {
-    id: "nattvaktenTold",
-    text: "Du berättar vad som hände i detalj. Smeden lyssnar tyst och lutar sig mot städet. 'Envis och modig, det är du. Jag ska inte ljuga, jag sörjer inte tjuven. Det är svårt att ha medlidande med den som stjäl.' Han skakar på huvudet och tar fram en liten påse. 'Men du fick tillbaka mina saker, och det glömmer jag inte. Här, 50 Kroner för besväret. Nu kör jag igång smidet.'",
-    choices: [
-      {
-        text: "Jag hjälper till så går det fortare.",
-        nextNodeId: "nattvaktenForge",
-        effects: [],
-      },
-      {
-        text: "Jag vill se hur man gjuter järn.",
-        nextNodeId: "nattvaktenForge",
-        effects: [],
-      },
-    ],
-  },
-
-  nattvaktenForge: {
-    id: "nattvaktenForge",
-    text: "Ni spenderar flera timmar i smedjan. Smeden smälter ned gamla grytor i degeln medan du hjälper till att hålla elden uppe. Han häller det glödande järnet i formarna, och du ser hur varje spjutspets tar form. När de svalnat nitar ni fast dem på trästavar och slipar dem vassa, en efter en. Till slut ligger tio spjut på rad vid väggen. Smeden torkar svetten ur pannan och nickar belåtet. 'Det här borde duga. Säg till Lars att de finns här att hämta när de behövs.'",
-    choices: [
-      {
-        text: "Då går jag tillbaka till Lars.",
         effects: [
           {
             type: "setStoryFlag",
             flag: "nattvakten.ToolsReturned",
             value: true,
           },
-          { type: "setStoryFlag", flag: "nattvakten.reportLars", value: true },
+        ],
+      },
+      {
+        text: "Vill du veta var jag hittade dem?",
+        nextNodeId: "nattvaktenTold",
+        effects: [
           {
             type: "setStoryFlag",
-            flag: "nattvakten.returnTools",
-            value: false,
+            flag: "nattvakten.ToolsReturned",
+            value: true,
+          },
+        ],
+      },
+    ],
+  },
+
+  nattvaktenTold: {
+    id: "nattvaktenTold",
+    text: "Du berättar vad som hände i detalj. Smeden lyssnar tyst och lutar sig mot städet. 'Envis och modig, det är du. Jag ska inte ljuga, jag sörjer inte tjuven. Det är svårt att ha medlidande med den som stjäl.' Han skakar på huvudet och tar fram en liten påse. 'Men du fick tillbaka mina saker, och det glömmer jag inte. Här, 50 Kroner för besväret. Jag börjar med spjutspetsarna nu. Kom tillbaka imorgon så ska de vara klara.'",
+    choices: [
+      {
+        text: "Då kommer jag tillbaka imorgon.",
+        effects: [
+          {
+            type: "scheduleStoryFlag",
+            flag: "nattvakten.SpearsReady",
+            days: 1,
           },
           { type: "endAdventure" },
         ],

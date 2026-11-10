@@ -59,6 +59,7 @@ export const witchIntroQuest: Record<string, AdventureNode> = {
         text: "Lämna grottan.",
         effects: [
           { type: "hideLocation", locationId: "witchIntroQuest" },
+          { type: "addExperience", amount: 21 },
           { type: "endAdventure" },
         ],
       },

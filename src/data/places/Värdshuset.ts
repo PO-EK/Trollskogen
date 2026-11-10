@@ -394,6 +394,7 @@ export const vardshuset: Record<string, AdventureNode> = {
             flag: "mainstory.witch.started",
             value: true,
           },
+          { type: "addExperience", amount: 10 },
         ],
       },
     ],

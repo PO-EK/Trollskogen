@@ -7,21 +7,91 @@
 }
 
 .top-bar {
-  height: 50px;
-
+  min-height: 50px;
   display: flex;
   align-items: center;
-
   padding: 0 15px;
-
   gap: 30px;
-
   border-bottom: 1px solid #444;
 }
 
-.top-bar p {
+.top-bar h2 {
+  flex: none;
+  margin: 0;
+}
+
+.top-bar-version {
+  min-width: 0;
   margin-left: auto;
   color: gold;
+  white-space: nowrap;
+}
+
+.top-bar-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  white-space: nowrap;
+  color: #f3e5c1;
+}
+
+.action-points {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-points-bar {
+  display: flex;
+  gap: 2px;
+}
+
+.action-point-block {
+  width: 10px;
+  height: 16px;
+  border: 1px solid #8c6b3e;
+  background: #25231f;
+  box-sizing: border-box;
+}
+
+.action-point-block.filled {
+  background: #c99b45;
+  border-color: #e4c47d;
+}
+
+@media (max-width: 800px) {
+  .top-bar {
+    gap: 16px;
+  }
+
+  .top-bar-version {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .top-bar-stats {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .top-bar-version {
+    display: none;
+  }
+
+  .top-bar-stats {
+    margin-left: auto;
+  }
+
+  .action-point-block {
+    width: 8px;
+    height: 14px;
+  }
 }
 
 .game-layout {
@@ -88,6 +158,21 @@
   color: #fff3d4;
   font-size: 14px;
   cursor: pointer;
+}
+
+.map-action-message {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  margin: 0;
+  padding: 8px 12px;
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+  background: rgba(25, 35, 29, 0.94);
+  color: #fff3d4;
+  font-size: 15px;
 }
 
 /* Medium screens: give the main panel more room */

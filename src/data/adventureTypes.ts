@@ -25,6 +25,10 @@ export type AdventureCondition =
       type: "storyFlag";
       flag: string;
       value: boolean;
+    }
+  | {
+      type: "hasActionPoints";
+      amount: number;
     };
 
 export type AdventureEffect =
@@ -45,6 +49,10 @@ export type AdventureEffect =
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
   | { type: "restoreMana"; amount: number }
+  | { type: "removeActionPoints"; amount: number }
+  | { type: "regainActionPoints"; amount: number }
+  | { type: "scheduleStoryFlag"; flag: string; days: number }
+  | { type: "sleep" }
   | { type: "fullHeal" }
   | { type: "damage"; amount: number }
   | { type: "setStoryFlag"; flag: string; value: boolean }

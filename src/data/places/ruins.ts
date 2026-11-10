@@ -27,6 +27,23 @@ export const ruins: Record<string, AdventureNode> = {
           value: false,
         },
       },
+      {
+        text: "Kolla kistan igen",
+        nextNodeId: "inside2",
+
+        effects: [
+          {
+            type: "openChest",
+            chestId: "ruinsChest",
+          },
+        ],
+
+        condition: {
+          type: "storyFlag",
+          flag: "ruins.searchedInside",
+          value: true,
+        },
+      },
 
       {
         text: "Sök runt på utsidan.",
@@ -80,7 +97,7 @@ export const ruins: Record<string, AdventureNode> = {
   inside2: {
     id: "inside2",
 
-    text: "Du lyfter undan brädor och hoppar över hinder tills du hittar din mors gamla kista.",
+    text: "Du hittar din mors gamla kista.",
 
     choices: [
       {

@@ -27,6 +27,8 @@ export function getMaxMana(int: number): number {
   return Math.max(1, Math.ceil(flat + MANA_BONUS_PER_INT_POINT * excess ** 2));
 }
 
+export const DAILY_ACTION_POINTS = 8;
+
 const playerStr = 10;
 const playerDex = 10;
 const playerCon = 10;
@@ -38,6 +40,8 @@ export type Player = {
   Id?: string;
 
   Name: string;
+  day: number;
+  ActionPoints: number;
 
   // Pengar
   Gold: number;
@@ -74,6 +78,7 @@ export type Player = {
   // Quest progression
   Quests: QuestState[];
   StoryFlags: Record<string, boolean>;
+  ScheduledStoryFlags: { flag: string; dueDay: number }[];
   UnlockedLocations: string[];
   LockedLocations: string[];
   // In the Player type:
@@ -88,13 +93,15 @@ export type QuestState = {
 export const createNewPlayer = (): Player => {
   let player: Player = {
     Name: "Admin",
+    day: 1,
+    ActionPoints: DAILY_ACTION_POINTS,
 
-    Gold: 20,
+    Gold: 0,
 
     Level: 1,
-    Exp: 4,
+    Exp: 14,
     ExpMax: 50,
-    SkillPoints: 1,
+    SkillPoints: 3,
     LearnedNodes: [],
 
     Str: playerStr,
@@ -121,6 +128,7 @@ export const createNewPlayer = (): Player => {
     Inventory: [],
     Quests: [],
     StoryFlags: {},
+    ScheduledStoryFlags: [],
     UnlockedLocations: locations
       .filter((location) => location.initialState === "unlocked")
       .map((location) => location.id),
@@ -131,9 +139,8 @@ export const createNewPlayer = (): Player => {
   };
 
   player = addItemToInventory(player, "bandage", "startBandage");
-  player = addItemToInventory(player, "banhammer", "startWeap");
   player = addItemToInventory(player, "storageKey", "playerKey");
-  player = equippedItem(player, "iron_sword", "starterSword");
+  player = equippedItem(player, "wooden_club", "starterSword");
 
   for (const [chestId, definition] of Object.entries(chests)) {
     for (const itemId of definition.contents) {

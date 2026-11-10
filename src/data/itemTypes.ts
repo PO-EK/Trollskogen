@@ -49,7 +49,7 @@ export type WeaponStats = Pick<
   "minDamage" | "maxDamage" | "stat" | "scaling"
 >;
 
-export type ArmourSlot = "head" | "body" | "feet" | "hands";
+export type ArmourSlot = "head" | "body" | "feet" | "hands" | "offHand";
 
 export type ArmourItem = BaseItem & {
   category: "armour";

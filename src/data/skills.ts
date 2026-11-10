@@ -1,17 +1,7 @@
 import type { Skill } from "./skillTypes";
 
 export const skills: Skill[] = [
-  // admin skills
-  {
-    id: "godRay",
-    name: "Admin stråle",
-    description: "Gud säger: Försvinn!",
-    target: "enemy",
-    damageType: "light",
-    damage: { kind: "spell", min: 200, max: 200, stat: "Int" },
-    manaCost: 1,
-  },
-  // ---- Weapon/Item skills ----
+  // #region Weapon/item skills
   {
     id: "torch_bash",
     name: "Eldklubba",
@@ -62,7 +52,7 @@ export const skills: Skill[] = [
     description: "Ett djupare hugg.",
     target: "enemy",
     damageType: "slashing",
-    damage: { kind: "weapon", multiplier: 1 },
+    damage: { kind: "weapon", multiplier: 1.4 },
     effects: [
       {
         type: "bleed",
@@ -79,7 +69,7 @@ export const skills: Skill[] = [
     description: "Ett hugg med full kraft.",
     target: "enemy",
     damageType: "slashing",
-    damage: { kind: "weapon", multiplier: 1.8 },
+    damage: { kind: "weapon", multiplier: 1.4 },
     effects: [
       {
         type: "bleed",
@@ -114,7 +104,7 @@ export const skills: Skill[] = [
     description: "En snabb stöt med vapnet.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.6 },
+    damage: { kind: "weapon", multiplier: 1.4 },
     effects: [
       {
         type: "bleed",
@@ -131,7 +121,7 @@ export const skills: Skill[] = [
     description: "En kraftig stöt som tränger djupt.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 2 },
+    damage: { kind: "weapon", multiplier: 1.4 },
     cooldown: 3,
   },
   {
@@ -149,8 +139,8 @@ export const skills: Skill[] = [
     target: "enemy",
     damageType: "crushing",
     damage: { kind: "weapon", multiplier: 0.8 },
-    effects: [{ type: "stun", chance: 60, turns: 3 }],
-    cooldown: 3,
+    effects: [{ type: "stun", chance: 100, turns: 2 }],
+    cooldown: 5,
   },
   {
     id: "crush_quick",
@@ -159,7 +149,7 @@ export const skills: Skill[] = [
     target: "enemy",
     damageType: "crushing",
     damage: { kind: "weapon", multiplier: 1 },
-    effects: [{ type: "stun", chance: 50, turns: 3 }],
+    effects: [{ type: "stun", chance: 50, turns: 2 }],
   },
   {
     id: "crush_hard",
@@ -167,9 +157,9 @@ export const skills: Skill[] = [
     description: "Ett tungt slag som krossar det mesta.",
     target: "enemy",
     damageType: "crushing",
-    damage: { kind: "weapon", multiplier: 1.5 },
-    effects: [{ type: "stun", chance: 50, turns: 3 }],
-    cooldown: 2,
+    damage: { kind: "weapon", multiplier: 1.4 },
+    effects: [{ type: "stun", chance: 60, turns: 2 }],
+    cooldown: 3,
   },
   {
     id: "wand_slash",
@@ -189,15 +179,60 @@ export const skills: Skill[] = [
     ],
   },
   {
+    id: "wand_windCut",
+    name: "Vass Vind",
+    description: "Få din fiende att blöda med hjälp av vinden.",
+    target: "enemy",
+    damageType: "slashing",
+    damage: { kind: "weapon", multiplier: 1 },
+    effects: [
+      {
+        type: "bleed",
+        damage: 4,
+        percentOfDamage: 20,
+        chance: 100,
+        maxStacks: 5,
+      },
+    ],
+  },
+  {
     id: "wand_drain",
-    name: "Magiuttag",
-    description:
-      "Träffar fienden med magisk kraft och återställer magi motsvarande en del av skadan.",
+    name: "Dra energi",
+    description: "Överför fiendens livskraft till dig som magi.",
     target: "enemy",
     damageType: "piercing",
     damage: { kind: "weapon", multiplier: 1 },
-    effects: [{ type: "manaLeech", percentOfDamage: 40 }],
-    cooldown: 1,
+    effects: [{ type: "manaLeech", percentOfDamage: 66 }],
+    cooldown: 2,
+  },
+  {
+    id: "ember_burst",
+    name: "Glödskur",
+    description: "Stavens glödande spets slungar eld mot fienden.",
+    target: "enemy",
+    damageType: "fire",
+    damage: { kind: "weapon", multiplier: 1 },
+    effects: [{ type: "burn", damage: 8, maxStacks: 5 }],
+  },
+  {
+    id: "black_siphon",
+    name: "Mörk urladdning",
+    description: "En mörk stöt som dränerar fiendens kraft.",
+    target: "enemy",
+    damageType: "dark",
+    damage: { kind: "weapon", multiplier: 1 },
+    effects: [{ type: "manaLeech", percentOfDamage: 66 }],
+    cooldown: 2,
+  },
+  {
+    id: "black_leech",
+    name: "Stjäl Liv",
+    description: "En mörk stöt som dränerar fiendens kraft.",
+    target: "enemy",
+    damageType: "dark",
+    damage: { kind: "weapon", multiplier: 1 },
+    effects: [{ type: "lifesteal", percentOfDamage: 66 }],
+    cooldown: 2,
   },
   {
     id: "wand_stab",
@@ -205,8 +240,7 @@ export const skills: Skill[] = [
     description: "Skada fienden med ren magisk kraft.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.5 },
-    cooldown: 2,
+    damage: { kind: "weapon", multiplier: 1.2 },
   },
   {
     id: "wand_push",
@@ -219,15 +253,29 @@ export const skills: Skill[] = [
     cooldown: 5,
   },
   {
+    id: "ember_wall",
+    name: "Eldcirkel",
+    description: "Stoppa fiendens rörelser med en eld vägg.",
+    target: "enemy",
+    damageType: "fire",
+    damage: { kind: "weapon", multiplier: 0.5 },
+    effects: [
+      { type: "stun", chance: 100, turns: 2 },
+      { type: "burn", damage: 8, maxStacks: 5 },
+    ],
+    cooldown: 5,
+  },
+  {
     id: "stab_weaken",
     name: "Hugg och Ducka",
     description: "Let efter en öppning i fiendens försvar.",
     target: "enemy",
-    effects: [{ type: "offguard", percent: 12, turns: 3 }],
+    effects: [{ type: "offguard", percent: 40, turns: 2 }],
     cooldown: 3,
   },
 
-  // ---- Enemy skills ----
+  // #endregion
+  // #region Enemy skills
 
   //Humans
   {
@@ -362,8 +410,19 @@ export const skills: Skill[] = [
     effects: [{ type: "damageMod", percent: -60, turns: 5 }],
     cooldown: 6,
   },
-  // ---- Skilltree skills ----
+  // #endregion
+  // #region Player skills
+  {
+    id: "godRay",
+    name: "Admin stråle",
+    description: "Gud säger: Försvinn!",
+    target: "enemy",
+    damageType: "light",
+    damage: { kind: "spell", min: 200, max: 200, stat: "Int" },
+    manaCost: 1,
+  },
 
+  // Skilltree skills
   //Krigare:
   {
     id: "takedown",
@@ -461,9 +520,9 @@ export const skills: Skill[] = [
     name: "Magisk Sköld",
     description: "Använd magi för att blockera skada.",
     target: "self",
-    effects: [{ type: "guard", percent: 70, turns: 3 }],
-    manaCost: 40,
-    cooldown: 3,
+    effects: [{ type: "guard", percent: 70, turns: 5 }],
+    manaCost: 20,
+    cooldown: 6,
   },
   {
     id: "shadow_clone",
@@ -479,8 +538,8 @@ export const skills: Skill[] = [
     name: "Meditera",
     description: "Öka din fokus och rensa din hjärna.",
     target: "self",
-    effects: [{ type: "buff", stat: "Int", amount: 6, turns: 4 }],
-    cooldown: 4,
+    effects: [{ type: "buff", stat: "Int", amount: 10, turns: 4 }],
+    cooldown: 5,
     manaCost: 8,
   },
 
@@ -519,8 +578,8 @@ export const skills: Skill[] = [
     description: "Skjut magiska pilar från dina händer.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "spell", min: 17, max: 18, stat: "Int" },
-    manaCost: 12,
+    damage: { kind: "spell", min: 12, max: 16, stat: "Int" },
+    manaCost: 22,
   },
   {
     id: "curse_weak",
@@ -746,6 +805,7 @@ export const skills: Skill[] = [
     manaCost: 10,
     cooldown: 2,
   },
+  // #endregion
 ];
 
 const skillMap = new Map(skills.map((skill) => [skill.id, skill]));

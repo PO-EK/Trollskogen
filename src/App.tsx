@@ -12,6 +12,7 @@ import { locations } from "./data/locations";
 import { OVERLAYS } from "./pages/overlays";
 import type { OverlayId } from "./pages/overlays";
 import type { CombatEncounter, CombatResult } from "./game/combatTypes";
+import { usePlayer } from "./context/usePlayer";
 
 type GameScreen = "worldMap" | "location" | "trading" | "combat";
 
@@ -31,6 +32,7 @@ function getLocationMapId(locationId: string): string {
 }
 
 function App() {
+  const { setPlayer } = usePlayer();
   const [screen, setScreen] = useState<GameScreen>("worldMap");
   const [activeMapId, setActiveMapId] = useState("village");
 
@@ -66,6 +68,21 @@ function App() {
 
   const [selectedTraderId, setSelectedTraderId] = useState<string | null>(null);
   const [combat, setCombat] = useState<ActiveCombat | null>(null);
+
+  function enterLocation(locationId: string) {
+    const mapId = getLocationMapId(locationId);
+    setSelectedLocationId(locationId);
+    setActiveMapId(mapId);
+    setScreen("location");
+
+    if (locationId !== "playerHQ") {
+      setPlayer((player) => ({
+        ...player,
+        ActionPoints: Math.max(0, player.ActionPoints - 1),
+      }));
+    }
+  }
+
   // Which overlay page (character, skill tree...) is open, if any.
   const [overlay, setOverlay] = useState<OverlayId | null>(null);
   // No swapping gear or skills in the middle of a fight.
@@ -117,12 +134,7 @@ function App() {
               {screen === "worldMap" && (
                 <WorldMap
                   mapId={activeMapId}
-                  onLocationSelect={(locationId) => {
-                    const mapId = getLocationMapId(locationId);
-                    setSelectedLocationId(locationId);
-                    setActiveMapId(mapId);
-                    setScreen("location");
-                  }}
+                  onLocationSelect={enterLocation}
                   onMapSelect={setActiveMapId}
                 />
               )}
@@ -144,12 +156,7 @@ function App() {
                       setSelectedTraderId(traderId);
                       setScreen("trading");
                     }}
-                    onTravelTo={(locationId) => {
-                      const mapId = getLocationMapId(locationId);
-                      setSelectedLocationId(locationId);
-                      setActiveMapId(mapId);
-                      setScreen("location");
-                    }}
+                    onTravelTo={enterLocation}
                     onStartCombat={(encounter, onFinish) => {
                       setOverlay(null);
                       setCombat({ encounter, onFinish });

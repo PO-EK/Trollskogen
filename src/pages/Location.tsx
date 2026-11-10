@@ -16,6 +16,7 @@ import {
   recalculatePlayerStats,
   restorePlayerResources,
 } from "../game/characterStats";
+import { DAILY_ACTION_POINTS } from "../data/player";
 import {
   addItemToInventory,
   findFirstAvailableItemPosition,
@@ -243,6 +244,10 @@ function Location({
         );
       }
 
+      if (condition.type === "hasActionPoints") {
+        return player.ActionPoints >= condition.amount;
+      }
+
       return false;
     });
   }
@@ -447,6 +452,65 @@ function Location({
           ...p,
           Mana: Math.min(p.Mana + effect.amount, p.ManaMax),
         }));
+        break;
+
+      case "removeActionPoints":
+        setPlayer((p) => ({
+          ...p,
+          ActionPoints: Math.max(
+            0,
+            p.ActionPoints - Math.max(0, effect.amount),
+          ),
+        }));
+        break;
+
+      case "regainActionPoints":
+        setPlayer((p) => ({
+          ...p,
+          ActionPoints: Math.min(
+            DAILY_ACTION_POINTS,
+            p.ActionPoints + Math.max(0, effect.amount),
+          ),
+        }));
+        break;
+
+      case "scheduleStoryFlag":
+        setPlayer((p) => ({
+          ...p,
+          ScheduledStoryFlags: [
+            ...p.ScheduledStoryFlags.filter(
+              (scheduled) => scheduled.flag !== effect.flag,
+            ),
+            {
+              flag: effect.flag,
+              dueDay: p.day + Math.max(1, Math.floor(effect.days)),
+            },
+          ],
+        }));
+        break;
+
+      case "sleep":
+        setPlayer((p) => {
+          const day = p.day + 1;
+          const dueFlags = p.ScheduledStoryFlags.filter(
+            (scheduled) => scheduled.dueDay <= day,
+          );
+
+          return {
+            ...restorePlayerResources(p),
+            ActionPoints: DAILY_ACTION_POINTS,
+            day,
+            StoryFlags: {
+              ...p.StoryFlags,
+              ...Object.fromEntries(
+                dueFlags.map((scheduled) => [scheduled.flag, true]),
+              ),
+            },
+            ScheduledStoryFlags: p.ScheduledStoryFlags.filter(
+              (scheduled) => scheduled.dueDay > day,
+            ),
+          };
+        });
         break;
 
       case "fullHeal":
@@ -659,12 +723,16 @@ function Location({
           getChestDefinition("playerStorage").height,
         ) !== null,
     );
+  const hasLootToCollect =
+    activeContainer?.type === "loot" && containerItems.length > 0;
 
   return (
     <div className="location">
       <h1 className="location-header">{location.name}</h1>
 
-      <div className="location-content">
+      <div
+        className={`location-content${hasLootToCollect ? " location-content--loot" : ""}`}
+      >
         <div className="location-text">
           {renderLocationText(currentNode.text)}
         </div>
@@ -720,9 +788,18 @@ function Location({
         {activeContainer &&
           activeContainer.type !== "chest" &&
           (activeContainer.type !== "loot" || containerItems.length > 0) && (
-            <div className="location-container">
+            <div
+              className={`location-container${activeContainer.type === "loot" ? " location-container--loot" : ""}`}
+            >
               {activeContainer.type === "loot" && (
                 <div className="location-loot-actions">
+                  <button
+                    className="location-choice"
+                    disabled={!canTakeAnyItem}
+                    onClick={handleTakeAll}
+                  >
+                    Ta allt
+                  </button>
                   {containerItems.length > 0 && !canTakeAnyItem && (
                     <p className="location-loot-message">
                       Föremålen får inte plats i ryggsäcken eller förvaringen.
@@ -747,15 +824,6 @@ function Location({
                   }
                 />
               </div>
-              {activeContainer.type === "loot" && (
-                <button
-                  className="location-choice"
-                  disabled={!canTakeAnyItem}
-                  onClick={handleTakeAll}
-                >
-                  Ta allt
-                </button>
-              )}
             </div>
           )}
       </div>

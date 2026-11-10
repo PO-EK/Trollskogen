@@ -226,6 +226,7 @@ export const mayors: Record<string, AdventureNode> = {
         effects: [
           { type: "setStoryFlag", flag: "newleader.convinced", value: true },
           { type: "lockLocation", locationId: "mayors" },
+          { type: "addExperience", amount: 12 },
           { type: "endAdventure" },
         ],
       },

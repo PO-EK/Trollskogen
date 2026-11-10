@@ -83,6 +83,14 @@ export const quests: QuestDefinition[] = [
         completedFlag: "nattvakten.ToolsReturned",
       },
       {
+        text: "Vänta en dag medan smeden smider spjutspetsarna.",
+        completedFlag: "nattvakten.SpearsReady",
+      },
+      {
+        text: "Återvänd till smeden och hämta spjutspetsarna.",
+        completedFlag: "nattvakten.SpearsCollected",
+      },
+      {
         text: "Lämna spjuten till Lars så att han kan börja träna nattvakten.",
         completedFlag: "nattvakten.spearsDelivered",
       },

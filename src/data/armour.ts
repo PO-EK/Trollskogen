@@ -8,8 +8,64 @@ import leatherBootsImage from "../assets/items/leatherBoots.png";
 import wizardRobeImage from "../assets/items/wizardRobe.png";
 import wizardHatImage from "../assets/items/wizardHat.png";
 import wizardShoesImage from "../assets/items/wizardShoes.png";
+import towerShieldImage from "../assets/items/towerShield.png";
+import bronzeBucklerImage from "../assets/items/bronzeBuckler.png";
+import holyShieldImage from "../assets/items/holyShield.png";
 
 export const armour: ArmourItem[] = [
+  {
+    id: "tower_shield",
+    category: "armour",
+    slot: "offHand",
+    name: "Väktarsköld",
+    description: "En tung sköld av mörkt trä, förstärkt med järn.",
+    image: towerShieldImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+    ],
+    baseValue: 120,
+    defense: 12,
+    attributeBonuses: { Str: 1, Con: 1 },
+  },
+  {
+    id: "bronze_buckler",
+    category: "armour",
+    slot: "offHand",
+    name: "Bronsbuckla",
+    description: "En liten rund sköld av koppar och brons.",
+    image: bronzeBucklerImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ],
+    baseValue: 80,
+    defense: 6,
+    attributeBonuses: { Dex: 2 },
+  },
+  {
+    id: "holy_shield",
+    category: "armour",
+    slot: "offHand",
+    name: "Helig sköld",
+    description: "En liten elfenbensvit sköld med ett heligt blått kors.",
+    image: holyShieldImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ],
+    baseValue: 100,
+    defense: 6,
+    attributeBonuses: { Int: 2 },
+  },
   {
     id: "wizard_shoes",
     category: "armour",
