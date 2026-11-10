@@ -8,9 +8,11 @@ import "./InventoryPanel.css";
 import { performTransaction } from "../../game/performTransaction";
 import ItemCard from "./ItemCard";
 import ItemDeleteSlot from "./ItemDeleteSlot";
+import ItemEquipSlot from "./ItemEquipSlot";
 import ItemUseSlot from "./ItemUseSlot";
-import type { ItemUse } from "../../data/itemTypes";
+import type { EquipmentSlot, ItemUse } from "../../data/itemTypes";
 import { getWorldBlockReason, USE_SLOT_ID } from "../../game/itemUse";
+import { equipSlotId } from "../../game/equipment";
 
 type InventoryPanelProps = {
   inCombat?: boolean; // the slot in the fight handles items there
@@ -21,6 +23,28 @@ function InventoryPanel({ inCombat = false }: InventoryPanelProps) {
   const { traders, setTraders } = useTrader();
 
   const { hoveredItemId, salePrice } = useItemHover();
+
+  function handleEquipItem(
+    item: ContainerItem,
+    slot: EquipmentSlot,
+    sourceId: string,
+    sourceType: ContainerType,
+  ) {
+    const result = performTransaction({
+      item,
+      sourceId,
+      sourceType,
+      destinationId: equipSlotId(slot),
+      destinationType: "equipment",
+      position: { x: 0, y: 0 },
+      player,
+    });
+
+    if (result.success) {
+      setPlayer(result.player);
+    }
+  }
+
   function handleUseItem(
     item: ContainerItem,
     _use: ItemUse,
@@ -105,6 +129,7 @@ function InventoryPanel({ inCombat = false }: InventoryPanelProps) {
             onUse={handleUseItem}
           />
         )}
+        <ItemEquipSlot onEquip={handleEquipItem} />
         <ItemDeleteSlot />
       </div>
       <div className="inventory-panel-title">Ryggsäcken</div>

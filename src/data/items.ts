@@ -11,6 +11,7 @@ import clothImage from "../assets/items/cloth.png";
 import clothBandage from "../assets/items/bandage.png";
 import leatherImage from "../assets/items/leather.png";
 import woodlogImage from "../assets/items/woodlog.png";
+import smedenToolsImage from "../assets/items/smedenTools.png";
 
 import sandwichImage from "../assets/items/macka.png";
 import soupVegImage from "../assets/items/gryta.png";
@@ -104,11 +105,14 @@ const generalItems: GeneralItem[] = [
     id: "smedenTools",
     name: "Gjutverktyg",
     description: "Smedens verktyg inlindat i djurskin.",
-    image: leatherImage,
+    image: smedenToolsImage,
     shape: [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
     ],
+    imageScale: 1.2,
     baseValue: 0,
   },
   {
@@ -240,7 +244,7 @@ const generalItems: GeneralItem[] = [
     baseValue: 40,
     use: {
       verb: "drack en läkande dryck",
-      effects: [{ type: "heal", percentOfMax: 50 }],
+      effects: [{ type: "heal", percentOfMax: 100 }],
     },
   },
   {

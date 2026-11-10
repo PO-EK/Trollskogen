@@ -61,8 +61,8 @@ export const ruins: Record<string, AdventureNode> = {
         nextNodeId: "inside2",
         effects: [
           {
-            type: "spawnLoot",
-            itemId: "health_potion",
+            type: "openChest",
+            chestId: "ruinsChest",
           },
           {
             type: "setStoryFlag",

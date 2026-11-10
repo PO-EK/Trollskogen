@@ -21,7 +21,7 @@ import {
   findFirstAvailableItemPosition,
 } from "../game/inventory";
 
-const LOOT_WIDTH = 4;
+const LOOT_WIDTH = 3;
 const LOOT_HEIGHT = 4;
 
 function renderLocationText(text: string) {
@@ -530,24 +530,57 @@ function Location({
   }
 
   function handleContainerItemsChanged(updatedItems: ContainerItem[]) {
+    if (activeContainer?.type === "chest") {
+      setPlayer((currentPlayer) => ({
+        ...currentPlayer,
+        Chests: {
+          ...currentPlayer.Chests,
+          [activeContainer.id]: updatedItems,
+        },
+      }));
+      return;
+    }
+
     setContainerItems(updatedItems);
   }
 
   function handleContainerItemRemoved(containerItemId: string) {
+    if (activeContainer?.type === "chest") {
+      setPlayer((currentPlayer) => ({
+        ...currentPlayer,
+        Chests: {
+          ...currentPlayer.Chests,
+          [activeContainer.id]: currentPlayer.Chests[activeContainer.id].filter(
+            (item) => item.containerItemId !== containerItemId,
+          ),
+        },
+      }));
+      return;
+    }
+
     setContainerItems((currentItems) =>
       currentItems.filter((item) => item.containerItemId !== containerItemId),
     );
   }
 
   function handleTakeAll() {
-    if (activeContainer?.type !== "loot") {
+    if (
+      !activeContainer ||
+      (activeContainer.type !== "loot" && activeContainer.type !== "chest") ||
+      (activeContainer.type === "chest" &&
+        activeContainer.id === "playerStorage")
+    ) {
       return;
     }
 
     let updatedPlayer = player;
     const remainingItems: ContainerItem[] = [];
+    const itemsToTake =
+      activeContainer.type === "loot"
+        ? containerItems
+        : player.Chests[activeContainer.id];
 
-    for (const lootItem of containerItems) {
+    for (const lootItem of itemsToTake) {
       const fitsInBackpack =
         findFirstAvailableItemPosition(
           lootItem.itemId,
@@ -568,22 +601,50 @@ function Location({
         continue;
       }
 
-      updatedPlayer = addItemToInventory(
-        updatedPlayer,
-        lootItem.itemId,
-        lootItem.containerItemId,
-      );
+      if (activeContainer.type === "loot") {
+        updatedPlayer = addItemToInventory(
+          updatedPlayer,
+          lootItem.itemId,
+          lootItem.containerItemId,
+        );
+      } else {
+        const remainingChestItems = updatedPlayer.Chests[
+          activeContainer.id
+        ].filter((item) => item.containerItemId !== lootItem.containerItemId);
+
+        updatedPlayer = addItemToInventory(
+          {
+            ...updatedPlayer,
+            Chests: {
+              ...updatedPlayer.Chests,
+              [activeContainer.id]: remainingChestItems,
+            },
+          },
+          lootItem.itemId,
+          lootItem.containerItemId,
+        );
+      }
     }
 
     if (updatedPlayer !== player) {
       setPlayer(updatedPlayer);
     }
-    setContainerItems(remainingItems);
+    if (activeContainer.type === "loot") {
+      setContainerItems(remainingItems);
+    }
   }
 
-  const canTakeAnyLoot =
-    activeContainer?.type === "loot" &&
-    containerItems.some(
+  const activeContainerItems =
+    activeContainer?.type === "chest"
+      ? player.Chests[activeContainer.id]
+      : containerItems;
+  const canTakeAll =
+    activeContainer?.type === "loot" ||
+    (activeContainer?.type === "chest" &&
+      activeContainer.id !== "playerStorage");
+  const canTakeAnyItem =
+    canTakeAll &&
+    activeContainerItems.some(
       (lootItem) =>
         findFirstAvailableItemPosition(
           lootItem.itemId,
@@ -629,13 +690,40 @@ function Location({
           </div>
         )}
 
+        {activeContainer?.type === "chest" && activeChest && (
+          <div className="location-container location-chest-container">
+            <h2 className="location-chest-title">{activeChest.name}</h2>
+            <div className="location-inventory-grid">
+              <ItemGrid
+                containerId={activeContainer.id}
+                containerType="chest"
+                width={activeChest.width}
+                height={activeChest.height}
+                inventory={activeContainerItems}
+                onInventoryChange={handleContainerItemsChanged}
+                onItemRemoved={handleContainerItemRemoved}
+                onCrossContainerDrop={handleCrossContainerDrop}
+              />
+            </div>
+            {canTakeAll && (
+              <button
+                className="location-choice"
+                disabled={!canTakeAnyItem}
+                onClick={handleTakeAll}
+              >
+                Ta allt
+              </button>
+            )}
+          </div>
+        )}
+
         {activeContainer &&
           activeContainer.type !== "chest" &&
           (activeContainer.type !== "loot" || containerItems.length > 0) && (
             <div className="location-container">
               {activeContainer.type === "loot" && (
                 <div className="location-loot-actions">
-                  {containerItems.length > 0 && !canTakeAnyLoot && (
+                  {containerItems.length > 0 && !canTakeAnyItem && (
                     <p className="location-loot-message">
                       Föremålen får inte plats i ryggsäcken eller förvaringen.
                     </p>
@@ -662,7 +750,7 @@ function Location({
               {activeContainer.type === "loot" && (
                 <button
                   className="location-choice"
-                  disabled={!canTakeAnyLoot}
+                  disabled={!canTakeAnyItem}
                   onClick={handleTakeAll}
                 >
                   Ta allt
@@ -670,87 +758,6 @@ function Location({
               )}
             </div>
           )}
-
-        {activeContainer?.type === "chest" && activeChest && (
-          <div
-            className="location-chest-backdrop"
-            onClick={() => setActiveContainer(null)}
-          >
-            <section
-              className="location-chest-overlay"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="location-chest-title"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <header className="location-chest-header">
-                <h2 id="location-chest-title">{activeChest.name}</h2>
-                <button
-                  className="location-chest-close"
-                  onClick={() => setActiveContainer(null)}
-                  aria-label="Stäng kistan"
-                >
-                  ×
-                </button>
-              </header>
-              <div className="location-chest-grids">
-                <section className="location-chest-section">
-                  <h3>Ryggsäck</h3>
-                  <ItemGrid
-                    containerId="player"
-                    containerType="player"
-                    width={player.BackpackWidth}
-                    height={player.BackpackHeight}
-                    inventory={player.Inventory}
-                    onInventoryChange={(updated) =>
-                      setPlayer((p) => ({ ...p, Inventory: updated }))
-                    }
-                    onItemRemoved={(id) =>
-                      setPlayer((p) => ({
-                        ...p,
-                        Inventory: p.Inventory.filter(
-                          (item) => item.containerItemId !== id,
-                        ),
-                      }))
-                    }
-                    onCrossContainerDrop={handleCrossContainerDrop}
-                  />
-                </section>
-                <section className="location-chest-section">
-                  <h3>{activeChest.name}</h3>
-                  <ItemGrid
-                    containerId={activeContainer.id}
-                    containerType="chest"
-                    width={activeChest.width}
-                    height={activeChest.height}
-                    inventory={player.Chests[activeContainer.id]}
-                    onInventoryChange={(updated) =>
-                      setPlayer((p) => ({
-                        ...p,
-                        Chests: {
-                          ...p.Chests,
-                          [activeContainer.id]: updated,
-                        },
-                      }))
-                    }
-                    onItemRemoved={(id) =>
-                      setPlayer((p) => ({
-                        ...p,
-                        Chests: {
-                          ...p.Chests,
-                          [activeContainer.id]: p.Chests[
-                            activeContainer.id
-                          ].filter((item) => item.containerItemId !== id),
-                        },
-                      }))
-                    }
-                    onCrossContainerDrop={handleCrossContainerDrop}
-                  />
-                </section>
-              </div>
-            </section>
-          </div>
-        )}
       </div>
     </div>
   );

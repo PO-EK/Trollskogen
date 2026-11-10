@@ -7,10 +7,16 @@ export type ChestDefinition = {
 
 export const chests = {
   playerStorage: {
-    name: "Förvaring",
+    name: "Din Kista",
     width: 7,
     height: 7,
-    contents: ["wand", "iron_dagger"],
+    contents: ["wooden_club", "iron_mace", "war_hammer"],
+  },
+  ruinsChest: {
+    name: "Moders kista",
+    width: 4,
+    height: 3,
+    contents: ["wand", "diamond", "health_potion", "goldRing"],
   },
   banditChest1: {
     name: "Rövarnas kista",
@@ -35,9 +41,7 @@ export const chests = {
 export type ChestId = keyof typeof chests;
 
 export function getChestDefinition(chestId: string): ChestDefinition {
-  const definition = Object.entries(chests).find(
-    ([id]) => id === chestId,
-  )?.[1];
+  const definition = Object.entries(chests).find(([id]) => id === chestId)?.[1];
 
   if (!definition) {
     throw new Error(`Unknown chest "${chestId}".`);

@@ -2,8 +2,116 @@ import type { ArmourItem } from "./itemTypes";
 import ironBodyImage from "../assets/items/ironBody.png";
 import ironHelmImage from "../assets/items/ironHelm.png";
 import ironBootsImage from "../assets/items/ironBoots.png";
+import leatherBodyImage from "../assets/items/leatherBody.png";
+import leatherHelmImage from "../assets/items/leatherHelm.png";
+import leatherBootsImage from "../assets/items/leatherBoots.png";
+import wizardRobeImage from "../assets/items/wizardRobe.png";
+import wizardHatImage from "../assets/items/wizardHat.png";
+import wizardShoesImage from "../assets/items/wizardShoes.png";
 
 export const armour: ArmourItem[] = [
+  {
+    id: "wizard_shoes",
+    category: "armour",
+    slot: "feet",
+    name: "Trollkarlens Skor",
+    description: "Mjuka blå skor för tysta steg och långa vandringar.",
+    image: wizardShoesImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 40,
+    defense: 3,
+    attributeBonuses: { Int: 2 },
+  },
+  {
+    id: "wizard_hat",
+    category: "armour",
+    slot: "head",
+    name: "Spetsig Trollkarlshatt",
+    description: "En hög, blå hatt full av hemligheter.",
+    image: wizardHatImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ],
+    baseValue: 45,
+    defense: 4,
+    attributeBonuses: { Int: 2 },
+  },
+  {
+    id: "wizard_robe",
+    category: "armour",
+    slot: "body",
+    name: "Blå Trollkarlskåpa",
+    description: "En lång blå kåpa sydd för magiker.",
+    image: wizardRobeImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+    ],
+    baseValue: 70,
+    defense: 8,
+    attributeBonuses: { Int: 2 },
+  },
+  {
+    id: "leather_boots",
+    category: "armour",
+    slot: "feet",
+    name: "Läderstövlar",
+    description: "Lätta stövlar av smidigt läder.",
+    image: leatherBootsImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+    ],
+    baseValue: 45,
+    defense: 5,
+    attributeBonuses: { Dex: 2 },
+  },
+  {
+    id: "leather_helm",
+    category: "armour",
+    slot: "head",
+    name: "Läderhjälm",
+    description: "En lätt hjälm av härdat läder.",
+    image: leatherHelmImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ],
+    baseValue: 50,
+    defense: 6,
+    attributeBonuses: { Dex: 2 },
+  },
+  {
+    id: "leather_body",
+    category: "armour",
+    slot: "body",
+    name: "Läderharnesk",
+    description: "Ett följsamt harnesk av flera lager läder.",
+    image: leatherBodyImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+    ],
+    baseValue: 80,
+    defense: 12,
+    attributeBonuses: { Dex: 2 },
+  },
   {
     id: "iron_boots",
     category: "armour",
@@ -15,8 +123,9 @@ export const armour: ArmourItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 60,
-    defense: 10,
+    baseValue: 50,
+    defense: 7,
+    attributeBonuses: { Con: 1 },
   },
   {
     id: "iron_helm",
@@ -32,7 +141,8 @@ export const armour: ArmourItem[] = [
       { x: 1, y: 1 },
     ],
     baseValue: 60,
-    defense: 10,
+    defense: 8,
+    attributeBonuses: { Con: 1 },
   },
   {
     id: "iron_body",
@@ -52,6 +162,7 @@ export const armour: ArmourItem[] = [
       { x: 1, y: 3 },
     ],
     baseValue: 100,
-    defense: 20,
+    defense: 16,
+    attributeBonuses: { Con: 1 },
   },
 ];

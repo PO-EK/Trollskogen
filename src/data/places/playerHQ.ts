@@ -3,7 +3,7 @@ import type { AdventureNode } from "../adventureTypes";
 export const playerHQ: Record<string, AdventureNode> = {
   intro: {
     id: "intro",
-    text: "Det här är din lilla stuga: ett enda rum, men mysigt och utrustat med allt du behöver. Här finns en spis, en säng och en låst kista.",
+    text: "Det här är din lilla stuga, tydligen så försvann ägarna. De försökte fly mot stora staden. Ingen vet om de lyckades, men du kan nu använda deras hus.",
     choices: [
       {
         text: "Gå in",
@@ -21,7 +21,7 @@ export const playerHQ: Record<string, AdventureNode> = {
 
   start: {
     id: "start",
-    text: "Du står i din stuga.",
+    text: "Dörren knirrar när du går in och du stänger den noga bakom dig. Ditt hem är enkelt: ett enda rum, men mysigt och utrustat med allt du behöver. Här finns en spis, en säng och en stor kista.",
 
     choices: [
       {
@@ -29,8 +29,8 @@ export const playerHQ: Record<string, AdventureNode> = {
         nextNodeId: "inBed",
       },
       {
-        text: "Undersök den låsta kistan",
-        nextNodeId: "storageChest",
+        text: "Undersök kistan",
+        nextNodeId: "lockedStorageChest",
         condition: { type: "storyFlag", flag: "unlockedStorage", value: false },
       },
       {
@@ -52,16 +52,27 @@ export const playerHQ: Record<string, AdventureNode> = {
 
   storageChest: {
     id: "storageChest",
-    text: "Kistan är av trä, förstärkt med tjocka metallband. Den ser tung och säker ut, men låset håller den stängd. Du behöver hitta en nyckel.",
+    text: "Kistan är av trä, förstärkt med tjocka metallband. Den ser tung och säker ut.",
     choices: [
       {
-        text: "Börja leta efter nyckeln",
+        text: "Tillbaka",
+        nextNodeId: "start",
+      },
+    ],
+  },
+
+  lockedStorageChest: {
+    id: "lockedStorageChest",
+    text: "Kistan är av trä, förstärkt med tjocka metallband. Den ser tung och säker ut. \n\nDu provar att öppna den men den är låst. Du funderar på att bryta upp den men inser att kistan kan vara till använding om du hittar nyckeln.",
+    choices: [
+      {
+        text: "Börja leta efter en nyckeln",
         condition: {
           type: "storyFlag",
           flag: "openStorageQuest.Started",
           value: false,
         },
-        nextNodeId: "storageChest",
+        nextNodeId: "start",
         effects: [
           {
             type: "setStoryFlag",
@@ -71,7 +82,7 @@ export const playerHQ: Record<string, AdventureNode> = {
         ],
       },
       {
-        text: "Använd nyckeln",
+        text: "Prova den nyckel du har",
         condition: [
           {
             type: "storyFlag",

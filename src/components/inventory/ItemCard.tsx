@@ -141,13 +141,32 @@ function WeaponDetails({ weapon }: { weapon: WeaponItem }) {
 }
 
 function ArmourDetails({ armour }: { armour: ArmourItem }) {
+  const bonuses = (["Str", "Dex", "Con", "Int"] as const).flatMap(
+    (attribute) => {
+      const amount = armour.attributeBonuses?.[attribute];
+
+      return amount === undefined ? [] : [{ attribute, amount }];
+    },
+  );
+
   return (
-    <div className="item-card-row">
-      <span className="item-card-label">Försvar</span>
-      <span className="item-card-value item-card-value--big">
-        {armour.defense}
-      </span>
-    </div>
+    <>
+      <div className="item-card-row">
+        <span className="item-card-label">Försvar</span>
+        <span className="item-card-value item-card-value--big">
+          {armour.defense}
+        </span>
+      </div>
+      {bonuses.map(({ attribute, amount }) => (
+        <div className="item-card-row" key={attribute}>
+          <span className="item-card-label">{STAT_LABELS[attribute]}</span>
+          <span className="item-card-value item-card-value--big">
+            {amount > 0 ? "+" : ""}
+            {amount}
+          </span>
+        </div>
+      ))}
+    </>
   );
 }
 

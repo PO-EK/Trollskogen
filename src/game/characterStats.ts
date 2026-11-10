@@ -159,3 +159,41 @@ export function applyAttributeBonuses(
 
   return restorePlayerResources(updated);
 }
+
+export function getItemAttributeBonuses(
+  itemId: string,
+  multiplier = 1,
+): AttributeBonus[] {
+  const definition = items.find((item) => item.id === itemId);
+
+  if (definition?.category !== "armour" || !definition.attributeBonuses) {
+    return [];
+  }
+
+  const bonuses = definition.attributeBonuses;
+  const attributes: AttributeBonus["attribute"][] = [
+    "Str",
+    "Dex",
+    "Con",
+    "Int",
+  ];
+
+  return attributes.flatMap((attribute) => {
+    const amount = bonuses[attribute];
+
+    return amount ? [{ attribute, amount: amount * multiplier }] : [];
+  });
+}
+
+export function adjustAttributeBonuses(
+  player: Player,
+  bonuses: readonly AttributeBonus[],
+): Player {
+  const updated = { ...player };
+
+  for (const bonus of bonuses) {
+    updated[bonus.attribute] += bonus.amount;
+  }
+
+  return recalculatePlayerStats(updated);
+}

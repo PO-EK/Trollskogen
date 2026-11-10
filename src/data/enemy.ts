@@ -75,7 +75,7 @@ export const enemies = {
     name: "Spejare",
     description:
       "En vaksam spejare som rör sig lätt och väntar på rätt tillfälle att anfalla.",
-    hp: 40,
+    hp: 80,
     minDamage: 20,
     maxDamage: 38,
     skills: ["stab_quick"],
@@ -109,9 +109,9 @@ export const enemies = {
     name: "Rövarhövding",
     description:
       "Rövarnas hårdföra ledare, märkt av många strider och redo att försvara sitt byte.",
-    hp: 140,
-    minDamage: 50,
-    maxDamage: 66,
+    hp: 240,
+    minDamage: 30,
+    maxDamage: 46,
     skills: ["slash_quick", "rally", "harden"],
     resistances: {
       ...neutralResistances,
@@ -155,7 +155,7 @@ export const enemies = {
     hp: 40,
     minDamage: 13,
     maxDamage: 23,
-    skills: ["bite", "dodge"],
+    skills: ["bite", "claws", "dodge"],
     resistances: {
       ...neutralResistances,
       piercing: 0.75,

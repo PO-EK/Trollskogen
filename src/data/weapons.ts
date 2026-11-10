@@ -6,10 +6,32 @@ import wandImage from "../assets/items/wand.png";
 import dolkImage from "../assets/items/dolk.png";
 import battleAxeImage from "../assets/items/battleaxe.png";
 import ironSpearImage from "../assets/items/spear1.png";
-// In the old_axe entry:
-//   skills: ["slash"],
+import woodenClubImage from "../assets/items/woodenClub.png";
+import maceImage from "../assets/items/mace.png";
+import warHammerImage from "../assets/items/warHammer.png";
 
 export const weapons: WeaponItem[] = [
+  // admin
+  {
+    id: "banhammer",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Banhammer",
+    description: "En klubba som tar bort hinder.",
+    image: warHammerImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+    ],
+    baseValue: 999,
+    minDamage: 300,
+    maxDamage: 300,
+    stat: "Str",
+    skills: ["crush_quick"],
+  },
+
+  // weapons
   {
     id: "iron_sword",
     category: "weapon",
@@ -43,7 +65,7 @@ export const weapons: WeaponItem[] = [
     minDamage: 4,
     maxDamage: 14,
     stat: "Dex",
-    skills: ["slash_deep", "stab_hard"],
+    skills: ["slash_deep", "stab_hard", "stab_weaken"],
   },
   {
     id: "wand",
@@ -61,6 +83,59 @@ export const weapons: WeaponItem[] = [
     maxDamage: 9,
     stat: "Int",
     skills: ["wand_slash", "wand_drain", "wand_push"],
+  },
+  {
+    id: "wooden_club",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Träklubba",
+    description: "En grovhuggen träklubba med läder lindat runt skaftet.",
+    image: woodenClubImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 15,
+    minDamage: 5,
+    maxDamage: 8,
+    stat: "Str",
+    skills: ["crush_quick", "crush_stun"],
+  },
+  {
+    id: "iron_mace",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Järnstridsklubba",
+    description: "En tung stridsklubba med ett huvud av järn.",
+    image: maceImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 65,
+    minDamage: 9,
+    maxDamage: 13,
+    stat: "Str",
+    skills: ["crush_quick", "crush_hard"],
+  },
+  {
+    id: "war_hammer",
+    category: "weapon",
+    slot: "mainHand",
+    name: "Stridshammare",
+    description:
+      "En stor krigshammare med ett långt skaft och tungt järnhuvud.",
+    image: warHammerImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+    ],
+    baseValue: 145,
+    minDamage: 15,
+    maxDamage: 21,
+    stat: "Str",
+    skills: ["crush_stun", "crush_hard"],
   },
   {
     id: "steel_sword",

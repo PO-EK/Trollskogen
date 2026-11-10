@@ -8,12 +8,11 @@ export const blacksmith: TraderDefinition = {
   inventoryHeight: 6,
   markup: 1.25,
   stock: [
+    "leather_body",
+    "leather_boots",
+    "leather_helm",
     "iron_body",
     "iron_boots",
-    "wood_torch",
     "iron_helm",
-    "iron_sword",
-    "iron_dagger",
-    "iron_spear",
   ],
 };

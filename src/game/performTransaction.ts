@@ -15,6 +15,10 @@ import {
   USE_SLOT_ID,
 } from "./itemUse";
 import { findFirstAvailableItemPosition } from "./inventory";
+import {
+  adjustAttributeBonuses,
+  getItemAttributeBonuses,
+} from "./characterStats";
 
 type PerformTransactionArgs = {
   item: ContainerItem;
@@ -576,13 +580,22 @@ function performEquip({
   const equipment = { ...player.Equipment };
   equipment[slot] = { ...ownedItem, x: 0, y: 0 };
 
+  const updatedPlayer: Player = {
+    ...player,
+    Inventory: inventory,
+    Equipment: equipment,
+  };
+  const attributeBonuses = [
+    ...(equipped ? getItemAttributeBonuses(equipped.itemId, -1) : []),
+    ...getItemAttributeBonuses(ownedItem.itemId),
+  ];
+
   return {
     success: true,
-    player: {
-      ...player,
-      Inventory: inventory,
-      Equipment: equipment,
-    },
+    player:
+      attributeBonuses.length > 0
+        ? adjustAttributeBonuses(updatedPlayer, attributeBonuses)
+        : updatedPlayer,
     trader,
   };
 }
@@ -611,16 +624,22 @@ function performUnequip({
   const equipment = { ...player.Equipment };
   delete equipment[slot];
 
+  const updatedPlayer: Player = {
+    ...player,
+    Inventory: [
+      ...player.Inventory,
+      { ...equipped, x: position.x, y: position.y },
+    ],
+    Equipment: equipment,
+  };
+  const attributeBonuses = getItemAttributeBonuses(equipped.itemId, -1);
+
   return {
     success: true,
-    player: {
-      ...player,
-      Inventory: [
-        ...player.Inventory,
-        { ...equipped, x: position.x, y: position.y },
-      ],
-      Equipment: equipment,
-    },
+    player:
+      attributeBonuses.length > 0
+        ? adjustAttributeBonuses(updatedPlayer, attributeBonuses)
+        : updatedPlayer,
     trader,
   };
 }

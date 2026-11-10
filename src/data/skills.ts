@@ -1,6 +1,16 @@
 import type { Skill } from "./skillTypes";
 
 export const skills: Skill[] = [
+  // admin skills
+  {
+    id: "godRay",
+    name: "Admin stråle",
+    description: "Gud säger: Försvinn!",
+    target: "enemy",
+    damageType: "light",
+    damage: { kind: "spell", min: 200, max: 200, stat: "Int" },
+    manaCost: 1,
+  },
   // ---- Weapon/Item skills ----
   {
     id: "torch_bash",
@@ -52,12 +62,12 @@ export const skills: Skill[] = [
     description: "Ett djupare hugg.",
     target: "enemy",
     damageType: "slashing",
-    damage: { kind: "weapon", multiplier: 0.8 },
+    damage: { kind: "weapon", multiplier: 1 },
     effects: [
       {
         type: "bleed",
-        damage: 2,
-        percentOfDamage: 10,
+        damage: 6,
+        percentOfDamage: 50,
         chance: 100,
         maxStacks: 10,
       },
@@ -121,16 +131,7 @@ export const skills: Skill[] = [
     description: "En kraftig stöt som tränger djupt.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.8 },
-    effects: [
-      {
-        type: "bleed",
-        damage: 2,
-        percentOfDamage: 10,
-        chance: 80,
-        maxStacks: 10,
-      },
-    ],
+    damage: { kind: "weapon", multiplier: 2 },
     cooldown: 3,
   },
   {
@@ -181,7 +182,7 @@ export const skills: Skill[] = [
       {
         type: "bleed",
         damage: 4,
-        percentOfDamage: 10,
+        percentOfDamage: 20,
         chance: 100,
         maxStacks: 5,
       },
@@ -194,7 +195,7 @@ export const skills: Skill[] = [
       "Träffar fienden med magisk kraft och återställer magi motsvarande en del av skadan.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.2 },
+    damage: { kind: "weapon", multiplier: 1 },
     effects: [{ type: "manaLeech", percentOfDamage: 40 }],
     cooldown: 1,
   },
@@ -204,7 +205,8 @@ export const skills: Skill[] = [
     description: "Skada fienden med ren magisk kraft.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "weapon", multiplier: 1.4 },
+    damage: { kind: "weapon", multiplier: 1.5 },
+    cooldown: 2,
   },
   {
     id: "wand_push",
@@ -212,9 +214,17 @@ export const skills: Skill[] = [
     description: "Få din fiende att flyga bakåt.",
     target: "enemy",
     damageType: "crushing",
-    damage: { kind: "weapon", multiplier: 1 },
+    damage: { kind: "weapon", multiplier: 0.5 },
     effects: [{ type: "stun", chance: 100, turns: 2 }],
     cooldown: 5,
+  },
+  {
+    id: "stab_weaken",
+    name: "Hugg och Ducka",
+    description: "Let efter en öppning i fiendens försvar.",
+    target: "enemy",
+    effects: [{ type: "offguard", percent: 12, turns: 3 }],
+    cooldown: 3,
   },
 
   // ---- Enemy skills ----
@@ -509,8 +519,8 @@ export const skills: Skill[] = [
     description: "Skjut magiska pilar från dina händer.",
     target: "enemy",
     damageType: "piercing",
-    damage: { kind: "spell", min: 16, max: 18, stat: "Int" },
-    manaCost: 8,
+    damage: { kind: "spell", min: 17, max: 18, stat: "Int" },
+    manaCost: 12,
   },
   {
     id: "curse_weak",

@@ -127,10 +127,11 @@ export const createNewPlayer = (): Player => {
     LockedLocations: locations
       .filter((location) => location.initialState === "locked")
       .map((location) => location.id),
-    KnownSkills: [],
+    KnownSkills: ["godRay"],
   };
 
   player = addItemToInventory(player, "bandage", "startBandage");
+  player = addItemToInventory(player, "banhammer", "startWeap");
   player = addItemToInventory(player, "storageKey", "playerKey");
   player = equippedItem(player, "iron_sword", "starterSword");
 

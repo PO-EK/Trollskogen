@@ -56,6 +56,7 @@ export type ArmourItem = BaseItem & {
   slot: ArmourSlot;
   defense: number;
   attackBonus?: number;
+  attributeBonuses?: Partial<Record<WeaponStat, number>>;
   skills?: string[];
 };
 
