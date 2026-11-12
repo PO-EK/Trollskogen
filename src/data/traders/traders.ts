@@ -17,7 +17,11 @@ function createTrader(definition: TraderDefinition): Trader {
   return initializedTrader;
 }
 
-export const traders: Trader[] = traderDefinitions.map(createTrader);
+export function createTraders(): Trader[] {
+  return traderDefinitions.map(createTrader);
+}
+
+export const traders: Trader[] = createTraders();
 
 export function getTrader(traderId: string): Trader | undefined {
   return traders.find((trader) => trader.id === traderId);

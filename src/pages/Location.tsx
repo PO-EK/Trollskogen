@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { usePlayer } from "../context/usePlayer";
 import { useItemHover } from "../context/useItemHover";
+import { useTrader } from "../context/useTrader";
 import "./Location.css";
 import { locations } from "../data/locations";
 import { getChestDefinition } from "../data/Chests";
-import { adventures } from "../data/places";
+import {
+  adventures,
+  getRandomAdventureStartNodeId,
+} from "../data/places";
 import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
@@ -74,6 +78,7 @@ function Location({
   onStartCombat,
 }: LocationProps) {
   const { player, setPlayer } = usePlayer();
+  const { resetTraders } = useTrader();
   const [currentNodeId, setCurrentNodeId] = useState(() => {
     const selectedLocation = locations.find(
       (location) => location.id === locationId,
@@ -310,6 +315,19 @@ function Location({
 
   function handleEffect(effect: AdventureEffect) {
     switch (effect.type) {
+      case "startRandomEncounter": {
+        const startNodeId = getRandomAdventureStartNodeId(effect.adventureId);
+
+        if (!startNodeId || !adventures[effect.adventureId]?.[startNodeId]) {
+          throw new Error(
+            `Adventure "${effect.adventureId}" has no valid encounter start node.`,
+          );
+        }
+
+        setCurrentNodeId(startNodeId);
+        break;
+      }
+
       case "unlockLocation":
         setPlayer((p) => ({
           ...p,
@@ -378,6 +396,21 @@ function Location({
           ...p,
           Gold: p.Gold - effect.amount,
         }));
+        break;
+
+      case "removeAllGold":
+        setPlayer((p) => ({
+          ...p,
+          Gold: 0,
+        }));
+        break;
+
+      case "checkGold":
+        setCurrentNodeId(
+          player.Gold >= effect.amount
+            ? effect.hasGoldNodeId
+            : effect.insufficientGoldNodeId,
+        );
         break;
 
       case "openTrader":
@@ -490,6 +523,7 @@ function Location({
         break;
 
       case "sleep":
+        resetTraders();
         setPlayer((p) => {
           const day = p.day + 1;
           const dueFlags = p.ScheduledStoryFlags.filter(

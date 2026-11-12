@@ -16,6 +16,11 @@ export type AdventureNode = {
   choices: AdventureChoice[];
 };
 
+export type AdventureEncounter = {
+  startNodeId: string;
+  nodes: Record<string, AdventureNode>;
+};
+
 export type AdventureCondition =
   | {
       type: "hasItem";
@@ -46,6 +51,13 @@ export type AdventureEffect =
   | { type: "openStorage" }
   | { type: "openChest"; chestId: ChestId }
   | { type: "removeGold"; amount: number }
+  | { type: "removeAllGold" }
+  | {
+      type: "checkGold";
+      amount: number;
+      hasGoldNodeId: string;
+      insufficientGoldNodeId: string;
+    }
   | { type: "addExperience"; amount: number }
   | { type: "heal"; amount: number }
   | { type: "restoreMana"; amount: number }
@@ -56,6 +68,7 @@ export type AdventureEffect =
   | { type: "fullHeal" }
   | { type: "damage"; amount: number }
   | { type: "setStoryFlag"; flag: string; value: boolean }
+  | { type: "startRandomEncounter"; adventureId: string }
   | { type: "openTrader"; traderId: string }
   | { type: "travelTo"; locationId: string }
   | { type: "unlockLocation"; locationId: string }

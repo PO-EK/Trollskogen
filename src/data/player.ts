@@ -96,12 +96,12 @@ export const createNewPlayer = (): Player => {
     day: 1,
     ActionPoints: DAILY_ACTION_POINTS,
 
-    Gold: 0,
+    Gold: 31,
 
     Level: 1,
-    Exp: 14,
-    ExpMax: 50,
-    SkillPoints: 3,
+    Exp: 11,
+    ExpMax: 75,
+    SkillPoints: 1,
     LearnedNodes: [],
 
     Str: playerStr,
@@ -117,8 +117,8 @@ export const createNewPlayer = (): Player => {
     ManaMax: maxMana,
 
     Equipment: {},
-    BackpackWidth: 6,
-    BackpackHeight: 6,
+    BackpackWidth: 5,
+    BackpackHeight: 4,
 
     Chests: Object.fromEntries(
       Object.entries(chests).map(([chestId]) => [chestId, []]),

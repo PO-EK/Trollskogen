@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { traders } from "../data/traders/traders";
+import { createTraders } from "../data/traders/traders";
 import { TraderContext } from "./TraderContext";
 
 export function TraderProvider({ children }: { children: React.ReactNode }) {
-  const [currentTraders, setCurrentTraders] = useState(traders);
+  const [currentTraders, setCurrentTraders] = useState(createTraders);
+
+  function resetTraders() {
+    setCurrentTraders(createTraders());
+  }
 
   return (
     <TraderContext.Provider
       value={{
         traders: currentTraders,
         setTraders: setCurrentTraders,
+        resetTraders,
       }}
     >
       {children}

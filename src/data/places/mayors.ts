@@ -40,14 +40,6 @@ export const mayors: Record<string, AdventureNode> = {
     text: "Det är tyst en lång stund. Du knackar en gång till, lite hårdare, och hör hur någon rör sig där inne. Ett golv knarrar, och sedan hörs en dämpad kvinnoröst genom dörren. 'Vad vill du?'",
     choices: [
       {
-        text: "Vad har hänt med byn?",
-        nextNodeId: "mayorsVillage",
-      },
-      {
-        text: "Behöver du hjälp med något?",
-        nextNodeId: "mayorsHelp",
-      },
-      {
         text: "Ulf skickade mig för att se om du är okej. Jag har med mig mat, får jag komma in?",
         nextNodeId: "mayorsInside",
         condition: {
@@ -56,6 +48,15 @@ export const mayors: Record<string, AdventureNode> = {
           value: true,
         },
       },
+      {
+        text: "Vad har hänt med byn?",
+        nextNodeId: "mayorsVillage",
+      },
+      {
+        text: "Behöver du hjälp med något?",
+        nextNodeId: "mayorsHelp",
+      },
+
       {
         text: "Återvänd till byn.",
         effects: [

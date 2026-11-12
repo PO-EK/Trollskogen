@@ -15,7 +15,7 @@ function TopBar() {
       <div className="top-bar-stats">
         <span>Dag: {player.day}</span>
         <div className="action-points">
-          <span>Actions</span>
+          <span>Tid kvar:</span>
           <div
             className="action-points-bar"
             role="progressbar"

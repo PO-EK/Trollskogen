@@ -6,7 +6,7 @@ export const witch: TraderDefinition = {
   description: "En mystisk kvinna som säljer märkliga drycker och föremål.",
   inventoryWidth: 6,
   inventoryHeight: 7,
-  markup: 1.4,
+  markup: 1.2,
   stock: [
     "wizard_robe",
     "wizard_hat",

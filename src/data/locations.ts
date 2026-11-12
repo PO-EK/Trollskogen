@@ -10,6 +10,7 @@ import woodcuttersHutImage from "../assets/map-locations/woodcuttersHut.png";
 import ancientTreeImage from "../assets/map-locations/ancientTree.png";
 import banditCampImage from "../assets/map-locations/banditCamp.png";
 import witchIntroQuestImage from "../assets/map-locations/witchIntroQuest.png";
+import clearingImage from "../assets/map-locations/clearing.png";
 
 export type LocationInitialState = "unlocked" | "hidden" | "locked";
 
@@ -193,8 +194,8 @@ export const locations: MapLocation[] = [
     mapId: "wilderness",
     name: "Rövarnas Läger",
     initialState: "hidden",
-    x: 53,
-    y: 24,
+    x: 60,
+    y: 54,
     image: banditCampImage,
     scale: 2,
     adventureId: "banditCamp",
@@ -203,7 +204,7 @@ export const locations: MapLocation[] = [
     id: "places",
     mapId: "wilderness",
     name: "Trollskogen",
-    initialState: "unlocked",
+    initialState: "hidden",
     x: 43,
     y: 24,
     image: ancientTreeImage,
@@ -211,11 +212,22 @@ export const locations: MapLocation[] = [
     adventureId: "places",
   },
   {
+    id: "exploreForrest",
+    mapId: "wilderness",
+    name: "Utforska Skogen",
+    initialState: "unlocked",
+    x: 28,
+    y: 58,
+    image: clearingImage,
+    scale: 1.4,
+    adventureId: "exploreForrest",
+  },
+  {
     id: "witchIntroQuest",
     mapId: "wilderness",
     name: "Svampgrotta",
     initialState: "hidden",
-    x: 20,
+    x: 30,
     y: 40,
     image: witchIntroQuestImage,
     scale: 1.2,

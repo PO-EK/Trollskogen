@@ -233,7 +233,6 @@ export const smeden: Record<string, AdventureNode> = {
             value: true,
           },
           { type: "setStoryFlag", flag: "nattvakten.reportLars", value: true },
-          { type: "endAdventure" },
         ],
       },
       {

@@ -42,7 +42,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 0, y: 1 },
     ],
-    baseValue: 18,
+    baseValue: 13,
   },
   {
     id: "beerMug",
@@ -50,7 +50,7 @@ const generalItems: GeneralItem[] = [
     description: "Bryggt lokalt.",
     image: beerImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 12,
+    baseValue: 9,
     use: {
       verb: "drack en öl",
       effects: [{ type: "restoreMana", amount: 40 }],
@@ -65,7 +65,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 8,
+    baseValue: 6,
     use: {
       verb: "åt en smörgås",
       effects: [{ type: "heal", amount: 40 }],
@@ -80,7 +80,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 28,
+    baseValue: 20,
     use: {
       verb: "åt en grönsaksgryta",
       effects: [
@@ -95,7 +95,7 @@ const generalItems: GeneralItem[] = [
     description: "En stark dryck som piggar upp sinnet.",
     image: teaImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 25,
+    baseValue: 18,
     use: {
       verb: "drack stjärnte",
       effects: [{ type: "restoreMana", amount: 80 }],
@@ -124,7 +124,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 20,
+    baseValue: 14,
   },
   {
     id: "wolfMeat",
@@ -132,7 +132,7 @@ const generalItems: GeneralItem[] = [
     description: "Rått kött från en varg.",
     image: wolfMeatImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 12,
+    baseValue: 9,
   },
   {
     id: "wolfPelt",
@@ -143,7 +143,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 48,
+    baseValue: 34,
   },
   {
     id: "ruby",
@@ -151,7 +151,7 @@ const generalItems: GeneralItem[] = [
     description: "En klar, röd ädelsten.",
     image: rubyImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 90,
+    baseValue: 63,
   },
   {
     id: "sapphire",
@@ -159,7 +159,7 @@ const generalItems: GeneralItem[] = [
     description: "En djupblå ädelsten med slipade fasetter.",
     image: sapphireImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 100,
+    baseValue: 70,
   },
   {
     id: "diamond",
@@ -167,7 +167,7 @@ const generalItems: GeneralItem[] = [
     description: "En gnistrande, klar ädelsten.",
     image: diamondImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 180,
+    baseValue: 126,
   },
   {
     id: "silverRing",
@@ -175,7 +175,7 @@ const generalItems: GeneralItem[] = [
     description: "En enkel ring av polerat silver.",
     image: silverRingImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 70,
+    baseValue: 49,
   },
   {
     id: "goldRing",
@@ -183,7 +183,7 @@ const generalItems: GeneralItem[] = [
     description: "En vacker ring av rent guld.",
     image: goldRingImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 125,
+    baseValue: 88,
   },
   {
     id: "diamondRing",
@@ -191,7 +191,7 @@ const generalItems: GeneralItem[] = [
     description: "En guldring prydd med en gnistrande diamant.",
     image: diamondRingImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 300,
+    baseValue: 210,
   },
   {
     id: "woodlog",
@@ -206,7 +206,7 @@ const generalItems: GeneralItem[] = [
       { x: 1, y: 1 },
       { x: 1, y: 2 },
     ],
-    baseValue: 12,
+    baseValue: 9,
   },
   {
     id: "firewood",
@@ -219,7 +219,7 @@ const generalItems: GeneralItem[] = [
       { x: 1, y: 0 },
       { x: 1, y: 1 },
     ],
-    baseValue: 4,
+    baseValue: 3,
   },
   {
     id: "storageKey",
@@ -241,7 +241,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 0, y: 1 },
     ],
-    baseValue: 40,
+    baseValue: 28,
     use: {
       verb: "drack en läkande dryck",
       effects: [{ type: "heal", percentOfMax: 100 }],
@@ -253,7 +253,7 @@ const generalItems: GeneralItem[] = [
     description: "Fyller på din magi.",
     image: manaPotionImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 25,
+    baseValue: 18,
     use: {
       verb: "drack en magisk dryck",
       effects: [{ type: "restoreMana", percentOfMax: 100 }],
@@ -265,7 +265,7 @@ const generalItems: GeneralItem[] = [
     description: "En blå svamp med magiska egenskaper.",
     image: blueMushroomImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 24,
+    baseValue: 17,
     use: {
       verb: "åt en magisk svamp",
       effects: [{ type: "restoreMana", amount: 12 }],
@@ -277,7 +277,7 @@ const generalItems: GeneralItem[] = [
     description: "En liten klase orange svampar som läker 12 hälsa.",
     image: orangeMushroomsImage,
     shape: [{ x: 0, y: 0 }],
-    baseValue: 12,
+    baseValue: 9,
     use: {
       verb: "åt en läkande svamp",
       effects: [{ type: "heal", amount: 12 }],
@@ -292,7 +292,7 @@ const generalItems: GeneralItem[] = [
       { x: 0, y: 0 },
       { x: 1, y: 0 },
     ],
-    baseValue: 15,
+    baseValue: 11,
     use: {
       verb: "lindade dig med ett bandage",
       effects: [{ type: "cure", statuses: ["bleed", "burn"] }],

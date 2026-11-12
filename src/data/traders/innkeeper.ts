@@ -6,6 +6,6 @@ export const innkeeper: TraderDefinition = {
   description: "En vänlig man som säljer drycker och andra förnödenheter.",
   inventoryWidth: 5,
   inventoryHeight: 3,
-  markup: 1.25,
-  stock: ["beerMug", "soupVeg", "teaStar", "sandwich"],
+  markup: 1.2,
+  stock: ["beerMug", "soupVeg", "teaStar", "sandwich", "bandage"],
 };

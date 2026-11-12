@@ -58,15 +58,15 @@ export const enemies = {
     name: "Rövare",
     description:
       "En härjad rövare med slitet läder och ett vasst vapen i handen.",
-    hp: 120,
-    minDamage: 12,
-    maxDamage: 15,
+    hp: 75,
+    minDamage: 10,
+    maxDamage: 11,
     skills: ["bandit_slash", "bandit_stab"],
     resistances: { ...neutralResistances },
     isBoss: false,
     exp: 44,
     gold: 14,
-    loot: [drop("ruby", 0.5), drop("sapphire", 0.3), drop("diamond", 0.1)],
+    loot: [drop("iron_mace", 0.4), drop("sapphire", 0.2), drop("diamond", 0.1)],
   },
 
   ambusher: {
@@ -75,15 +75,19 @@ export const enemies = {
     name: "Spejare",
     description:
       "En vaksam spejare som rör sig lätt och väntar på rätt tillfälle att anfalla.",
-    hp: 80,
-    minDamage: 20,
-    maxDamage: 38,
-    skills: ["stab_quick"],
+    hp: 50,
+    minDamage: 16,
+    maxDamage: 18,
+    skills: ["stab_quick", "dodge"],
     resistances: { ...neutralResistances, slashing: 1.2 },
     isBoss: false,
     exp: 65,
-    gold: 80,
-    loot: [drop("health_potion", 0.5)],
+    gold: 10,
+    loot: [
+      drop("health_potion", 0.5),
+      drop("sapphire", 0.3),
+      drop("diamond", 0.1),
+    ],
   },
 
   mercenary: {
@@ -93,14 +97,14 @@ export const enemies = {
     description:
       "En välutrustad legoknekt med stadig hållning och vana av strid.",
     hp: 220,
-    minDamage: 22,
-    maxDamage: 25,
+    minDamage: 15,
+    maxDamage: 21,
     skills: ["slash_quick", "stab_hard", "rally"],
     resistances: { ...neutralResistances, piercing: 1.4 },
     isBoss: false,
     exp: 155,
-    gold: 80,
-    loot: [drop("battle_axe", 0.2)],
+    gold: 31,
+    loot: [drop("steel_sword", 0.8), drop("diamond", 0.2)],
   },
 
   banditChief: {
