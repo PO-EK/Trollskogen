@@ -15,6 +15,42 @@ export type QuestDefinition = {
 
 export const quests: QuestDefinition[] = [
   {
+    id: "shadowOverTrollskogen",
+    title: "Skuggan över Trollskogen",
+    description:
+      "Ett mörker ligger över Trollskogen, och även trollen har flytt sina grottor. Melander vet inte vad det är, men hon vet hur man tar reda på det: tala med skogens äldsta väsen. Hon har skickat dig till Näcken. Ta aldrig emot gåvor, svara inte på hans frågor och lämna floden snabbt.",
+    stages: [
+      {
+        text: "Följ fiolen till floden och fråga Näcken vad som skrämmer skogens väsen.",
+        completedFlag: "mainstory.nacken.talked",
+      },
+      {
+        text: "Återvänd till Melander och berätta vad Näcken sa.",
+        completedFlag: "mainstory.witch.nackenReported",
+      },
+      {
+        text: "Återvänd till Melander i morgon för att kontakta älvorna.",
+        completedFlag: "mainstory.elves.contacted",
+      },
+      {
+        text: "Prata med Melander om vad älvorna berättade.",
+        completedFlag: "mainstory.witch.lostKnowledgeTold",
+      },
+      {
+        text: "Gå till den stora runstenen i skogen och skriv av runorna.",
+        completedFlag: "mainstory.runes.copied",
+      },
+      {
+        text: "Återvänd till Melander så att hon kan tyda runorna.",
+        completedFlag: "mainstory.runes.deciphered",
+      },
+    ],
+    startedFlag: "mainstory.shadow.started",
+    completedFlag: "mainstory.shadow.complete",
+    completedText: "[PLATSHÅLLARE: skrivs när questet fortsätter.]",
+  },
+  // nyckeln till kistan
+  {
     id: "openStorageQuest",
     title: "Nyckeln till kistan",
     description: "Hitta nyckeln till kistan i din stuga och lås upp den.",
@@ -28,6 +64,7 @@ export const quests: QuestDefinition[] = [
     completedFlag: "unlockedStorage",
     completedText: "Kistan i din stuga är upplåst.",
   },
+  // Läkedryck till smeden
   {
     id: "healTheSmith",
     title: "Smedens läkande dryck",
@@ -47,7 +84,7 @@ export const quests: QuestDefinition[] = [
     completedFlag: "healTheSmith.Complete",
     completedText: "Smeden är återställd och smedjan kan öppna igen.",
   },
-
+  // Nattvakten
   {
     id: "nightWatch",
     title: "Byns nattvakt",
@@ -103,6 +140,7 @@ export const quests: QuestDefinition[] = [
     completedFlag: "nattvakten.complete",
     completedText: "Lars tränar byns nya nattvakt.",
   },
+  //Häxan Melander
   {
     id: "witchMelander",
     title: "Häxan Melander",
@@ -126,6 +164,7 @@ export const quests: QuestDefinition[] = [
     completedFlag: "mainstory.witch.complete",
     completedText: "Melander har berättat vad hon vet.",
   },
+  //New Leader
   {
     id: "newLeader",
     title: "En ny ledare",

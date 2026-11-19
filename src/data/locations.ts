@@ -9,6 +9,9 @@ import witchHutImage from "../assets/map-locations/witchHut.png";
 import woodcuttersHutImage from "../assets/map-locations/woodcuttersHut.png";
 import ancientTreeImage from "../assets/map-locations/ancientTree.png";
 import banditCampImage from "../assets/map-locations/banditCamp.png";
+import waterfallImage from "../assets/map-locations/waterfall.png";
+import banditStashImage from "../assets/map-locations/banditStash.png";
+import nackenPondImage from "../assets/map-locations/nackenPond.png";
 import witchIntroQuestImage from "../assets/map-locations/witchIntroQuest.png";
 import clearingImage from "../assets/map-locations/clearing.png";
 
@@ -199,6 +202,41 @@ export const locations: MapLocation[] = [
     image: banditCampImage,
     scale: 2,
     adventureId: "banditCamp",
+  },
+  {
+    id: "nackenPond",
+    mapId: "wilderness",
+    name: "Näcken vid floden",
+    initialState: "hidden",
+    x: 53,
+    y: 20,
+    image: nackenPondImage,
+    scale: 1.4,
+    adventureId: "nackenPond",
+    introNodeId: "intro",
+    introSeenFlag: "nacken.IntroSeen",
+  },
+  {
+    id: "waterfall",
+    mapId: "wilderness",
+    name: "Vattenfallet",
+    initialState: "hidden",
+    x: 84,
+    y: 49,
+    image: waterfallImage,
+    scale: 1.4,
+    adventureId: "waterfall",
+  },
+  {
+    id: "banditStash",
+    mapId: "wilderness",
+    name: "Rövarnas förråd",
+    initialState: "hidden",
+    x: 77,
+    y: 72,
+    image: banditStashImage,
+    scale: 1.4,
+    adventureId: "banditStash",
   },
   {
     id: "places",

@@ -51,6 +51,7 @@ export type AdventureEffect =
   | { type: "openStorage" }
   | { type: "openChest"; chestId: ChestId }
   | { type: "removeGold"; amount: number }
+  | { type: "upgradeBackpackHeight" }
   | { type: "removeAllGold" }
   | {
       type: "checkGold";

@@ -344,6 +344,10 @@ export const vardshuset: Record<string, AdventureNode> = {
     text: "Marie sitter vid en sjukbädd och byter en blodig bandagering. Hon nickar åt dig utan att släppa den skadades hand. 'Behöver du något?'",
     choices: [
       {
+        text: "Kan du hjälpa mig att skaffa en större ryggsäck?",
+        nextNodeId: "marieBackpack",
+      },
+      {
         text: "Kan jag hjälpa dig på något sätt?",
         nextNodeId: "marieHelp",
         condition: {
@@ -357,6 +361,181 @@ export const vardshuset: Record<string, AdventureNode> = {
         nextNodeId: "start",
       },
     ],
+  },
+
+  marieBackpack: {
+    id: "marieBackpack",
+    text: "Marie granskar din ryggsäck och nickar. 'Jag kan sy ut den och förstärka sömmarna. Vi tar ett steg i taget, så håller den för lasten.'",
+    choices: [
+      {
+        text: "Hur mycket kostar det?",
+        condition: {
+          type: "storyFlag",
+          flag: "marie.backpackUpgrade1",
+          value: false,
+        },
+        effects: [
+          {
+            type: "checkGold",
+            amount: 250,
+            hasGoldNodeId: "marieBackpackOffer1",
+            insufficientGoldNodeId: "marieBackpackInsufficient",
+          },
+        ],
+      },
+      {
+        text: "Hur mycket kostar det?",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade1",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade2",
+            value: false,
+          },
+        ],
+        effects: [
+          {
+            type: "checkGold",
+            amount: 500,
+            hasGoldNodeId: "marieBackpackOffer2",
+            insufficientGoldNodeId: "marieBackpackInsufficient",
+          },
+        ],
+      },
+      {
+        text: "Hur mycket kostar det?",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade2",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade3",
+            value: false,
+          },
+        ],
+        effects: [
+          {
+            type: "checkGold",
+            amount: 1000,
+            hasGoldNodeId: "marieBackpackOffer3",
+            insufficientGoldNodeId: "marieBackpackInsufficient",
+          },
+        ],
+      },
+      {
+        text: "Ryggsäcken är redan så stor den kan bli.",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade1",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade2",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "marie.backpackUpgrade3",
+            value: true,
+          },
+        ],
+        nextNodeId: "marieBackpackComplete",
+      },
+      {
+        text: "Tillbaka.",
+        nextNodeId: "marieStart",
+      },
+    ],
+  },
+
+  marieBackpackOffer1: {
+    id: "marieBackpackOffer1",
+    text: "'För 250 kronor kan jag lägga till en rad och förstärka botten. Ska jag göra det?'",
+    choices: [
+      {
+        text: "Ja, förstora ryggsäcken.",
+        nextNodeId: "marieBackpackSuccess",
+        effects: [
+          { type: "removeGold", amount: 250 },
+          { type: "upgradeBackpackHeight" },
+          {
+            type: "setStoryFlag",
+            flag: "marie.backpackUpgrade1",
+            value: true,
+          },
+        ],
+      },
+      { text: "Inte just nu.", nextNodeId: "marieBackpack" },
+    ],
+  },
+
+  marieBackpackOffer2: {
+    id: "marieBackpackOffer2",
+    text: "Marie granskar sömmarna och nickar. 'Jag kan lägga till ännu en rad och förstärka remmarna för 500 kronor. Ska jag göra det?'",
+    choices: [
+      {
+        text: "Ja, förstora ryggsäcken.",
+        nextNodeId: "marieBackpackSuccess",
+        effects: [
+          { type: "removeGold", amount: 500 },
+          { type: "upgradeBackpackHeight" },
+          {
+            type: "setStoryFlag",
+            flag: "marie.backpackUpgrade2",
+            value: true,
+          },
+        ],
+      },
+      { text: "Inte just nu.", nextNodeId: "marieBackpack" },
+    ],
+  },
+
+  marieBackpackOffer3: {
+    id: "marieBackpackOffer3",
+    text: "Marie känner på ryggsäckens förstärkta sömmar. 'En sista rad blir dyr att sy ordentligt. Det kostar 1 000 kronor. Ska jag göra det?'",
+    choices: [
+      {
+        text: "Ja, förstora ryggsäcken.",
+        nextNodeId: "marieBackpackSuccess",
+        effects: [
+          { type: "removeGold", amount: 1000 },
+          { type: "upgradeBackpackHeight" },
+          {
+            type: "setStoryFlag",
+            flag: "marie.backpackUpgrade3",
+            value: true,
+          },
+        ],
+      },
+      { text: "Inte just nu.", nextNodeId: "marieBackpack" },
+    ],
+  },
+
+  marieBackpackInsufficient: {
+    id: "marieBackpackInsufficient",
+    text: "Marie skakar vänligt på huvudet. 'Du har inte tillräckligt med kronor för att betala för arbetet ännu.'",
+    choices: [{ text: "Jag förstår.", nextNodeId: "marieBackpack" }],
+  },
+
+  marieBackpackSuccess: {
+    id: "marieBackpackSuccess",
+    text: "Marie syr fast en ny rad och drar åt sömmarna. 'Så där. Nu får du plats med lite mer.'",
+    choices: [{ text: "Tack, Marie.", nextNodeId: "start" }],
+  },
+
+  marieBackpackComplete: {
+    id: "marieBackpackComplete",
+    text: "Marie ler nöjt. 'Nu är ryggsäcken så stor och stadig den kan bli. Fler rader skulle inte hålla för vikten.'",
+    choices: [{ text: "Tillbaka.", nextNodeId: "start" }],
   },
 
   marieHelp: {

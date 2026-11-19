@@ -3,6 +3,8 @@ import { weapons } from "./weapons";
 import { armour } from "./armour";
 import { getSkill } from "./skills";
 import healthPotionImage from "../assets/items/health_potion.png";
+import magicWaterImage from "../assets/items/magicWater.png";
+import witchGlassSetImage from "../assets/items/witchGlassSet.png";
 import firewoodImage from "../assets/items/firewood.png";
 
 import storageKeyImage from "../assets/items/storageKey.png";
@@ -258,6 +260,33 @@ const generalItems: GeneralItem[] = [
       verb: "drack en magisk dryck",
       effects: [{ type: "restoreMana", percentOfMax: 100 }],
     },
+  },
+  {
+    id: "magicWater",
+    name: "Magiskt vatten",
+    description: "Vatten ifrån ett magiskt vattenfall djupt inne i skogen.",
+    image: magicWaterImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    baseValue: 0,
+  },
+  {
+    id: "witchGlassSet",
+    name: "Glas till häxan",
+    description:
+      "En samling tomma trolldrycksflaskor och andra glasföremål.",
+    image: witchGlassSetImage,
+    shape: [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 0, y: 2 },
+      { x: 1, y: 2 },
+    ],
+    baseValue: 0,
   },
   {
     id: "magicMushroom",

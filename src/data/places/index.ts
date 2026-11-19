@@ -11,6 +11,9 @@ import { mayors } from "../places/mayors";
 import { woodcuttersHut } from "../places/woodcuttersHut";
 import { byHus } from "../places/byHus";
 import { banditCamp } from "../places/banditCamp";
+import { waterfall } from "../places/waterfall";
+import { banditStash } from "../places/banditStash";
+import { nackenPond } from "../places/nackenPond";
 import { witchIntroQuest } from "../places/witchIntroQuest";
 import { exploreForrest, exploreForrestStartNodeIds } from "./exploreForrest";
 
@@ -32,6 +35,9 @@ export const adventures: Record<string, Record<string, AdventureNode>> = {
   byHus4: byHus,
   exploreForrest,
   banditCamp,
+  waterfall,
+  banditStash,
+  nackenPond,
 };
 
 const randomizedAdventureStartNodeIds: Record<string, string[]> = {

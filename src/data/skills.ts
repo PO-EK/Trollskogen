@@ -211,7 +211,7 @@ export const skills: Skill[] = [
     description: "Stavens glödande spets slungar eld mot fienden.",
     target: "enemy",
     damageType: "fire",
-    damage: { kind: "weapon", multiplier: 1 },
+    damage: { kind: "weapon", multiplier: 0.8 },
     effects: [{ type: "burn", damage: 8, maxStacks: 5 }],
   },
   {
@@ -258,9 +258,9 @@ export const skills: Skill[] = [
     description: "Stoppa fiendens rörelser med en eld vägg.",
     target: "enemy",
     damageType: "fire",
-    damage: { kind: "weapon", multiplier: 0.5 },
+    damage: { kind: "weapon", multiplier: 0.2 },
     effects: [
-      { type: "stun", chance: 100, turns: 2 },
+      { type: "stun", chance: 100, turns: 1 },
       { type: "burn", damage: 8, maxStacks: 5 },
     ],
     cooldown: 5,

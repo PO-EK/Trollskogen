@@ -35,7 +35,7 @@ function TopBar() {
         </div>
       </div>
       <p className="top-bar-version">
-        Version 0.1.8 - 2026-11-10. Dag och Tid, nya quests och vapen. klart.
+        Version 0.9 - 2026-11-19. Huvuduppdraget nästan klart.
       </p>
     </header>
   );

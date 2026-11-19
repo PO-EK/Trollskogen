@@ -398,6 +398,13 @@ function Location({
         }));
         break;
 
+      case "upgradeBackpackHeight":
+        setPlayer((p) => ({
+          ...p,
+          BackpackHeight: p.BackpackHeight + 1,
+        }));
+        break;
+
       case "removeAllGold":
         setPlayer((p) => ({
           ...p,
@@ -462,12 +469,22 @@ function Location({
         break;
 
       case "removeItem":
-        setPlayer((p) => ({
-          ...p,
-          Inventory: p.Inventory.filter(
-            (item) => item.itemId !== effect.itemId,
-          ),
-        }));
+        setPlayer((p) => {
+          const itemIndex = p.Inventory.findIndex(
+            (item) => item.itemId === effect.itemId,
+          );
+          if (itemIndex === -1) {
+            return p;
+          }
+
+          return {
+            ...p,
+            Inventory: [
+              ...p.Inventory.slice(0, itemIndex),
+              ...p.Inventory.slice(itemIndex + 1),
+            ],
+          };
+        });
         break;
 
       case "addExperience":

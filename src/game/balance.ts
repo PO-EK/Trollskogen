@@ -8,10 +8,11 @@ export const DAMAGE_BONUS_PER_POINT = 0.12;
 // HP and mana gain a quadratic bonus from stat points above the baseline.
 export const HP_PER_CON_POINT = 5;
 export const HP_BONUS_PER_CON_POINT = 0.1;
+export const HP_PER_LEVEL = 6;
 
 // Dodge: 20% at Dex 10, approaching 75%. DODGE_HALF_POINT is how many Dex
 // points above 10 give half of the possible bonus.
-export const BASE_DODGE = 0.2;
+export const BASE_DODGE = 0.4;
 export const MAX_DODGE = 0.75;
 export const DODGE_HALF_POINT = 20;
 
@@ -27,9 +28,8 @@ export function getDodgeChance(dex: number): number {
 // Försvar at which incoming damage is halved.
 export const DEFENSE_HALF_POINT = 40;
 
-export const HP_PER_LEVEL = 6;
-export const MANA_PER_LEVEL = 5;
-
 // Mana scaling, independent from HP scaling.
-export const MANA_PER_INT_POINT = 4;
+export const MANA_PER_LEVEL = 3;
+
+export const MANA_PER_INT_POINT = 3;
 export const MANA_BONUS_PER_INT_POINT = 0.2;

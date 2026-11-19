@@ -18,11 +18,11 @@ export const chests = {
     height: 3,
     contents: ["diamond", "health_potion", "goldRing"],
   },
-  banditChest1: {
+  witchBanditStorageChest: {
     name: "Rövarnas kista",
-    width: 4,
+    width: 6,
     height: 4,
-    contents: [],
+    contents: ["battle_axe", "ruby", "health_potion", "goldRing"],
   },
   banditChest2: {
     name: "Rövarnas kista",
