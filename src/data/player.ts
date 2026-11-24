@@ -85,6 +85,79 @@ export type Player = {
   KnownSkills: string[]; // spells/skills the player has learned
 };
 
+export const PLAYER_SAVE_VERSION = 1;
+
+type PlayerSave = {
+  version: number;
+  savedAt: string;
+  player: Player;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function serializePlayerSave(player: Player): string {
+  const save: PlayerSave = {
+    version: PLAYER_SAVE_VERSION,
+    savedAt: new Date().toISOString(),
+    player,
+  };
+  return JSON.stringify(save, null, 2);
+}
+
+export function deserializePlayerSave(json: string): Player {
+  const parsed: unknown = JSON.parse(json);
+  if (!isRecord(parsed) || parsed.version !== PLAYER_SAVE_VERSION) {
+    throw new Error("Save-filen har ett ogiltigt eller gammalt format.");
+  }
+  if (!isRecord(parsed.player)) {
+    throw new Error("Save-filen innehåller ingen giltig spelardata.");
+  }
+
+  const player = parsed.player;
+  const requiredNumbers = [
+    "day",
+    "ActionPoints",
+    "Gold",
+    "Level",
+    "Exp",
+    "ExpMax",
+    "SkillPoints",
+    "Str",
+    "Dex",
+    "DodgeChance",
+    "Con",
+    "Int",
+    "HP",
+    "HPMax",
+    "Mana",
+    "ManaMax",
+    "BackpackWidth",
+    "BackpackHeight",
+  ];
+
+  if (
+    typeof player.Name !== "string" ||
+    requiredNumbers.some((key) => typeof player[key] !== "number") ||
+    !Array.isArray(player.LearnedNodes) ||
+    !Array.isArray(player.EquippedSkills) ||
+    !Array.isArray(player.Inventory) ||
+    !isRecord(player.Equipment) ||
+    !isRecord(player.Chests) ||
+    !Array.isArray(player.Quests) ||
+    !isRecord(player.StoryFlags) ||
+    !Array.isArray(player.ScheduledStoryFlags) ||
+    !Array.isArray(player.UnlockedLocations) ||
+    !Array.isArray(player.LockedLocations) ||
+    !Array.isArray(player.KnownSkills)
+  ) {
+    throw new Error("Save-filen saknar obligatorisk spelardata.");
+  }
+
+  return player as unknown as Player;
+}
+
 export type QuestState = {
   questId: string;
   completed: boolean;
@@ -99,8 +172,8 @@ export const createNewPlayer = (): Player => {
     Gold: 31,
 
     Level: 1,
-    Exp: 11,
-    ExpMax: 75,
+    Exp: 15,
+    ExpMax: 125,
     SkillPoints: 1,
     LearnedNodes: [],
 
@@ -135,7 +208,7 @@ export const createNewPlayer = (): Player => {
     LockedLocations: locations
       .filter((location) => location.initialState === "locked")
       .map((location) => location.id),
-    KnownSkills: ["godRay"],
+    KnownSkills: [],
   };
 
   player = addItemToInventory(player, "bandage", "startBandage");

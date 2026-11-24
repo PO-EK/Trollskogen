@@ -41,13 +41,30 @@ export const quests: QuestDefinition[] = [
         completedFlag: "mainstory.runes.copied",
       },
       {
-        text: "Återvänd till Melander så att hon kan tyda runorna.",
+        text: "Ge de avskrivna runorna till Melander.",
+        completedFlag: "mainstory.runes.handedIn",
+      },
+      {
+        text: "Återvänd till Melander i morgon, när hon har tytt runorna.",
         completedFlag: "mainstory.runes.deciphered",
+      },
+      {
+        text: "Hitta rövarnas läger.",
+        completedFlag: "mainstory.banditCamp.found",
+      },
+      {
+        text: "Besegra rövarhövdingen.",
+        completedFlag: "mainstory.banditChief.defeated",
+      },
+      {
+        text: "Återvänd till Melander.",
+        completedFlag: "mainstory.shadow.reported",
       },
     ],
     startedFlag: "mainstory.shadow.started",
     completedFlag: "mainstory.shadow.complete",
-    completedText: "[PLATSHÅLLARE: skrivs när questet fortsätter.]",
+    completedText:
+      "Skuggan är förseglad i Melanders ring, som hon förvarar i ett låst skrin tills de hittar ett mer permanent lösning.",
   },
   // nyckeln till kistan
   {

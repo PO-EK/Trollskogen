@@ -113,9 +113,9 @@ export const enemies = {
     name: "Rövarhövding",
     description:
       "Rövarnas hårdföra ledare, märkt av många strider och redo att försvara sitt byte.",
-    hp: 240,
-    minDamage: 30,
-    maxDamage: 46,
+    hp: 540,
+    minDamage: 20,
+    maxDamage: 26,
     skills: ["slash_quick", "rally", "harden"],
     resistances: {
       ...neutralResistances,
@@ -123,9 +123,9 @@ export const enemies = {
       crushing: 0.75,
     },
     isBoss: true,
-    exp: 125,
+    exp: 265,
     gold: 212,
-    loot: [],
+    loot: [drop("battle_axe", 1), drop("sapphire", 1), drop("diamond", 1)],
   },
 
   // ==========================================

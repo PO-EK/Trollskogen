@@ -35,6 +35,21 @@
   color: #f3e5c1;
 }
 
+.top-bar-save-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.top-bar-save-actions button {
+  min-height: 32px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.top-bar-load-input {
+  display: none;
+}
+
 .action-points {
   display: flex;
   align-items: center;

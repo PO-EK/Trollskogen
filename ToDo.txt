@@ -16,8 +16,8 @@ Combat Engine - Klart
 Disable Right-Click + Select - Klart
 Level up - Klart
 Skill Tree - Klart
-
 Quest tracking - Klart
+Save and Load - Klart
 
 Quests/Story Locations:
 
@@ -25,21 +25,4 @@ Intro - Klart
 Ruins - Klart
 Smeden - Klart
 Värdhuset - Klart
-Häxan
-
-Enemies Stats + Art:
-
-Rövare - Klart
-Spejare - Klart
-Legoknäckt - Klart
-Rövarhövding
-
-Järv
-Varg - Klart
-Vildgalt
-Brjörn
-
-Vättar
-Myling
-Skogsrå
-Troll
+Häxan- Klart

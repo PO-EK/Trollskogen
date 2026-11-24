@@ -45,6 +45,62 @@ export const witchCottage: Record<string, AdventureNode> = {
     text: "Du kliver in i stugan. Värmen och doften av örter och rök slår emot dig. Melander står böjd över en stor kittel som puttrar och bubblar och rör i den med en lång träslev. Hon nickar åt dig utan att se upp. 'Så, vad vill du?'",
     choices: [
       {
+        text: "Skuggan är besegrad.",
+        nextNodeId: "witchShadowReturn1",
+        condition: [
+          { type: "storyFlag", flag: "mainstory.shadow.sealed", value: true },
+          {
+            type: "storyFlag",
+            flag: "mainstory.shadow.reported",
+            value: false,
+          },
+        ],
+      },
+      {
+        text: "Fråga vad runorna säger.",
+        nextNodeId: "witchRunesTold1",
+        condition: [
+          { type: "storyFlag", flag: "mainstory.runes.ready", value: true },
+          {
+            type: "storyFlag",
+            flag: "mainstory.runes.deciphered",
+            value: false,
+          },
+        ],
+      },
+      {
+        text: "Angående rövarna...",
+        nextNodeId: "witchBanditReminder",
+        condition: [
+          {
+            type: "storyFlag",
+            flag: "mainstory.runes.deciphered",
+            value: true,
+          },
+          {
+            type: "storyFlag",
+            flag: "mainstory.banditChief.defeated",
+            value: false,
+          },
+        ],
+      },
+      {
+        text: "Jag har skrivit av runorna.",
+        nextNodeId: "witchRunesGive1",
+        condition: [
+          { type: "storyFlag", flag: "mainstory.runes.copied", value: true },
+          { type: "storyFlag", flag: "mainstory.runes.handedIn", value: false },
+        ],
+      },
+      {
+        text: "Hur går det med runorna?",
+        nextNodeId: "witchRunesWait",
+        condition: [
+          { type: "storyFlag", flag: "mainstory.runes.handedIn", value: true },
+          { type: "storyFlag", flag: "mainstory.runes.ready", value: false },
+        ],
+      },
+      {
         text: "Fråga vad ni fick ut av älvorna.",
         nextNodeId: "witchLostKnowledge1",
         condition: [
@@ -1111,5 +1167,145 @@ export const witchCottage: Record<string, AdventureNode> = {
     id: "witchRunesReminder",
     text: "Melander tittar upp från boken. 'Du har sett den där stora stenen med runor ute i skogen. Det är den vi behöver. Skriv av runorna så exakt du kan, och kom tillbaka till mig.'",
     choices: [{ text: "Tillbaka.", nextNodeId: "start" }],
+  },
+  witchRunesGive1: {
+    id: "witchRunesGive1",
+    text: "Du lägger pappren på bordet framför Melander. Hon lägger ifrån sig sin bok och drar dem närmare, och hennes mörka ögon följer varje linje. Hon säger ingenting på en lång stund. Fingret rör sig över symbolerna, långsamt, som om hon kände igen dem på känsel.\n\n'Noggrant,' mumlar hon. 'Mycket noggrant. Du har inte tagit en enda genväg.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesGive2" }],
+  },
+
+  witchRunesGive2: {
+    id: "witchRunesGive2",
+    text: "Du berättar om rövaren som dök upp i gläntan, om hövdingens order att leta upp och förstöra varje runsten, och om att han attackerade dig. Melander lyssnar utan att avbryta, och rynkan i pannan blir djupare.\n\n'Förstöra dem.' Hon ser på pappren, sedan på dig. 'Då är det ännu viktigare att jag skyndar mig. Någon vill inte att det här ska hittas.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesGive3" }],
+  },
+
+  witchRunesGive3: {
+    id: "witchRunesGive3",
+    text: "Hon reser sig och går till bokhyllan, drar ut tre tjocka böcker och lägger dem på bordet bredvid pappren. 'Det här är ett gammalt språk,' säger hon. 'Inte något som någon talar nu. Några av tecknen känner jag igen, andra inte, och några ser ut som att de har ändrat betydelse med tiden. Gammal skrift är som en gammal vän. Den svarar när den vill.'\n\nHon slår sig ned igen och drar fram en penna. 'Det kommer ta tid. Gå hem och vila, du har gjort ditt. Kom tillbaka i morgon, så berättar jag vad jag har hittat.'",
+    choices: [
+      {
+        text: "Jag kommer tillbaka i morgon.",
+        nextNodeId: "start",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.runes.handedIn",
+            value: true,
+          },
+          {
+            type: "scheduleStoryFlag",
+            flag: "mainstory.runes.ready",
+            days: 1,
+          },
+        ],
+      },
+    ],
+  },
+
+  witchRunesWait: {
+    id: "witchRunesWait",
+    text: "Melander sitter böjd över pappren, omgiven av öppna böcker, och hon tittar knappt upp. 'Inte klar än,' säger hon, med pennan i handen. 'Några tecken vill inte ge med sig. Kom tillbaka i morgon.'",
+    choices: [{ text: "Tillbaka.", nextNodeId: "start" }],
+  },
+
+  witchRunesTold1: {
+    id: "witchRunesTold1",
+    text: "Melander sitter vid bordet när du kommer in. Ljuset bredvid henne har brunnit ned till en stump, och pappren runt henne är täckta av anteckningar i hennes smala handstil. Hon ser trött ut, men det glimmar i hennes ögon.\n\n'Du är tillbaka,' säger hon. 'Bra. Sätt dig.'\n\nHon lägger handen på de avskrivna runorna. 'Det du hittade beskriver ritualen. Steg för steg, och med det rätta namnet. Och det står hur de förseglade skuggan i ett träd, djupt inne i skogen.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesTold2" }],
+  },
+
+  witchRunesTold2: {
+    id: "witchRunesTold2",
+    text: "'Och nu tillbaka till rövarna.' Hon lutar sig fram. 'Varför skulle de leta igenom skogen efter runstenar, för att förstöra dem? Jag kan bara komma på en förklaring. De har redan hittat det de egentligen letade efter. Trädet.'\n\nHon knackar med fingret mot bordet. 'Jag tror att de högg ned det, utan att förstå vad det höll. Och nu försöker de utplåna allt som kan visa vad de gjorde.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesTold3" }],
+  },
+
+  witchRunesTold3: {
+    id: "witchRunesTold3",
+    text: "'Du borde leta upp deras läger,' säger Melander. 'Du vet redan att de håller till ute i skogen. Jag har ritat en ungefärlig plats åt dig.' Hon skjuter över ett sönderrivet papper med en kort skiss. 'Titta om det finns någon där som verkar onaturlig. Någon som har blivit övertagen.'\n\nDu frågar vad hon menar. 'En skugga som släpps fri har ingen kropp,' säger hon. 'Den behöver någon att bära den. Och den som bär den ser ut, tänker och beter sig inte som vanligt.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesTold4" }],
+  },
+
+  witchRunesTold4: {
+    id: "witchRunesTold4",
+    text: "Hon tar något ur fickan och lägger det i din hand. En enkel ring av mörkt silver, med runor inristade på insidan, så små att du knappt kan se dem.\n\n'Jag har gjort den under natten. Om du hittar skuggan kan du låsa in den i ringen. Men inte så länge den har en kropp att gömma sig i.' Hon ser på dig, allvarlig nu. 'Besegrar du den, kommer den att leta efter en ny kropp. Och den väljer nog dig.'\n\nDu ser på ringen. 'Det är en fälla,' fortsätter hon. 'När den försöker ta dig, blir den förseglad i stället. Men det betyder att du är betet. Jag ska inte ljuga för dig, det är en risk.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchRunesTold5" }],
+  },
+
+  witchRunesTold5: {
+    id: "witchRunesTold5",
+    text: "Du trär ringen på fingret. Den sitter som om den var gjord för dig, och den är kall mot huden.\n\n'Bär den hela tiden,' säger Melander. 'Och kom tillbaka till mig när det är gjort. Sedan måste vi komma på var vi kan gömma den, så att ingen någonsin hittar den.'",
+    choices: [
+      {
+        text: "Jag tar tag i det.",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.runes.deciphered",
+            value: true,
+          },
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.shadow.vesselGiven",
+            value: true,
+          },
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.banditCamp.found",
+            value: true,
+          },
+          { type: "unlockLocation", locationId: "banditCamp" },
+          { type: "endAdventure" },
+        ],
+      },
+    ],
+  },
+
+  witchBanditReminder: {
+    id: "witchBanditReminder",
+    text: "Melander tittar upp från sina anteckningar. 'Rövarnas läger. Leta efter någon som inte är sig själv, och besegra honom. Ringen ska du bära hela tiden. Sedan kommer du tillbaka hit.' Hon tystnar. 'Var försiktig.'",
+    choices: [{ text: "Tillbaka.", nextNodeId: "start" }],
+  },
+
+  witchShadowReturn1: {
+    id: "witchShadowReturn1",
+    text: "Melander går fram och tillbaka över golvet, med händerna knutna framför sig, och hon verkar ha gjort det länge. \n\nHon ser inte lättad ut att se dig. I stället betraktar hon dig allvarligt, noggrant, från topp till tå.\n\n'Här, ta emot,' säger hon, och kastar något till dig.\n\nDu fångar det i luften och ser efter vad det är. Det är en gammal rostig spik.",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchShadowReturn2" }],
+  },
+
+  witchShadowReturn2: {
+    id: "witchShadowReturn2",
+    text: "Du tittar förvirrat på henne och tackar för spiken.\n\nMelanders axlar sjunker, och för första gången sedan du kom in ser hon lättad ut. 'Gjutjärn,' säger hon. 'Älvor kan inte röra vid det utan att brännas. Du höll i den utan att dra undan handen.' Hon andas ut. 'Jag är glad att du inte blev övertagen av skuggan.'\n\nHon skyndar över golvet och hämtar en liten tygpåse, som verkar tom. 'Här. För ringen.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchShadowReturn3" }],
+  },
+
+  witchShadowReturn3: {
+    id: "witchShadowReturn3",
+    text: "Du drar av dig ringen. Den är fortfarande kall mot huden, och den väger mer än den borde. Du lägger den i påsen, och Melander knyter igen den med ett hårt knyck. Hon lägger påsen i ett litet träskrin, som en liten kista, och vrider om nyckeln i låset.\n\n'Jag måste hålla uppsikt över det här,' mumlar hon, 'tills vi kan komma på ett mer permanent gömställe.'",
+    choices: [{ text: "Fortsätt.", nextNodeId: "witchShadowReturn4" }],
+  },
+
+  witchShadowReturn4: {
+    id: "witchShadowReturn4",
+    text: "Hon ställer skrinet på hyllan bland burkarna och vänder sig mot dig. Något i hennes ansikte mjuknar, och den skarpa blicken blir nästan varm.\n\n'Du har gjort något som ingen annan hade vågat,' säger hon. 'Hjältedåd, det skulle de kalla det i byn. Jag kallar det modigt, och dumdristigt, och precis vad den här skogen behövde.'\n\nHon slår sig ned vid kitteln och tar sleven i handen igen. 'Om du behöver något, så finns jag här.'",
+    choices: [
+      {
+        text: "Tack, Melander.",
+        nextNodeId: "start",
+        effects: [
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.shadow.reported",
+            value: true,
+          },
+          {
+            type: "setStoryFlag",
+            flag: "mainstory.shadow.complete",
+            value: true,
+          },
+        ],
+      },
+    ],
   },
 };
