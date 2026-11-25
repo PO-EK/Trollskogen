@@ -52,6 +52,34 @@
   margin: 0;
 }
 
+.location-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+  color: wheat;
+  font-family: Georgia, serif;
+  text-align: center;
+}
+
+.location-input-form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #8c6b3e;
+  border-radius: 4px;
+  background: #17130e;
+  color: #fff3d4;
+  font: inherit;
+  cursor: text;
+}
+
+.location-input-form input::placeholder {
+  color: #b8a98b;
+}
+
 .location-choice {
   box-sizing: border-box;
   width: 100%;

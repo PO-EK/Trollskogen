@@ -10,7 +10,11 @@ import {
   MANA_BONUS_PER_INT_POINT,
   getDodgeChance,
 } from "../game/balance";
-import { addItemToChest, addItemToInventory } from "../game/inventory";
+import {
+  addItemToChest,
+  addItemToContainer,
+  addItemToInventory,
+} from "../game/inventory";
 import { equippedItem } from "../game/equipment";
 import { locations } from "./locations";
 
@@ -165,16 +169,16 @@ export type QuestState = {
 
 export const createNewPlayer = (): Player => {
   let player: Player = {
-    Name: "Admin",
+    Name: "Soldaten",
     day: 1,
     ActionPoints: DAILY_ACTION_POINTS,
 
-    Gold: 31,
+    Gold: 42,
 
     Level: 1,
-    Exp: 15,
-    ExpMax: 125,
-    SkillPoints: 1,
+    Exp: 0,
+    ExpMax: 100,
+    SkillPoints: 0,
     LearnedNodes: [],
 
     Str: playerStr,
@@ -212,9 +216,12 @@ export const createNewPlayer = (): Player => {
   };
 
   player = addItemToInventory(player, "bandage", "startBandage");
-  player = addItemToInventory(player, "storageKey", "playerKey");
-  player = equippedItem(player, "wooden_club", "starterSword");
-
+  player = addItemToChest(
+    player,
+    "playerStorage",
+    "iron_sword",
+    "starterSword",
+  );
   for (const [chestId, definition] of Object.entries(chests)) {
     for (const itemId of definition.contents) {
       player = addItemToChest(player, chestId, itemId);

@@ -6,6 +6,61 @@
   min-width: 0;
 }
 
+.main-menu {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at center, rgba(69, 54, 35, 0.8), transparent 68%),
+    #17130e;
+  color: #fff3d4;
+}
+
+.main-menu h1 {
+  margin: 0;
+  color: #e8d7b0;
+  font-family: Georgia, serif;
+}
+
+.main-menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(260px, 100%);
+}
+
+.main-menu-actions button {
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 2px solid #8c6b3e;
+  border-radius: 4px;
+  background: #211a12;
+  color: #fff3d4;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.main-menu-actions button:hover {
+  background: #30261b;
+  border-color: #c09a5b;
+}
+
+.main-menu-load-input {
+  display: none;
+}
+
+.main-menu-error {
+  max-width: min(500px, 100%);
+  color: #ffb3a7;
+}
+
 .top-bar {
   min-height: 50px;
   display: flex;

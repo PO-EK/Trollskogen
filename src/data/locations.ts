@@ -37,12 +37,12 @@ export const locations: MapLocation[] = [
   {
     id: "intro",
     mapId: "village",
-    name: "Spela intro igen",
-    initialState: "unlocked",
-    x: 10,
-    y: 10,
+    name: "Skuggan över Trollskogen",
+    initialState: "hidden",
+    x: 1,
+    y: 1,
     image: introScrollImage,
-    scale: 1,
+    scale: 0.1,
     adventureId: "intro",
   },
   {

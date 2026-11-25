@@ -66,13 +66,13 @@ export const playerHQ: Record<string, AdventureNode> = {
     text: "Kistan är av trä, förstärkt med tjocka metallband. Den ser tung och säker ut. \n\nDu provar att öppna den men den är låst. Du funderar på att bryta upp den men inser att kistan kan vara till använding om du hittar nyckeln.",
     choices: [
       {
-        text: "Börja leta efter en nyckeln",
+        text: "Börja leta efter nyckeln",
         condition: {
           type: "storyFlag",
           flag: "openStorageQuest.Started",
           value: false,
         },
-        nextNodeId: "start",
+        nextNodeId: "searchForStorageKey",
         effects: [
           {
             type: "setStoryFlag",
@@ -82,7 +82,7 @@ export const playerHQ: Record<string, AdventureNode> = {
         ],
       },
       {
-        text: "Prova den nyckel du har",
+        text: "Prova nyckeln",
         condition: [
           {
             type: "storyFlag",
@@ -96,11 +96,24 @@ export const playerHQ: Record<string, AdventureNode> = {
           { type: "removeItem", itemId: "storageKey" },
           { type: "setStoryFlag", flag: "unlockedStorage", value: true },
           { type: "openStorage" },
+          { type: "addExperience", amount: 18 },
         ],
       },
       {
         text: "Tillbaka",
         nextNodeId: "start",
+      },
+    ],
+  },
+
+  searchForStorageKey: {
+    id: "searchForStorageKey",
+    text: "Du börjar leta igenom den lilla stugan. Du tittar under den rangliga sängen, i de tomma skåpen och bakom spisen. Förutom damm och några gamla trasor hittar du inte mycket. Till sist känner du något kallt och tungt bakom en lös golvbräda: en stor järnnyckel.",
+    choices: [
+      {
+        text: "Ta nyckeln",
+        nextNodeId: "start",
+        effects: [{ type: "spawnLoot", itemId: "storageKey" }],
       },
     ],
   },

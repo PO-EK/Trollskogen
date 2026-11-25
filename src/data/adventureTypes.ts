@@ -14,6 +14,15 @@ export type AdventureNode = {
   id: string;
   text: string;
   choices: AdventureChoice[];
+  input?: AdventureNodeInput;
+};
+
+export type AdventureNodeInput = {
+  type: "playerName";
+  label: string;
+  placeholder: string;
+  submitText: string;
+  nextNodeId: string;
 };
 
 export type AdventureEncounter = {
@@ -60,6 +69,11 @@ export type AdventureEffect =
       insufficientGoldNodeId: string;
     }
   | { type: "addExperience"; amount: number }
+  | {
+      type: "increaseAttribute";
+      attribute: "Str" | "Dex" | "Int";
+      amount: number;
+    }
   | { type: "heal"; amount: number }
   | { type: "restoreMana"; amount: number }
   | { type: "removeActionPoints"; amount: number }

@@ -16,7 +16,7 @@ export const chests = {
     name: "Moders kista",
     width: 4,
     height: 3,
-    contents: ["diamond", "health_potion", "goldRing"],
+    contents: ["diamond", "health_potion", "wood_wand"],
   },
   witchBanditStorageChest: {
     name: "Rövarnas kista",

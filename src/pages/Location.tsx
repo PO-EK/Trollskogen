@@ -9,7 +9,11 @@ import {
   adventures,
   getRandomAdventureStartNodeId,
 } from "../data/places";
-import type { AdventureChoice, AdventureEffect } from "../data/adventureTypes";
+import type {
+  AdventureChoice,
+  AdventureEffect,
+  AdventureNodeInput,
+} from "../data/adventureTypes";
 import type { ContainerItem } from "../data/containerItems";
 import ItemGrid from "../components/inventory/ItemGrid";
 import type { ContainerType } from "../data/containerTypes";
@@ -17,6 +21,7 @@ import { performTransaction } from "../game/performTransaction";
 import type { CombatEncounter, CombatResult } from "../game/combatTypes";
 import { placeLoot } from "../game/lootPlacement";
 import {
+  adjustAttributeBonuses,
   recalculatePlayerStats,
   restorePlayerResources,
 } from "../game/characterStats";
@@ -103,6 +108,7 @@ function Location({
     return "start";
   });
   const [containerItems, setContainerItems] = useState<ContainerItem[]>([]);
+  const [nameDraft, setNameDraft] = useState("");
   const [activeContainer, setActiveContainer] =
     useState<ActiveLocationContainer | null>(null);
   const { setHoveredItem } = useItemHover();
@@ -313,6 +319,20 @@ function Location({
     });
   }
 
+  function handleNodeInput(input: AdventureNodeInput) {
+    const name = nameDraft.trim();
+    if (!name) {
+      return;
+    }
+
+    setPlayer((currentPlayer) => ({
+      ...currentPlayer,
+      Name: name,
+    }));
+    setNameDraft("");
+    setCurrentNodeId(input.nextNodeId);
+  }
+
   function handleEffect(effect: AdventureEffect) {
     switch (effect.type) {
       case "startRandomEncounter": {
@@ -489,6 +509,14 @@ function Location({
 
       case "addExperience":
         addExperience(effect.amount);
+        break;
+
+      case "increaseAttribute":
+        setPlayer((p) =>
+          adjustAttributeBonuses(p, [
+            { attribute: effect.attribute, amount: effect.amount },
+          ]),
+        );
         break;
 
       case "heal":
@@ -776,6 +804,7 @@ function Location({
     );
   const hasLootToCollect =
     activeContainer?.type === "loot" && containerItems.length > 0;
+  const nodeInput = currentNode.input;
 
   return (
     <div className="location">
@@ -789,6 +818,36 @@ function Location({
         </div>
 
         <div className="location-choices">
+          {nodeInput?.type === "playerName" && (
+            <form
+              className="location-input-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleNodeInput(nodeInput);
+              }}
+            >
+              <label htmlFor="location-player-name">
+                {nodeInput.label}
+              </label>
+              <input
+                id="location-player-name"
+                type="text"
+                value={nameDraft}
+                placeholder={nodeInput.placeholder}
+                autoComplete="nickname"
+                maxLength={24}
+                required
+                onChange={(event) => setNameDraft(event.target.value)}
+              />
+              <button
+                className="location-choice"
+                type="submit"
+                disabled={!nameDraft.trim()}
+              >
+                {nodeInput.submitText}
+              </button>
+            </form>
+          )}
           {currentNode.choices.filter(meetsCondition).map((choice) => (
             <button
               className="location-choice"
