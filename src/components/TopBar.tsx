@@ -33,7 +33,9 @@ function TopBar() {
       setPlayer(loadedPlayer);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Save-filen kunde inte laddas.";
+        error instanceof Error
+          ? error.message
+          : "Save-filen kunde inte laddas.";
       window.alert(message);
     } finally {
       if (loadInputRef.current) {
@@ -72,10 +74,7 @@ function TopBar() {
         <button type="button" onClick={saveGame}>
           Save
         </button>
-        <button
-          type="button"
-          onClick={() => loadInputRef.current?.click()}
-        >
+        <button type="button" onClick={() => loadInputRef.current?.click()}>
           Load
         </button>
         <input
@@ -92,7 +91,7 @@ function TopBar() {
         />
       </div>
       <p className="top-bar-version">
-        Version 1.0 - 2026-11-24. Skuggan över Trollskogen är klart.
+        Version 1.0 - 2026-11-25. Skuggan över Trollskogen är klart.
       </p>
     </header>
   );

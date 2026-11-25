@@ -10,12 +10,7 @@ import {
   MANA_BONUS_PER_INT_POINT,
   getDodgeChance,
 } from "../game/balance";
-import {
-  addItemToChest,
-  addItemToContainer,
-  addItemToInventory,
-} from "../game/inventory";
-import { equippedItem } from "../game/equipment";
+import { addItemToChest, addItemToInventory } from "../game/inventory";
 import { locations } from "./locations";
 
 export function getMaxHP(con: number): number {
@@ -173,7 +168,7 @@ export const createNewPlayer = (): Player => {
     day: 1,
     ActionPoints: DAILY_ACTION_POINTS,
 
-    Gold: 42,
+    Gold: 36,
 
     Level: 1,
     Exp: 0,
